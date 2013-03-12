@@ -134,8 +134,10 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow["OriginalSequence"] = peptideSeq;
             drow["BestSequence"] = peptideSeq;
             drow["PeptideScore"] = "" + pScore;
-            int check = positionList.Count(i => positionList[i] > 0);
-			if (positionList.Count(i => i > 0) == 0)
+
+			int nonZeroItemCount = (from item in positionList where item > 0 select item).Count();
+
+			if (nonZeroItemCount == 0)
 			{
                 drow["AScore"] = "-1";
                
