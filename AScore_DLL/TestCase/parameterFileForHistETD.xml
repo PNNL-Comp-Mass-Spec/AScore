@@ -1,0 +1,58 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<Run>
+<FragmentType>ETD</FragmentType>
+<MassTolerance>0.05</MassTolerance>
+<Threads>3</Threads>
+
+<Modifications>
+	
+	<StaticSeqModifications>
+		<Mod1>
+			<MassMonoIsotopic>57.0215</MassMonoIsotopic>
+			<PossibleModSites>
+				<Pos1>C</Pos1>
+			</PossibleModSites>
+			<UniqueID>10</UniqueID>
+		</Mod1>
+	</StaticSeqModifications>
+	
+	<DynamicModifications>
+		<Mod1>
+			<MassMonoIsotopic>28.0314</MassMonoIsotopic>
+			<ModificationSymbol>#</ModificationSymbol>
+			<PossibleModSites>
+				<Pos1>R</Pos1>
+				<Pos2>K</Pos2>
+			</PossibleModSites>
+			<UniqueID>1</UniqueID>
+		</Mod1>
+		<Mod2>
+			<MassMonoIsotopic>14.0157</MassMonoIsotopic>
+			<ModificationSymbol>*</ModificationSymbol>
+			<PossibleModSites>
+				<Pos1>R</Pos1>
+				<Pos2>K</Pos2>
+			</PossibleModSites>
+			<UniqueID>2</UniqueID>
+		</Mod2>
+		<Mod3>
+			<MassMonoIsotopic>42.0106</MassMonoIsotopic>
+			<ModificationSymbol>@</ModificationSymbol>
+			<PossibleModSites>
+				<Pos1>K</Pos1>
+			</PossibleModSites>
+			<UniqueID>3</UniqueID>
+		</Mod3>
+		<Mod4>
+			<MassMonoIsotopic>79.9799</MassMonoIsotopic>
+			<ModificationSymbol>^</ModificationSymbol>
+			<PossibleModSites>
+				<Pos1>S</Pos1>
+				<Pos2>T</Pos2>
+				<Pos3>Y</Pos3>
+			</PossibleModSites>
+			<UniqueID>4</UniqueID>
+		</Mod4>
+	</DynamicModifications>
+</Modifications>
+</Run>

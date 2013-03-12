@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<Run>
+<FragmentType>
+CID
+</FragmentType>
+<MassTolerance>
+0.5
+</MassTolerance>
+<Threads>
+1
+</Threads>
+
+<Modifications>
+	
+	<StaticSeqModifications>
+		<Mod1>
+			<MassMonoIsotopic>57.0215</MassMonoIsotopic>
+			<PossibleModSites>
+				<Pos1>C</Pos1>
+			</PossibleModSites>
+			<UniqueID>1</UniqueID>
+		</Mod1>
+		<Mod2>
+			<MassMonoIsotopic>304.2022</MassMonoIsotopic>
+			<PossibleModSites>
+				<Pos1>K</Pos1>
+			</PossibleModSites>
+			<UniqueID>2</UniqueID>
+		</Mod2>
+			
+	</StaticSeqModifications>
+	
+	<DynamicModifications>
+		<Mod1>
+			<MassMonoIsotopic>79.9799</MassMonoIsotopic>
+			<ModificationSymbol>*</ModificationSymbol>
+			<PossibleModSites>
+				<Pos1>S</Pos1>
+				<Pos2>T</Pos2>
+				<Pos3>Y</Pos3>
+			</PossibleModSites>
+			<UniqueID>3</UniqueID>
+		</Mod1>
+	</DynamicModifications>
+	<TerminiModifications>
+		<Mod1>
+			<MassMonoIsotopic>304.2022</MassMonoIsotopic>
+			<Nterm>true</Nterm>
+			<UniqueID>4</UniqueID>
+		</Mod1>	
+	</TerminiModifications>
+	
+</Modifications>
+</Run>

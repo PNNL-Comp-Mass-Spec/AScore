@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <StartArguments>-T:msgfdb -O:"C:\Users\aldr699\Documents\2012\iTRAQ\SandovalWork\extracted_results_ascore.txt" -F:"\\protoapps\DataPkgs\Public\2012\585_CPTAC_OVC_4timepoint_phospho_MSGFDB\ITQ201208031456_Auto865781\Step_1_AScore\extracted_results.txt" -D:"\\protoapps\DataPkgs\Public\2012\585_CPTAC_OVC_4timepoint_phospho_MSGFDB\ITQ201208031456_Auto865781\Step_1_AScore\CPTAC_OvC_JB5427_iTRAQ_NiNTA_02_4Apr12_Lynx_12-02-31_dta.txt" -P:"\\protoapps\DataPkgs\Public\2012\585_CPTAC_OVC_4timepoint_phospho_MSGFDB\ITQ201208031456_Auto865781\Step_1_AScore\DynPhos_stat_4plex_iodo_hcd.xml"</StartArguments>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PublishUrlHistory />
+    <InstallUrlHistory />
+    <SupportUrlHistory />
+    <UpdateUrlHistory />
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+</Project>
