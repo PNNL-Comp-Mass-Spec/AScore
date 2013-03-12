@@ -111,7 +111,7 @@ namespace AScore_DLL
 				case 'W': return Tryptophan;
 				case 'Y': return Tyrosine;
 				case 'V': return Valine;
-				default: return -1.0;
+				default: return 0.0;
 			}
 		}
 
