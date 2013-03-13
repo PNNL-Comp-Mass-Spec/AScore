@@ -21,7 +21,36 @@ namespace AScore_DLL.Mod
 		public int UniqueID { get; set; }
 		public MassType ModMassType { get; set; }
 
+		// nTerminus and cTerminus are used by both static and dynamic mods to indicate whether the mod affects the N-terminus or the C-terminus
+		public bool nTerminus { get; set; }
+		public bool cTerminus { get; set; }
 
+		/// <summary>
+		/// Default constructor
+		/// </summary>
+		public Modification()
+		{
+		}
+
+		/// <summary>
+		/// Constructor whose source is a dynamic mod entry
+		/// </summary>
+		public Modification(Modification itemToCopy)
+		{
+			this.CopyFrom(itemToCopy);
+		}
+
+		protected void CopyFrom(Modification itemToCopy)
+		{
+			this.MassMonoisotopic = itemToCopy.MassMonoisotopic;
+			this.MassAverage = itemToCopy.MassAverage;
+			this.ModSymbol = itemToCopy.ModSymbol;
+			this.PossibleModSites = itemToCopy.PossibleModSites;
+			this.UniqueID = itemToCopy.UniqueID;
+			this.ModMassType = itemToCopy.ModMassType;
+			this.nTerminus = itemToCopy.nTerminus;
+			this.cTerminus = itemToCopy.cTerminus;
+		}
 
 		public double Mass
 		{
@@ -49,7 +78,7 @@ namespace AScore_DLL.Mod
 			}
 			foreach (char p in PossibleModSites)
 			{
-				if (p==' ' || c == p)
+				if ( p == ' ' || c == p)
 				{
 					return true;
 				}

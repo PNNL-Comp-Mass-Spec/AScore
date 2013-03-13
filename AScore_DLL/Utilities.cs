@@ -44,6 +44,7 @@ namespace AScore_DLL
 					// it's empty, that's an error   
 					throw new ApplicationException("The data provided is not in a valid format.");
 				}
+
 				// fill the rest of the table; positional   
 				while ((line = sr.ReadLine()) != null)
 				{

@@ -44,11 +44,16 @@ namespace AScore_DLL.Managers
 		}
 
 		/// <summary>
-		/// Gets the precursor mass
+		/// Gets the precursor mass (M+H value)
 		/// </summary>
 		public double PrecursorMass
 		{
 			get { return precursorMass; }
+		}
+
+		public double PrecursorNeutralMass
+		{
+			get { return PHRPReader.clsPeptideMassCalculator.ConvoluteMass(precursorMass, 1, 0); }
 		}
 
 		/// <summary>

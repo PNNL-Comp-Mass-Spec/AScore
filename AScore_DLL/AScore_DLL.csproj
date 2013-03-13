@@ -85,8 +85,8 @@
     <Compile Include="Managers\ExperimentalSpectra.cs" />
     <Compile Include="Managers\ExperimentalSpectraEntry.cs" />
     <Compile Include="Managers\SpectraManager.cs" />
+    <Compile Include="MessageEventBase.cs" />
     <Compile Include="Mod\DynamicModification.cs" />
-    <Compile Include="Mod\TerminiModification.cs" />
     <Compile Include="Combinatorics\Permutations.cs" />
     <Compile Include="Combinatorics\SmallPrimeUtility.cs" />
     <Compile Include="Managers\ParameterFileManager.cs" />

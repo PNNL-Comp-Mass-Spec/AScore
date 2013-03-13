@@ -111,7 +111,9 @@ namespace AScore_DLL
 				case 'W': return Tryptophan;
 				case 'Y': return Tyrosine;
 				case 'V': return Valine;
-				default: return 0.0;
+				default: 
+					// Unrecognized character (or a symbol)
+					return 0;
 			}
 		}
 
@@ -130,7 +132,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 71.0779;
 					case MassType.Monoisotopic: return 71.037114;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -146,7 +148,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 156.1857;
 					case MassType.Monoisotopic: return 156.10111;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -162,7 +164,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 114.1026;
 					case MassType.Monoisotopic: return 114.04293;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -178,7 +180,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 115.0874;
 					case MassType.Monoisotopic: return 115.02694;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -194,7 +196,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 103.1429;
 					case MassType.Monoisotopic: return 103.00919;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -210,7 +212,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 129.11400;
 					case MassType.Monoisotopic: return 129.04259;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -226,7 +228,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 128.12920;
 					case MassType.Monoisotopic: return 128.05858;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -242,7 +244,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 57.05130;
 					case MassType.Monoisotopic: return 57.021464;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -258,7 +260,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 137.13930;
 					case MassType.Monoisotopic: return 137.05891;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -274,7 +276,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 113.15760;
 					case MassType.Monoisotopic: return 113.08406;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -290,7 +292,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 113.1576;
 					case MassType.Monoisotopic: return 113.08406;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -306,7 +308,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 128.1723;
 					case MassType.Monoisotopic: return 128.09496;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -322,7 +324,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 131.1961;
 					case MassType.Monoisotopic: return 131.04048;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -338,7 +340,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 147.1739;
 					case MassType.Monoisotopic: return 147.06841;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -354,7 +356,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 97.1152;
 					case MassType.Monoisotopic: return 97.052764;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -370,7 +372,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 87.0773;
 					case MassType.Monoisotopic: return 87.032029;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -386,7 +388,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 101.1039;
 					case MassType.Monoisotopic: return 101.04768;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -402,7 +404,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 186.2099;
 					case MassType.Monoisotopic: return 186.07931;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -418,7 +420,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 163.1733;
 					case MassType.Monoisotopic: return 163.06333;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -434,7 +436,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 99.13110;
 					case MassType.Monoisotopic: return 99.068414;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -484,7 +486,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 1.0072765;
 					case MassType.Monoisotopic: return 1.0072765;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -500,7 +502,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 18.0153214;
 					case MassType.Monoisotopic: return 18.0105633;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -517,7 +519,7 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 17.03065;
 					case MassType.Monoisotopic: return 17.026547;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
@@ -533,11 +535,12 @@ namespace AScore_DLL
 				{
 					case MassType.Average: return 16.02267;
 					case MassType.Monoisotopic: return 16.0187224;
-					default: return -1.0;
+					default: return 0;
 				}
 			}
 		}
 
 		#endregion // Molecular Weights
 	}
+
 }

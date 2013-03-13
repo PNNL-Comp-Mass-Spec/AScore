@@ -34,7 +34,9 @@ namespace AScore_DLL
 				DatasetManager datasetMan = new SequestFHT(myFht);
 				DtaManager dtaManager = new DtaManager(myDta);
 				ParameterFileManager paramFile = new ParameterFileManager(parFile);
-				Algorithm.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+
+				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
 
 			}
 		}
@@ -50,7 +52,8 @@ namespace AScore_DLL
             DtaManager dta = new DtaManager(mydta);
             ParameterFileManager par = new ParameterFileManager(mypar);
             string fileOutput = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt_ascore.txt";
-            Algorithm.AlgorithmRun(dta,dataman,par, fileOutput);
+			AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+			ascoreEngine.AlgorithmRun(dta, dataman, par, fileOutput);
 
         }
         [Test]
@@ -93,7 +96,8 @@ namespace AScore_DLL
                 DatasetManager datasetMan = new MsgfdbFHT(datasetname[i]);
                 DtaManager dtaManager = new DtaManager(dtaname[i]);
                 ParameterFileManager paramFile = new ParameterFileManager(ascParam[i]);
-                Algorithm.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
             }
 
         }
@@ -133,7 +137,8 @@ namespace AScore_DLL
 				DatasetManager datasetMan = new SequestFHT(datasetname[i]);
 				DtaManager dtaManager = new DtaManager(dtaname[i]);
 				ParameterFileManager paramFile = new ParameterFileManager(ascParam[i]);
-				Algorithm.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
 			}
 
 
@@ -157,7 +162,8 @@ namespace AScore_DLL
 				DatasetManager datasetMan = new SequestFHT(datasetname[i]);
 				DtaManager dtaManager = new DtaManager(dtaname[i]);
 				ParameterFileManager paramFile = new ParameterFileManager(ascParam[i]);
-				Algorithm.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
 			}
 
 
@@ -181,7 +187,8 @@ namespace AScore_DLL
 				DatasetManager datasetMan = new SequestFHT(datasetname[i]);
 				DtaManager dtaManager = new DtaManager(dtaname[i]);
 				ParameterFileManager paramFile = new ParameterFileManager(ascParam[i]);
-				Algorithm.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
 			}
 
 
@@ -276,7 +283,8 @@ namespace AScore_DLL
 				DtaManager dtman = new DtaManager(tempdta);
 				ParameterFileManager pman = new ParameterFileManager(ascP);
 
-				Algorithm.AlgorithmRun(dtman, dsman, pman, tempout);
+				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
 
 			}
 
@@ -333,7 +341,8 @@ namespace AScore_DLL
                 DtaManager dtman = new DtaManager(tempdta);
                 ParameterFileManager pman = new ParameterFileManager(ascP);
 
-                Algorithm.AlgorithmRun(dtman, dsman, pman, tempout);
+				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
 
             }
         }
@@ -352,8 +361,9 @@ namespace AScore_DLL
 
 
             System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
-           
-            Algorithm.AlgorithmRun(dtaman, dfht, pfile, @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase\TestMSGFFilter.txt");
+
+			AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+			ascoreEngine.AlgorithmRun(dtaman, dfht, pfile, @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase\TestMSGFFilter.txt");
 
             sw.Stop();
             Console.WriteLine("Time used (float): {0} ms", sw.Elapsed.TotalMilliseconds);
@@ -426,7 +436,8 @@ namespace AScore_DLL
                     DtaManager dtman = new DtaManager(tempdta);
                     ParameterFileManager pman = new ParameterFileManager(ascP);
 
-                    Algorithm.AlgorithmRun(dtman, dsman, pman, tempout);
+					AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+					ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
 
                 }
             }
@@ -507,7 +518,8 @@ namespace AScore_DLL
                     DtaManager dtman = new DtaManager(tempdta);
                     ParameterFileManager pman = new ParameterFileManager(ascP);
 
-                    Algorithm.AlgorithmRun(dtman, dsman, pman, tempout);
+					AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+					ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
 
                 }
             }

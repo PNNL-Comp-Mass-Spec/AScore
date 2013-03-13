@@ -10,7 +10,7 @@ namespace AScore_DLL.Managers
 	/// <summary>
 	/// Provides an interface to extract individual dta files from the master dta file
 	/// </summary>
-	public class DtaManager : AScore_DLL.Managers.SpectraManager
+	public class DtaManager : AScore_DLL.MessageEventBase, AScore_DLL.Managers.SpectraManager
 	{
 		#region Class Members
 
@@ -171,7 +171,7 @@ namespace AScore_DLL.Managers
 
 				if (precursorChargeState != dtaChargeState)
 				{
-					Console.WriteLine("\nCharge state mismatch: dtaChargeState=" + dtaChargeState + " vs. precursorChargeState=" + precursorChargeState);
+					ReportWarning("Charge state mismatch: dtaChargeState=" + dtaChargeState + " vs. precursorChargeState=" + precursorChargeState);
 					dtaChargeState = precursorChargeState;
 				}
 

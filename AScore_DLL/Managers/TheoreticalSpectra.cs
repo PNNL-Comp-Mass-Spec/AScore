@@ -19,38 +19,59 @@ namespace AScore_DLL.Managers
 		private double minRange = 0.0;
 		private double maxRange = 2000.0;
 		private int count;
+		private double peptideMassWithStaticMods = 0;
+
 		List<double> bIonsMass= new List<double>();
 		List<double> yIonsMass = new List<double>();
-		string fht;
+		string peptideSequence;							// Peptide sequence, without any mods
 
 		public int Count
 		{
 			get { return count; }
 		}
 
-		public TheoreticalSpectra(string fht, ParameterFileManager ascoreParameters, int chargeS, 
+		/// <summary>
+		/// Computed, theoretical mass of the peptide, including static mods but not including dynamic mods
+		/// </summary>
+		public double PeptideNeutralMassWithStaticMods
+		{
+			get { return peptideMassWithStaticMods; }
+		}
+
+		/// <summary>
+		/// Creates the theoretical mass spectrum for the given peptide
+		/// </summary>
+		/// <param name="sequenceClean">Clean sequence (no mod symbols)</param>
+		/// <param name="ascoreParameters"></param>
+		/// <param name="chargeS"></param>
+		/// <param name="moveMod"></param>
+		/// <param name="massType"></param>
+		/// <remarks>The theoretical mass spectrum takes into account static mods and static N-terminal mods.  It does not include dynamic mods</remarks>
+		public TheoreticalSpectra(string sequenceClean, ParameterFileManager ascoreParameters, int chargeS,
 			List<Mod.DynamicModification> moveMod, MassType massType)
 		{
 			chargeState = chargeS;
-			this.fht = fht;
+			this.peptideSequence = sequenceClean;
 			Calculate(chargeState, ascoreParameters, massType);
 		}
-
 		
-
-		private void GenerateIonMasses(List<Modification> staticMods,
-			List<TerminiModification> terminiMods)
+		/// <summary>
+		/// Generates the b and y ions for a peptide, including adding static mods but excluding dynamic mods
+		/// </summary>
+		/// <param name="staticMods"></param>
+		/// <param name="terminiMods"></param>
+		/// <returns>The peptide mass, including static modifications</returns>
+		private double GenerateIonMasses(List<Modification> staticMods,
+			List<Modification> terminiMods)
 		{
-			string peptideNoPmt = fht;
-
 
 			// Need to iterate through each amino acid in the peptide to
 			// generate the ion masses
-			for (int i = 0; i < peptideNoPmt.Length; ++i)
+			for (int i = 0; i < peptideSequence.Length; ++i)
 			{
 				// Current amino acid
-				char bAcid = peptideNoPmt[i];
-				char yAcid = peptideNoPmt[peptideNoPmt.Length - i - 1];
+				char bAcid = peptideSequence[i];
+				char yAcid = peptideSequence[peptideSequence.Length - i - 1];
 
 
 				// Get the monoisotopic mass for the current amino acid
@@ -60,11 +81,11 @@ namespace AScore_DLL.Managers
 
 				foreach (Modification m in staticMods)
 				{	
-					if(m.Match(bAcid))
+					if (m.Match(bAcid))
 					{
 						bIonsMass[i] += m.Mass;
 					}
-					if(m.Match(yAcid))
+					if (m.Match(yAcid))
 					{
 						yIonsMass[i] += m.Mass;
 					}
@@ -77,39 +98,44 @@ namespace AScore_DLL.Managers
 					bIonsMass[i] += bIonsMass[i - 1];
 					yIonsMass[i] += yIonsMass[i - 1];
 				}
+
 				// Check for c or n terminus modifications to be
 				// applied to the first entry in the mass lists in order to
 				// propagate to all the entries
 				if (i == 0)
 				{
-
-					bIonsMass[i] = EdgeCase(bIonsMass[i], terminiMods, bAcid, true);
-					yIonsMass[i] = EdgeCase(yIonsMass[i], terminiMods, yAcid, false);
+					bIonsMass[i] = EdgeCase(bIonsMass[i], terminiMods, bAcid, leftSide: true);
+					yIonsMass[i] = EdgeCase(yIonsMass[i], terminiMods, yAcid, leftSide: false);
 				}
 
 			}
+
+			double peptideMass = bIonsMass[bIonsMass.Count - 1] - MolecularWeights.Hydrogen + MolecularWeights.Water;
+
 			bIonsMass.RemoveAt(bIonsMass.Count - 1);
 			//yIonsMonoisotopicMass[yIonsMonoisotopicMass.Count - 1] = EdgeCase(
 			//    yIonsMonoisotopicMass[yIonsMonoisotopicMass.Count -1], 
-			//    terminiMods, fht[0], true);
-	//		yIonsMass.RemoveAt(yIonsMass.Count - 1);
+			//    terminiMods, peptideSequence[0], true);
+			//yIonsMass.RemoveAt(yIonsMass.Count - 1);
+
+			return peptideMass;
 		}
 
 
 
 		/// <summary>
-		/// N and C terminal cases
+		/// N and C terminal static mod cases
 		/// </summary>
 		/// <param name="mass">fragment ion mass</param>
 		/// <param name="terminiMods">terminus mod list</param>
 		/// <param name="aAcid">current sequence position amino acid letter</param>
 		/// <param name="leftSide">true for n-terminus false for c-terminus</param>
 		/// <returns>modified mass</returns>
-		private static double EdgeCase(double mass, List<TerminiModification> terminiMods, char aAcid, bool leftSide)
+		private static double EdgeCase(double mass, List<Modification> terminiMods, char aAcid, bool leftSide)
 		{
 
 
-			foreach (TerminiModification t in terminiMods)
+			foreach (Modification t in terminiMods)
 			{
 				if (t.nTerminus && leftSide && t.Match(aAcid))
 				{
@@ -134,30 +160,32 @@ namespace AScore_DLL.Managers
 		}
 
 		/// <summary>
-		/// Makes the call to generate the ion masses adjusts for etd fragmentation
+		/// Makes the call to generate the ion masses
+		/// Adjusts for etd fragmentation
 		/// </summary>
 		/// <param name="charge">charge, do i need this?</param>
-		/// <param name="ascoreParameterss">ascore parameters</param>
-		private void Calculate(int charge, ParameterFileManager ascoreParameterss, MassType massType)
+		/// <param name="ascoreParameters">ascore parameters</param>
+		private void Calculate(int charge, ParameterFileManager ascoreParameters, MassType massType)
 		{
 			chargeState = charge;
 
 			AminoAcidMass.MassType = massType;
 			MolecularWeights.MassType = massType;
-			foreach (Modification sm in ascoreParameterss.StaticMods)
+			foreach (Modification sm in ascoreParameters.StaticMods)
 			{
 				sm.ModMassType = massType;
 			}
-			foreach (TerminiModification tm in ascoreParameterss.TerminiMods)
+			foreach (Modification tm in ascoreParameters.TerminiMods)
 			{
 				tm.ModMassType = massType;
 			}
 
 			// First thing to do is generate the base ion masses
-			GenerateIonMasses(ascoreParameterss.StaticMods, ascoreParameterss.TerminiMods);
+			peptideMassWithStaticMods = GenerateIonMasses(ascoreParameters.StaticMods, ascoreParameters.TerminiMods);
+
 			// If the fragment type is ETD, we need to convert the B and Y ions
 			// into C and Z ions
-			if (ascoreParameterss.FragmentType == FragmentType.ETD)
+			if (ascoreParameters.FragmentType == FragmentType.ETD)
 			{
 				for (int i = 0; i < yIonsMass.Count; ++i)
 				{
@@ -184,7 +212,7 @@ namespace AScore_DLL.Managers
 			{
 				tempFragIons[i] = ChargeStateIons.GenerateFragmentIon(i, massType,
 					myMods, positions,
-					bIonsMass, yIonsMass, fht.Length);
+					bIonsMass, yIonsMass, peptideSequence.Length);
 			}
 			return tempFragIons;
 		}

@@ -21,16 +21,16 @@ namespace AScore_DLL.Combinatorics
 		/// <param name="inSitePositions">Possible site positions for each combination group</param>
 		public ModMixtureCombo(List<Mod.DynamicModification> dynMods, string sequence)
 		{
-			
+
 			sitePositions = GetSiteLocation(dynMods, sequence);
 			combinationSets = GenerateCombosToCheck(sitePositions, dynMods);
 
 			//Generates a list of all modifiable sites for all modifications
 			foreach (List<int> sites in sitePositions)
 			{
-				foreach(int s in sites)
+				foreach (int s in sites)
 				{
-					if(!allSites.Contains(s))
+					if (!allSites.Contains(s))
 					{
 						allSites.Add(s);
 					}
@@ -40,7 +40,7 @@ namespace AScore_DLL.Combinatorics
 			CalculateCombos(0, new List<List<int>>());
 		}
 
-#region Public Properties
+		#region Public Properties
 
 		/// <summary>
 		/// Final Combination sets
@@ -58,48 +58,48 @@ namespace AScore_DLL.Combinatorics
 			get { return allSites; }
 		}
 
-#endregion
+		#endregion
 
 		/// <summary>
 		/// Creates a set lists ordered by the dynamic modification list order.
 		/// Each list contains the indices within the sequence for possible sites of modification
-		/// ie R.RFLPSCTK.M would have possiblePositions[0] = {4,6} for if phosphorylation were the first
+		/// ie R.RFLPSCTK.M would have possiblePositions[0] = {4,6} if phosphorylation were the first
 		/// mod in dynamic mods
 		/// </summary>
 		/// <param name="dynMods">Dynamic modification list from ascoreparamters</param>
 		/// <param name="sequence">peptide sequence</param>
 		/// <returns>list of lists of possible modification sites</returns>
 		public List<List<int>> GetSiteLocation(List<Mod.DynamicModification> dynMods, string sequence)
-		{
-			int count = 0;
+		{			
 			List<List<int>> possiblePositions = new List<List<int>>();
-			for (int i = 0; i < dynMods.Count; i++)
+
+			foreach (Mod.DynamicModification dMod in dynMods)
 			{
 				possiblePositions.Add(new List<int>());
 			}
-			foreach (char aa in sequence)
+
+			
+			for (int i = 0; i < sequence.Length; i++)
 			{
 				int theCount = 0;
 				foreach (Mod.DynamicModification dMod in dynMods)
 				{
-					if (dMod.OnN && count == 0)
+					if (dMod.nTerminus && i == 0)
 					{
-						possiblePositions[theCount].Add(count);
+						possiblePositions[theCount].Add(i);
 					}
-					else if (dMod.OnC && count == sequence.Length - 1)
+					else if (dMod.cTerminus && i == sequence.Length - 1)
 					{
-						possiblePositions[theCount].Add(count);
+						possiblePositions[theCount].Add(i);
 					}
-					else if (dMod.Match(aa))
+					else if (dMod.Match(sequence[i]))
 					{
-						possiblePositions[theCount].Add(count);
-
+						possiblePositions[theCount].Add(i);
 					}
 					theCount++;
-					
 				}
-				count++;
 			}
+
 			return possiblePositions;
 		}
 
@@ -143,7 +143,7 @@ namespace AScore_DLL.Combinatorics
 					{
 						aFinalCombo.Add(0);
 					}
-					else if(greaterThanZero == 1)
+					else if (greaterThanZero == 1)
 					{
 						aFinalCombo.Add(siteList.Find(c => c != 0));
 					}
@@ -158,14 +158,14 @@ namespace AScore_DLL.Combinatorics
 			}
 			else
 			{
-				
+
 				for (int k = 0; k < combinationSets[i].Count; k++)
 				{
 					currentList.Add(combinationSets[i][k]);
 					CalculateCombos(i + 1, currentList);
 					currentList.Remove(combinationSets[i][k]);
 				}
-				
+
 			}
 		}
 

@@ -51,7 +51,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             dAscores.Columns.Add("numSiteIonsPoss", typeof(string));
             dAscores.Columns.Add("numSiteIonsMatched", typeof(string));
             dAscores.Columns.Add("SecondSequence", typeof(string));
-
+			dAscores.Columns.Add("ModSymbolPermuted", typeof(string));
 
 
         }
@@ -88,6 +88,11 @@ namespace AScore_DLL.Managers.DatasetManagers
             get {return t;}
         }
 
+		public int ResultsCount
+		{
+			get { return dAscores.Rows.Count; }
+		}
+
 		/// <summary>
 		/// Writes ascore information to table
 		/// </summary>
@@ -98,8 +103,13 @@ namespace AScore_DLL.Managers.DatasetManagers
 		/// <param name="siteDetermineMatched"></param>
 		/// <param name="secondSequences"></param>
 		public void WriteToTable(string peptideSeq, string bestSeq, int scanNum, double topPeptideScore, double vecAScore, double vecNumSiteIons,
-						double siteDetermineMatched, string secondSequences)
+						double siteDetermineMatched, string secondSequences, char modSymbol)
 		{
+			//if (peptideSeq == "R.HGTDLWIDNM@SSAVPNHS*PEKK.D")
+			//{
+			//    Console.WriteLine("Debug: found " + peptideSeq);
+			//}
+
             DataRow drow = dAscores.NewRow();
             drow["Job"] = jobNum;
             drow["Scan"] = "" + scanNum;
@@ -111,22 +121,25 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow["numSiteIonsPoss"] = vecNumSiteIons;
             drow["numSiteIonsMatched"] = "" + siteDetermineMatched;
             drow["SecondSequence"] = secondSequences;
+			drow["ModSymbolPermuted"] = modSymbol;
+
             dAscores.Rows.Add(drow);
 
 		}
 
 		/// <summary>
 		/// Writes ascore information to table
+		/// Call this function if a peptide has zero or just one modifiable site
 		/// </summary>
 		/// <param name="bestSeq"></param>
 		/// <param name="pScore"></param>
 		/// <param name="positionList"></param>
         public void WriteToTable(string peptideSeq, int scanNum, double pScore, int[] positionList)
 		{
-            if (peptideSeq == "R.NNNEKDM*ALTAFVLISLQEAK.D")
-            {
-				Console.WriteLine("Debug: found " + peptideSeq);
-            }
+			//if (peptideSeq == "R.HGTDLWIDNM@SSAVPNHS*PEKK.D")
+			//{
+			//    Console.WriteLine("Debug: found " + peptideSeq);
+			//}
 
             DataRow drow = dAscores.NewRow();
             drow["Job"] = jobNum;
@@ -135,9 +148,9 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow["BestSequence"] = peptideSeq;
             drow["PeptideScore"] = "" + pScore;
 
-			int nonZeroItemCount = (from item in positionList where item > 0 select item).Count();
+			int intNonZeroCount = (from item in positionList where item > 0 select item).Count();
 
-			if (nonZeroItemCount == 0)
+			if (intNonZeroCount == 0)
 			{
                 drow["AScore"] = "-1";
                
@@ -149,6 +162,8 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow["numSiteIonsMatched"] = 0;
             drow["numSiteIonsPoss"] = 0;
             drow["SecondSequence"] = "---";
+			drow["ModSymbolPermuted"] = "-";
+
             dAscores.Rows.Add(drow);
 
 		}
