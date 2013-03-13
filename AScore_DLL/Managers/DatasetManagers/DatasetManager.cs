@@ -51,7 +51,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             dAscores.Columns.Add("numSiteIonsPoss", typeof(string));
             dAscores.Columns.Add("numSiteIonsMatched", typeof(string));
             dAscores.Columns.Add("SecondSequence", typeof(string));
-			dAscores.Columns.Add("ModSymbolPermuted", typeof(string));
+			dAscores.Columns.Add("ModInfo", typeof(string));
 
 
         }
@@ -98,12 +98,8 @@ namespace AScore_DLL.Managers.DatasetManagers
 		/// </summary>
 		/// <param name="bestSeq"></param>
 		/// <param name="topPeptideScore"></param>
-		/// <param name="vecAScore"></param>
-		/// <param name="vecNumSiteIons"></param>
-		/// <param name="siteDetermineMatched"></param>
-		/// <param name="secondSequences"></param>
-		public void WriteToTable(string peptideSeq, string bestSeq, int scanNum, double topPeptideScore, double vecAScore, double vecNumSiteIons,
-						double siteDetermineMatched, string secondSequences, char modSymbol)
+		/// <param name="ascoreResult"></param>
+		public void WriteToTable(string peptideSeq, string bestSeq, int scanNum, double topPeptideScore, AScoreResult ascoreResult)
 		{
 			//if (peptideSeq == "R.HGTDLWIDNM@SSAVPNHS*PEKK.D")
 			//{
@@ -117,11 +113,11 @@ namespace AScore_DLL.Managers.DatasetManagers
 			drow["BestSequence"] = bestSeq;
 			drow["PeptideScore"] = "" + topPeptideScore;
 
-            drow["AScore"] = "" + vecAScore;
-            drow["numSiteIonsPoss"] = vecNumSiteIons;
-            drow["numSiteIonsMatched"] = "" + siteDetermineMatched;
-            drow["SecondSequence"] = secondSequences;
-			drow["ModSymbolPermuted"] = modSymbol;
+			drow["AScore"] = "" + ascoreResult.AScore;
+			drow["numSiteIonsPoss"] = ascoreResult.NumSiteIons;
+			drow["numSiteIonsMatched"] = "" + ascoreResult.SiteDetermineMatched;
+			drow["SecondSequence"] = ascoreResult.SecondSequence;
+			drow["ModInfo"] = ascoreResult.ModInfo;
 
             dAscores.Rows.Add(drow);
 
@@ -162,7 +158,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow["numSiteIonsMatched"] = 0;
             drow["numSiteIonsPoss"] = 0;
             drow["SecondSequence"] = "---";
-			drow["ModSymbolPermuted"] = "-";
+			drow["ModInfo"] = "-";
 
             dAscores.Rows.Add(drow);
 

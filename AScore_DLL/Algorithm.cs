@@ -64,7 +64,6 @@ namespace AScore_DLL
 				string peptideSeq;
 				double msgfScore;
 
-				//TODO: need to update msgfdb to reflect getnextrow change
 				if (filterOnMSGFScore)
 					datasetManager.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out msgfScore, ref ascoreParameters);
 				else
@@ -167,23 +166,16 @@ namespace AScore_DLL
 		private void ComputeAScore(DatasetManager datasetManager, ParameterFileManager ascoreParameters, int scanNumber, int chargeState, string peptideSeq, string front, string back, string sequenceClean, ExperimentalSpectra expSpec, double mzmax, double mzmin, List<int[]> myPositionsList)
 		{
 
-			// Initialize ascore results storage
-			// These are parallel lists
-			// TODO: Merge these into a single list of a container tracking all of the details
+			// Initialize AScore results storage
+			List <AScoreResult> lstResults = new List<AScoreResult>();
 
-			List<double> vecAScore = new List<double>();			// AScore value
-			List<int> vecNumSiteIons = new List<int>();				// Number of b/y ions that could be matched
-			List<int> siteDetermineMatched = new List<int>();		// Number of b/y ions that were matched
-			List<int[]> AScorePeptideMods = new List<int[]>();		// Mod types and locations			
-			List<char> vecModSymbol = new List<char>();				// Mod symbol was permuted for this result
-
-			//test
+			// Change the charge state to 2+ if it is 1+
 			if (chargeState == 1)
 			{
 				chargeState = 2;
 			}
 
-			//test
+			// Parallel lists of scores
 			List<List<double>> peptideScores = new List<List<double>>();
 			List<List<double>> weightedScores = new List<List<double>>();
 
@@ -278,7 +270,10 @@ namespace AScore_DLL
 
 				for (int indSite = 0; indSite < siteInfo.Count; ++indSite)
 				{
-					vecModSymbol.Add(LookupModSymbolByID(siteInfo.Values[indSite], ascoreParameters.DynamicMods));
+					AScoreResult ascoreResult = new AScoreResult();
+					lstResults.Add(ascoreResult);
+
+					ascoreResult.ModInfo = LookupModInfoByID(siteInfo.Values[indSite], ascoreParameters.DynamicMods);
 
 					int secondPeptide = 0;
 					for (secondPeptide = 0; secondPeptide < sortedSumScore.Count; ++secondPeptide)
@@ -297,7 +292,7 @@ namespace AScore_DLL
 								}
 							if (othersMatch)
 							{
-								AScorePeptideMods.Add(myPositionsList[sortedSumScore[secondPeptide].Index]);
+								ascoreResult.PeptideMods = myPositionsList[sortedSumScore[secondPeptide].Index];
 								break;
 							}
 						}
@@ -305,7 +300,7 @@ namespace AScore_DLL
 						{
 							if (secondDict[siteInfo.Keys[indSite]] != siteInfo.Values[indSite])
 							{
-								AScorePeptideMods.Add(myPositionsList[sortedSumScore[secondPeptide].Index]);
+								ascoreResult.PeptideMods = myPositionsList[sortedSumScore[secondPeptide].Index];
 								break;
 							}
 						}
@@ -313,12 +308,9 @@ namespace AScore_DLL
 
 					if (secondPeptide == sortedSumScore.Count)
 					{
-						vecAScore.Add(1000);
-						vecNumSiteIons.Add(0);
-						siteDetermineMatched.Add(0);
-
-						// Empty mod array
-						AScorePeptideMods.Add(new int[] { });
+						ascoreResult.AScore = 1000;
+						ascoreResult.NumSiteIons = 0;
+						ascoreResult.SiteDetermineMatched = 0;
 
 						continue;
 					}
@@ -364,26 +356,24 @@ namespace AScore_DLL
 						ascoreParameters.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal).Count);
 
 					// Add the results to the list
-					vecAScore.Add(Math.Abs(a1 - a2));
-					vecNumSiteIons.Add(siteIons1.Count);
-					siteDetermineMatched.Add(bestDeterminingCount);
+					ascoreResult.AScore = Math.Abs(a1 - a2);
+					ascoreResult.NumSiteIons = siteIons1.Count;
+					ascoreResult.SiteDetermineMatched = bestDeterminingCount;
+
 				}
 
-				List<string> secondSequences = new List<string>();
-				for (int i = 0; i < vecAScore.Count; i++)
+				foreach (AScoreResult ascoreResult in lstResults)
 				{
-					secondSequences.Add(front + "." +
-						GenerateFinalSequences(sequenceClean, ascoreParameters, AScorePeptideMods[i]) + "." + back);
-
+					ascoreResult.SecondSequence = front + "." +
+						GenerateFinalSequences(sequenceClean, ascoreParameters, ascoreResult.PeptideMods) + "." + back;
 				}
 
 
 				//Put scores into our table
 				string bestSeq = front + "." + GenerateFinalSequences(sequenceClean, ascoreParameters, topPeptidePTMsites) + "." + back;
-				for (int i = 0; i < vecAScore.Count; i++)
+				foreach (AScoreResult ascoreResult in lstResults)
 				{
-					datasetManager.WriteToTable(peptideSeq, bestSeq, scanNumber, topPeptideScore, vecAScore[i], vecNumSiteIons[i],
-						siteDetermineMatched[i], secondSequences[i], vecModSymbol[i]);
+					datasetManager.WriteToTable(peptideSeq, bestSeq, scanNumber, topPeptideScore, ascoreResult);
 				}
 			}
 			catch (Exception ex)
@@ -662,20 +652,24 @@ namespace AScore_DLL
 		}
 
 
-		protected char LookupModSymbolByID(int uniqueID, List<Mod.DynamicModification> dynamicMods)
+		protected string LookupModInfoByID(int uniqueID, List<Mod.DynamicModification> dynamicMods)
 		{
-			char modSymbol = '?';
+			string modInfo = string.Empty;
 
 			foreach (Mod.DynamicModification m in dynamicMods)
 			{
 				if (m.UniqueID == uniqueID)
 				{
-					modSymbol = m.ModSymbol;
+					foreach (char site in m.PossibleModSites)
+					{
+						modInfo += site;
+					}
+					modInfo += m.ModSymbol;
 					break;
 				}
 			}
 
-			return modSymbol;
+			return modInfo;
 		}
 
 

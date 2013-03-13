@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm.cs" />
+    <Compile Include="AScoreResult.cs" />
     <Compile Include="Managers\DatasetManagers\DatasetManager.cs" />
     <Compile Include="Managers\DatasetManagers\InspectFHT.cs" />
     <Compile Include="Managers\DatasetManagers\MsgfdbFHT.cs" />
