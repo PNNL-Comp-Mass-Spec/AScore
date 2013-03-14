@@ -13,44 +13,69 @@ namespace AScore_Console
 	{
 		static System.IO.StreamWriter mLogFile = null;
 
+		struct AScoreOptionsType
+		{
+			public string SearchType;
+			public string FirstHitsFile;
+			public string CDtaFile;
+			public string AScoreParamFile;
+			public string OutputFolderPath;
+			public bool FilterOnMSGFScore;
+			
+			public bool SkipExistingResults;
+			public bool CreateUpdatedFirstHitsFile;
+			public string UpdatedFirstHitsFileName;
+
+			public void Initialize()
+			{
+				SearchType = string.Empty;
+				FirstHitsFile = string.Empty;
+				CDtaFile = string.Empty;
+				AScoreParamFile = string.Empty;
+				OutputFolderPath = string.Empty;
+				FilterOnMSGFScore = true;
+
+				SkipExistingResults = false;
+				CreateUpdatedFirstHitsFile = false;
+				UpdatedFirstHitsFileName = string.Empty;
+			}
+		}
+
 		static int Main(string[] args)
 		{
 			try
 			{
 				CommandLineUtil clu = new CommandLineUtil();
 				bool read = clu.ParseCommandLine();
-				string searchType = string.Empty;
-				string fhtFile = string.Empty;
-				string dtaFile = string.Empty;
-				string paramFile = string.Empty;
-				string outPath = string.Empty;
-				string logFilePath = string.Empty;
-				string outValue;
 
-				bool filterOnMSGFScore = true;
+				AScoreOptionsType ascoreOptions = new AScoreOptionsType();
+				ascoreOptions.Initialize();
+				string logFilePath = string.Empty;
+
+				string outValue;
 				string syntaxError = string.Empty;
 				string supportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
 
 				if (!clu.ShowHelp)
 				{
-					if (!clu.RetrieveValueForParameter("T", out searchType, false))
+					if (!clu.RetrieveValueForParameter("T", out ascoreOptions.SearchType, false))
 						syntaxError = "-T:Search_Engine not defined";
 
-					if (!clu.RetrieveValueForParameter("F", out fhtFile, false))
+					if (!clu.RetrieveValueForParameter("F", out ascoreOptions.FirstHitsFile, false))
 						syntaxError = "-F:fhtfile_path not defined";
 
-					if (!clu.RetrieveValueForParameter("D", out dtaFile, false))
+					if (!clu.RetrieveValueForParameter("D", out ascoreOptions.CDtaFile, false))
 						syntaxError = "-D:dta_file_path not defined";
 
-					if (!clu.RetrieveValueForParameter("P", out paramFile, false))
+					if (!clu.RetrieveValueForParameter("P", out ascoreOptions.AScoreParamFile, false))
 						syntaxError = "-P:parameter_file not defined";
 
-					if (!clu.RetrieveValueForParameter("O", out outPath, false) || string.IsNullOrWhiteSpace(outPath))
-						outPath = ".";
+					if (!clu.RetrieveValueForParameter("O", out ascoreOptions.OutputFolderPath, false) || string.IsNullOrWhiteSpace(ascoreOptions.OutputFolderPath))
+						ascoreOptions.OutputFolderPath = ".";
 
 					if (clu.RetrieveValueForParameter("FM", out outValue, false))
 					{
-						if (!bool.TryParse(outValue, out filterOnMSGFScore))
+						if (!bool.TryParse(outValue, out ascoreOptions.FilterOnMSGFScore))
 						{
 							syntaxError = "specify true or false for -FM; not -FM:" + outValue;
 						}
@@ -58,9 +83,20 @@ namespace AScore_Console
 
 					if (clu.RetrieveValueForParameter("L", out outValue, false))
 						logFilePath = string.Copy(outValue);
+
+					if (clu.RetrieveValueForParameter("U", out outValue, false))
+					{
+						ascoreOptions.CreateUpdatedFirstHitsFile = true;
+						if (!string.IsNullOrWhiteSpace(outValue))
+							ascoreOptions.UpdatedFirstHitsFileName = string.Copy(outValue);
+					}
+					
+					if (clu.RetrieveValueForParameter("Skip", out outValue, false))
+					{
+						ascoreOptions.SkipExistingResults = true;						
+					}
+
 				}
-
-
 
 
 				//	AScore_DLL.AScoreParameters parameters = 
@@ -81,6 +117,8 @@ namespace AScore_Console
 					Console.WriteLine(" -O:output_file_path");
 					Console.WriteLine(" -L:log_file_path");
 					Console.WriteLine(" -FM:true  (true or false to enable/disable filtering on data in column MSGF_SpecProb; default is true)");
+					Console.WriteLine(" -U:updated_fht_file_name  (create a copy of the fht_file with updated peptide sequences plus new AScore-related columns");
+					Console.WriteLine(" -Skip    (will not re-run AScore if an existing results file already exists)");
 					Console.WriteLine();
 					Console.WriteLine("Example command line:");
 					Console.WriteLine(System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
@@ -97,28 +135,28 @@ namespace AScore_Console
 				}
 
 
-				if (!File.Exists(paramFile))
+				if (!File.Exists(ascoreOptions.AScoreParamFile))
 				{
-					Console.WriteLine("Input file not found: " + paramFile);
+					Console.WriteLine("Input file not found: " + ascoreOptions.AScoreParamFile);
 					clu.PauseAtConsole(2000, 333);
 					return -10;
 				}
 
-				if (!File.Exists(dtaFile))
+				if (!File.Exists(ascoreOptions.CDtaFile))
 				{
-					Console.WriteLine("Input file not found: " + dtaFile);
+					Console.WriteLine("Input file not found: " + ascoreOptions.CDtaFile);
 					clu.PauseAtConsole(2000, 333);
 					return -11;
 				}
 
-				if (!File.Exists(fhtFile))
+				if (!File.Exists(ascoreOptions.FirstHitsFile))
 				{
-					Console.WriteLine("Input file not found: " + fhtFile);
+					Console.WriteLine("Input file not found: " + ascoreOptions.FirstHitsFile);
 					clu.PauseAtConsole(2000, 333);
 					return -12;
 				}
 
-				int returnCode = RunAScore(searchType, fhtFile, dtaFile, paramFile, outPath, logFilePath, filterOnMSGFScore, supportedSearchModes);
+				int returnCode = RunAScore(ascoreOptions, logFilePath, supportedSearchModes);
 
 				if (returnCode != 0)
 					clu.PauseAtConsole(2000, 333);
@@ -142,7 +180,7 @@ namespace AScore_Console
 
 		}
 
-		private static int RunAScore(string searchType, string fhtFile, string dtaFile, string paramFile, string outPath, string logFilePath, bool filterOnMSGFScore, string supportedSearchModes)
+		private static int RunAScore(AScoreOptionsType ascoreOptions, string logFilePath, string supportedSearchModes)
 		{
 
 			if (!String.IsNullOrWhiteSpace(logFilePath))
@@ -151,45 +189,7 @@ namespace AScore_Console
 				mLogFile.AutoFlush = true;
 			}
 
-			ParameterFileManager paramManager = new ParameterFileManager(paramFile);
-			DtaManager dtaManager = new DtaManager(dtaFile);
-
-			paramManager.ErrorEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineErrorEventHandler);
-			paramManager.WarningEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineWarningEventHandler);
-			paramManager.MessageEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineMessageEventHandler);
-
-			dtaManager.ErrorEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineErrorEventHandler);
-			dtaManager.WarningEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineWarningEventHandler);
-			dtaManager.MessageEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineMessageEventHandler);
-
-			DatasetManager datasetManager;
-			searchType = searchType.ToLower();
-
-			switch (searchType)
-			{
-				case "xtandem":
-					datasetManager = new XTandemFHT(fhtFile);
-					break;
-				case "sequest":
-					datasetManager = new SequestFHT(fhtFile);
-					break;
-				case "inspect":
-					datasetManager = new InspectFHT(fhtFile);
-					break;
-				case "msgfdb":
-				case "msgfplus":
-				case "msgf+":
-					datasetManager = new MsgfdbFHT(fhtFile);
-					break;
-				default:
-					ShowMessage("Incorrect search type: " + searchType + " , supported values are " + supportedSearchModes);
-					Console.WriteLine();
-					return -13;
-			}
-
-			ShowMessage("Parsing input file: " + fhtFile);
-
-			System.IO.DirectoryInfo diOutputFolder = new System.IO.DirectoryInfo(outPath);
+			System.IO.DirectoryInfo diOutputFolder = new System.IO.DirectoryInfo(ascoreOptions.OutputFolderPath);
 			if (!diOutputFolder.Exists)
 			{
 				try
@@ -208,21 +208,85 @@ namespace AScore_Console
 			{
 				ShowMessage("Writing results to " + diOutputFolder.FullName);
 			}
+			
+			string ascoreResultsFilePath = System.IO.Path.Combine(diOutputFolder.FullName, System.IO.Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile) + "_ascore.txt");
 
-			string outputFilePath = System.IO.Path.Combine(diOutputFolder.FullName, System.IO.Path.GetFileNameWithoutExtension(fhtFile) + "_ascore.txt");
+			if (ascoreOptions.SkipExistingResults && System.IO.File.Exists(ascoreResultsFilePath))
+			{
+				ShowMessage("Existing results file found; will not re-create");
+			}
+			else
+			{
+				ParameterFileManager paramManager = new ParameterFileManager(ascoreOptions.AScoreParamFile);
+				AttachEvents(paramManager);
 
-			AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				DtaManager dtaManager = new DtaManager(ascoreOptions.CDtaFile);
+				AttachEvents(dtaManager);
 
-			ascoreEngine.ErrorEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineErrorEventHandler);
-			ascoreEngine.WarningEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineWarningEventHandler);
-			ascoreEngine.MessageEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineMessageEventHandler);
+				DatasetManager datasetManager;
+				ascoreOptions.SearchType = ascoreOptions.SearchType.ToLower();
 
-			ascoreEngine.AlgorithmRun(dtaManager, datasetManager, paramManager, outputFilePath, filterOnMSGFScore);
+				switch (ascoreOptions.SearchType)
+				{
+					case "xtandem":
+						datasetManager = new XTandemFHT(ascoreOptions.FirstHitsFile);
+						break;
+					case "sequest":
+						datasetManager = new SequestFHT(ascoreOptions.FirstHitsFile);
+						break;
+					case "inspect":
+						datasetManager = new InspectFHT(ascoreOptions.FirstHitsFile);
+						break;
+					case "msgfdb":
+					case "msgfplus":
+					case "msgf+":
+						datasetManager = new MsgfdbFHT(ascoreOptions.FirstHitsFile);
+						break;
+					default:
+						ShowMessage("Incorrect search type: " + ascoreOptions.SearchType + " , supported values are " + supportedSearchModes);
+						Console.WriteLine();
+						return -13;
+				}
+
+				ShowMessage("Parsing input file: " + ascoreOptions.FirstHitsFile);
+
+				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				AttachEvents(ascoreEngine);
+
+				// Initialize the options
+				ascoreEngine.FilterOnMSGFScore = ascoreOptions.FilterOnMSGFScore;
 
 
-			ShowMessage("Success");
+				// Run the algorithm
+				ascoreEngine.AlgorithmRun(dtaManager, datasetManager, paramManager, ascoreResultsFilePath);
+
+				ShowMessage("AScore Complete");
+			}
+
+			if (ascoreOptions.CreateUpdatedFirstHitsFile)
+			{
+				AScore_DLL.PHRPResultsMerger resultsMerger = new AScore_DLL.PHRPResultsMerger();
+				AttachEvents(resultsMerger);
+
+				resultsMerger.MergeResults(ascoreOptions.FirstHitsFile, ascoreResultsFilePath, ascoreOptions.UpdatedFirstHitsFileName);
+
+				ShowMessage("Results merged; new file: " + resultsMerger.MergedFilePath);
+			}
+			
+
 
 			return 0;
+		}
+
+		/// <summary>
+		/// Attaches the Error, Warning, and Message events to the local event handler
+		/// </summary>
+		/// <param name="paramManager"></param>
+		private static void AttachEvents(AScore_DLL.MessageEventBase paramManager)
+		{
+			paramManager.ErrorEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineErrorEventHandler);
+			paramManager.WarningEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineWarningEventHandler);
+			paramManager.MessageEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineMessageEventHandler);
 		}
 
 		private static void ShowMessage(string message)

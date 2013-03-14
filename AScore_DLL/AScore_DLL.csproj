@@ -61,12 +61,18 @@
     <Reference Include="PHRPReader">
       <HintPath>lib\PHRPReader.dll</HintPath>
     </Reference>
+    <Reference Include="PNNLOmics">
+      <HintPath>lib\PNNLOmics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="ThermoRawFileReaderDLL">
+      <HintPath>lib\ThermoRawFileReaderDLL.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm.cs" />
@@ -92,6 +98,7 @@
     <Compile Include="Combinatorics\SmallPrimeUtility.cs" />
     <Compile Include="Managers\ParameterFileManager.cs" />
     <Compile Include="Managers\PeptideScoresManager.cs" />
+    <Compile Include="PHRPResultsMerger.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Mod\Modification.cs" />

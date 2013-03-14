@@ -14,12 +14,32 @@ namespace AScore_DLL
 {
 	public class Algorithm : MessageEventBase
 	{
+		public const string MODINFO_NO_MODIFIED_RESIDUES = "-";
+
 		private readonly double[] ScoreWeights = { 0.5, 0.75, 1.0, 1.0, 1.0, 1.0, 0.75, 0.5, 0.25, 0.25 };
 		private const double lowRangeMultiplier = 0.28;
 		private const double maxRange = 2000.0;
 		private const double minRange = 50.0;
 
-			#region Public Method
+		private bool m_filterOnMSGFScore = true;
+
+		#region "Properties"
+
+		public bool FilterOnMSGFScore
+		{
+			get
+			{
+				return m_filterOnMSGFScore;
+			}
+			set
+			{
+				m_filterOnMSGFScore = value;
+			}
+		}
+
+		#endregion
+
+		#region Public Method
 
 		/// <summary>
 		/// Runs the all the tools necessary to perform an ascore run
@@ -31,20 +51,7 @@ namespace AScore_DLL
 		public void AlgorithmRun(DtaManager dtaManager, DatasetManager datasetManager,
 			ParameterFileManager ascoreParameters, string outputFilePath)
 		{
-			AlgorithmRun(dtaManager, datasetManager, ascoreParameters, outputFilePath, filterOnMSGFScore: true);
-		}
 
-		/// <summary>
-		/// Runs the all the tools necessary to perform an ascore run
-		/// </summary>
-		/// <param name="dtaFileName">dta file path</param>
-		/// <param name="parameterFile">parameter file path</param>
-		/// <param name="datasetFileName">dataset file path</param>
-		/// <param name="outputFilePath">output file path</param>
-		/// <param name="filterOnMSGFScore">set to True to filter on data in column MSGF_SpecProb</param>
-		public void AlgorithmRun(DtaManager dtaManager, DatasetManager datasetManager,
-			ParameterFileManager ascoreParameters, string outputFilePath, bool filterOnMSGFScore)
-		{
 			int totalRows = datasetManager.GetRowLength();
 			Dictionary<string, int> dctPeptidesProcessed = new Dictionary<string, int>();
 
@@ -64,7 +71,7 @@ namespace AScore_DLL
 				string peptideSeq;
 				double msgfScore;
 
-				if (filterOnMSGFScore)
+				if (m_filterOnMSGFScore)
 					datasetManager.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out msgfScore, ref ascoreParameters);
 				else
 				{
@@ -93,7 +100,7 @@ namespace AScore_DLL
 				string sequenceClean = GetCleanSequence(sequenceWithoutSuffixOrPrefix, ref ascoreParameters);
 				bool skipPSM = false;
 
-				if (filterOnMSGFScore && msgfScore > ascoreParameters.MSGFPreFilter)
+				if (m_filterOnMSGFScore && msgfScore > ascoreParameters.MSGFPreFilter)
 					skipPSM = true;
 
 				string scanChargePeptide = scanNumber + "_" + chargeState + "_" + sequenceWithoutSuffixOrPrefix;
@@ -108,7 +115,7 @@ namespace AScore_DLL
 					datasetManager.IncrementRow();
 					continue;
 				}
-								
+
 
 				//Get experimental spectra
 				ExperimentalSpectra expSpec = dtaManager.GetExperimentalSpectra(
@@ -120,7 +127,7 @@ namespace AScore_DLL
 					datasetManager.IncrementRow();
 					continue;
 				}
-				
+
 				// Assume monoisotopic if hi-res however in low res we use average for higher charge states.
 				MolecularWeights.MassType = MassType.Monoisotopic;
 
@@ -144,14 +151,23 @@ namespace AScore_DLL
 				List<int[]> myPositionsList = GetMyPostionList(sequenceClean, modMixture);
 
 				//If I have more than 1 modifiable site proceed to calculation
-				if (myPositionsList.Count > 1 /*&& chargeState > 1*/)
+				if (myPositionsList.Count > 1)
 				{
 					ComputeAScore(datasetManager, ascoreParameters, scanNumber, chargeState, peptideSeq, front, back, sequenceClean, expSpec, mzmax, mzmin, myPositionsList);
 				}
-				else /*if(chargeState > 1)*/
+				else if (myPositionsList.Count == 1)
 				{
-					// Only one modifiable site
-					datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0]);
+					// Either one or no modifiable sites
+					int uniqueID = myPositionsList[0].Max();
+					if (uniqueID == 0)
+						datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], MODINFO_NO_MODIFIED_RESIDUES);
+					else
+						datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], LookupModInfoByID(uniqueID, ascoreParameters.DynamicMods));
+				}
+				else
+				{
+					// No modifiable sites
+					datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], MODINFO_NO_MODIFIED_RESIDUES);
 				}
 				datasetManager.IncrementRow();
 
@@ -163,11 +179,16 @@ namespace AScore_DLL
 
 		}
 
+
+		#endregion
+
+		#region Private Methods
+
 		private void ComputeAScore(DatasetManager datasetManager, ParameterFileManager ascoreParameters, int scanNumber, int chargeState, string peptideSeq, string front, string back, string sequenceClean, ExperimentalSpectra expSpec, double mzmax, double mzmin, List<int[]> myPositionsList)
 		{
 
 			// Initialize AScore results storage
-			List <AScoreResult> lstResults = new List<AScoreResult>();
+			List<AScoreResult> lstResults = new List<AScoreResult>();
 
 			// Change the charge state to 2+ if it is 1+
 			if (chargeState == 1)
@@ -209,7 +230,7 @@ namespace AScore_DLL
 								break;
 							}
 						}
-					}					
+					}
 
 					if (!bValidMatch)
 						ReportError("Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
@@ -382,9 +403,6 @@ namespace AScore_DLL
 			}
 		}
 
-		#endregion
-
-		#region Private Methods
 		/// <summary>
 		/// Gets a clean sequence intitializes dynamic modifications
 		/// </summary>
@@ -420,7 +438,8 @@ namespace AScore_DLL
 				{
 					// Invalid index for i; assume the residue is not modified
 					sbFinalSeq.Append(seq[i]);
-				} else if (peptideMods[i] == 0)
+				}
+				else if (peptideMods[i] == 0)
 				{
 					sbFinalSeq.Append(seq[i]);
 				}
@@ -556,7 +575,7 @@ namespace AScore_DLL
 		/// <param name="toGetDetermining">list to get unique from</param>
 		/// <param name="secondSpec">list which contains overlap to remove from first list</param>
 		/// <returns>list of values unique to the toGetDetermining list</returns>
-		public List<double> GetSiteDeterminingIons(List<double> toGetDetermining, List<double> secondSpec)
+		protected List<double> GetSiteDeterminingIons(List<double> toGetDetermining, List<double> secondSpec)
 		{
 			List<double> siteDetermined = new List<double>(toGetDetermining);
 			foreach (double ion in secondSpec)

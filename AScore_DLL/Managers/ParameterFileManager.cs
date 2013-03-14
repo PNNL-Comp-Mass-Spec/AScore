@@ -143,9 +143,9 @@ namespace AScore_DLL.Managers
 
 			List<Modification> staticMods;
 			List<Modification> terminalMods;
-			List<DynamicModification> dyhamicMods;
+			List<DynamicModification> dynamicMods;
 
-			int uniqueID = 0;
+			int uniqueID = 1;
 
 			// Parse the static mods
 			staticMods = ParseXmlModInfo(parameterFile, "StaticSeqModifications", ref uniqueID, requireModSites: true);
@@ -154,9 +154,9 @@ namespace AScore_DLL.Managers
 			terminalMods = ParseXmlModInfo(parameterFile, "TerminiModifications", ref uniqueID, requireModSites: false);
 
 			// Parse the dynamic mods
-			dyhamicMods = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
+			dynamicMods = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
 
-			InitializeAScoreParameters(staticMods, terminalMods, dyhamicMods, f, massTol, msgfTol);
+			InitializeAScoreParameters(staticMods, terminalMods, dynamicMods, f, massTol, msgfTol);
 		}
 
 
