@@ -74,14 +74,33 @@ namespace AScore_DLL
 					return false;
 				}
 
+				// Initialize the PHRPReader
+				success = InitializeReader(fiInputFile);
+				if (!success)
+					return false;
+
 				if (string.IsNullOrEmpty(mergedPhrpDataFileName))
 				{
 					// Auto-define mergedPhrpDataFileName
-					mergedPhrpDataFileName = System.IO.Path.GetFileNameWithoutExtension(fiInputFile.Name) + "_WithAScore.txt";
+					mergedPhrpDataFileName = System.IO.Path.GetFileNameWithoutExtension(fiInputFile.Name) + "_WithAScore" + fiInputFile.Extension;
 				}
 
 				m_MergedFilePath = System.IO.Path.Combine(fiAScoreResultsFile.Directory.FullName, mergedPhrpDataFileName);
 				fiOutputFilePath = new System.IO.FileInfo(m_MergedFilePath);
+
+
+				if (FilePathsMatch(fiInputFile, fiOutputFilePath))
+				{
+					ReportError("Input PHRP file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
+					return false;
+				}
+
+				if (FilePathsMatch(fiAScoreResultsFile, fiOutputFilePath))
+				{
+					ReportError("AScore results file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
+					return false;
+				}
+				
 
 				// Cache the AScore results in memory
 				Dictionary<string, AScoreResultsType> cachedAscoreResults = new Dictionary<string, AScoreResultsType>();
@@ -90,7 +109,7 @@ namespace AScore_DLL
 				if (!success)
 					return false;
 
-				success = MakeUpdatedPHRPFile(fiInputFile, fiOutputFilePath, cachedAscoreResults);
+				success = MakeUpdatedPHRPFile(fiInputFile, fiOutputFilePath, mPHRPReader, cachedAscoreResults);
 
 			}
 			catch (Exception ex)
@@ -219,9 +238,8 @@ namespace AScore_DLL
 			return modInfoNames;
 		}
 
-		private bool MakeUpdatedPHRPFile(System.IO.FileInfo fiInputFile, System.IO.FileInfo fiOutputFilePath, Dictionary<string, AScoreResultsType> cachedAscoreResults)
+		protected bool InitializeReader(System.IO.FileInfo fiInputFile)
 		{
-
 			try
 			{
 				PHRPReader.clsPHRPReader.ePeptideHitResultType ePeptideHitResultType;
@@ -232,11 +250,6 @@ namespace AScore_DLL
 					ReportError("Error: Could not determine the format of the PHRP data file: " + fiInputFile.FullName);
 					return false;
 				}
-
-				// Read the header line from the PHRP file
-				string outputHeaderLine = ReadHeaderLine(fiInputFile.FullName);
-
-				SortedSet<string> modInfoNames = DetermineModInfoNames(cachedAscoreResults);
 
 				// Open the data file and read the data
 				mPHRPReader = new PHRPReader.clsPHRPReader(fiInputFile.FullName, PHRPReader.clsPHRPReader.ePeptideHitResultType.Unknown, false, false, false);
@@ -254,6 +267,26 @@ namespace AScore_DLL
 				mPHRPReader.WarningEvent += new clsPHRPReader.WarningEventEventHandler(mPHRPReader_WarningEvent);
 				mPHRPReader.MessageEvent += new clsPHRPReader.MessageEventEventHandler(mPHRPReader_MessageEvent);
 
+			}
+			catch (Exception ex)
+			{
+				ReportError("Error in InitializeReader: " + ex.Message);
+				return false;
+			}
+
+			return true;
+
+		}
+		private bool MakeUpdatedPHRPFile(System.IO.FileInfo fiInputFile, System.IO.FileInfo fiOutputFilePath, PHRPReader.clsPHRPReader oPHRPReader, Dictionary<string, AScoreResultsType> cachedAscoreResults)
+		{
+
+			try
+			{
+				// Read the header line from the PHRP file
+				string outputHeaderLine = ReadHeaderLine(fiInputFile.FullName);
+
+				SortedSet<string> modInfoNames = DetermineModInfoNames(cachedAscoreResults);
+
 				// Create the output file
 				using (System.IO.StreamWriter swOutFile = new System.IO.StreamWriter(new System.IO.FileStream(fiOutputFilePath.FullName, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.Read)))
 				{
@@ -270,9 +303,9 @@ namespace AScore_DLL
 					}
 					swOutFile.WriteLine(outLine);
 
-					while (mPHRPReader.MoveNext())
+					while (oPHRPReader.MoveNext())
 					{
-						PHRPReader.clsPSM oPSM = mPHRPReader.CurrentPSM;
+						PHRPReader.clsPSM oPSM = oPHRPReader.CurrentPSM;
 
 						string scanPeptideKey = ConstructScanPeptideKey(oPSM.ScanNumber, oPSM.Peptide);
 						AScoreResultsType ascoreResult;
@@ -313,7 +346,7 @@ namespace AScore_DLL
 
 						swOutFile.WriteLine(outLine);
 
-						//UpdateProgress(mPHRPReader.PercentComplete);					
+						//UpdateProgress(oPHRPReader.PercentComplete);					
 					}
 				}
 			}
@@ -324,6 +357,17 @@ namespace AScore_DLL
 			}
 
 			return true;
+		}
+
+		protected bool FilePathsMatch(System.IO.FileInfo fiFile1, System.IO.FileInfo fiFile2)
+		{
+			string filePath1 = System.IO.Path.GetFullPath(fiFile1.FullName);
+			string filePath2 = System.IO.Path.GetFullPath(fiFile2.FullName);
+
+			if (filePath1.ToLower() == filePath2.ToLower())
+				return true;
+			else
+				return false;
 		}
 
 		protected string ReadHeaderLine(string filePath)
