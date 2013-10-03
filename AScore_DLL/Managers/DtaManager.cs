@@ -82,13 +82,13 @@ namespace AScore_DLL.Managers
 
 		#region Public Methods
 
-        public void Abort()
-        {
-            if (masterDta != null)
-            {
-                masterDta.Close();
-            }
-        }
+		public void Abort()
+		{
+			if (masterDta != null)
+			{
+				masterDta.Close();
+			}
+		}
 
 		//Gets a spectra entry from the dta file
 		public string GetDtaFileName(int scanNumber, int scanCount, int chargeState)
@@ -127,26 +127,27 @@ namespace AScore_DLL.Managers
 			// MyDataset.0538.0538.3.dta
 			// Note that scans could have one or more leading zeroes, so we need to account for that
 
-			for (int padLength = 0; padLength <= 6; padLength++)
+			var lstCharges = new List<int> { dtaChargeState };
+			for (int alternateCharge = 1; alternateCharge < 10; alternateCharge++)
 			{
-				var scanPrefixPad = new string('0', padLength);
-				spectraName = GetDtaFileName(scanNumber, scanCount, dtaChargeState, scanPrefixPad);
+				if (alternateCharge != dtaChargeState)
+					lstCharges.Add(alternateCharge);
+			}
 
-				if (dtaEntries.ContainsKey(spectraName))
-					break;
-								
-				// Try different charge states
+			foreach (int chargeState in lstCharges)
+			{
 				bool matchFound = false;
-				for (dtaChargeState = 1; dtaChargeState < 6; dtaChargeState++)
+				for (int padLength = 0; padLength <= 6; padLength++)
 				{
-					spectraName = GetDtaFileName(scanNumber, scanCount, dtaChargeState);
+					var scanPrefixPad = new string('0', padLength);
+					spectraName = GetDtaFileName(scanNumber, scanCount, chargeState, scanPrefixPad);
+
 					if (dtaEntries.ContainsKey(spectraName))
 					{
 						matchFound = true;
 						break;
 					}
 				}
-
 				if (matchFound)
 					break;
 			}
@@ -182,23 +183,23 @@ namespace AScore_DLL.Managers
 			// Parse out charge state
 			ind1 = ind2 + 1;
 			ind2 = line.IndexOf(' ', ind1);
-            if (ind2 > -1)
-            {
-                int.TryParse(line.Substring(ind1, ind2 - ind1), out precursorChargeState);
+			if (ind2 > -1)
+			{
+				int.TryParse(line.Substring(ind1, ind2 - ind1), out precursorChargeState);
 
-                // Parse out scan number (if it's present)
-                ind1 = line.IndexOf('=') + 1;
-                ind2 = line.IndexOf(' ', ind1);
-                int.TryParse(line.Substring(ind1, ind2 - ind1), out scanNumber);
+				// Parse out scan number (if it's present)
+				ind1 = line.IndexOf('=') + 1;
+				ind2 = line.IndexOf(' ', ind1);
+				int.TryParse(line.Substring(ind1, ind2 - ind1), out scanNumber);
 
-                // Charge state
-                ind1 = line.LastIndexOf('=') + 1;
+				// Charge state
+				ind1 = line.LastIndexOf('=') + 1;
 				int.TryParse(line.Substring(ind1, 1), out dtaChargeState);
-            }
-            else
-            {
-                int.TryParse(line.Substring(ind1), out precursorChargeState);
-            }
+			}
+			else
+			{
+				int.TryParse(line.Substring(ind1), out precursorChargeState);
+			}
 
 			if (precursorChargeState != dtaChargeState)
 			{
@@ -241,7 +242,7 @@ namespace AScore_DLL.Managers
 			// Finally, create the new ExperimentalSpectra
 			var expSpec = new ExperimentalSpectra(scanNumber, psmChargeState,
 				precursorMass, precursorChargeState, entries);
-			
+
 			return expSpec;
 		}
 
