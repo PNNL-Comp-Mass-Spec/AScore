@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
+using System.Xml.Schema;
 
 namespace AScore_DLL.Managers
 {
@@ -14,6 +15,8 @@ namespace AScore_DLL.Managers
 		#region Class Members
 
 		#region Variables
+
+		private static Dictionary<int, double> mCachedFactorial = new Dictionary<int, double>();
 
 		#endregion // Variables
 
@@ -71,11 +74,19 @@ namespace AScore_DLL.Managers
 		/// <returns></returns>
 		private static double LogFactorial(int n)
 		{
+			double value;
+			if (mCachedFactorial.TryGetValue(n, out value))
+				return value;
+
 			//log n! = 0.5log(2.pi) + 0.5logn + nlog(n/e) + log(1 + 1/(12n))
-			return (double)0.5 * (
+			value = (double)0.5 * (
 				System.Math.Log10(2 * System.Math.PI * n))
 				+ n * (System.Math.Log10(n / System.Math.E))
 				+ (System.Math.Log10(1.0 + 1.0 / (12 * n)));
+
+			mCachedFactorial.Add(n, value);
+
+			return value;
 		}
 
 		#endregion // Public Methods
