@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace AScore_DLL
+﻿namespace AScore_DLL
 {
 	public class AScoreResult
 	{
-		// AScore value
+		// AScore value (closer to 0 is better; 1000 means horrible, -1 means no modified residues)
 		public double AScore { get; set; }
 
 		// Number of b/y ions that could be matched

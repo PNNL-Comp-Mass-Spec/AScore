@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AScore_DLL;
-
-namespace AScore_DLL.Managers.DatasetManagers
+﻿namespace AScore_DLL.Managers.DatasetManagers
 {
 	public class MsgfdbFHT : DatasetManager
 	{

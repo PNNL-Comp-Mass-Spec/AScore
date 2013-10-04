@@ -1,9 +1,6 @@
 ﻿//Joshua Aldrich
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AScore_DLL.Mod;
 using System.Collections;
 

@@ -1,5 +1,4 @@
-﻿using System;
-namespace AScore_DLL.Managers
+﻿namespace AScore_DLL.Managers
 {
     interface SpectraManager
     {

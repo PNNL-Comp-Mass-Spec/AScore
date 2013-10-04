@@ -2,10 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
 
@@ -15,6 +13,7 @@ namespace AScore_DLL
 	public class Algorithm : MessageEventBase
 	{
 		public const string MODINFO_NO_MODIFIED_RESIDUES = "-";
+		protected const double MASS_C13 = 1.00335483;
 
 		private readonly double[] ScoreWeights = { 0.5, 0.75, 1.0, 1.0, 1.0, 1.0, 0.75, 0.5, 0.25, 0.25 };
 		private const double lowRangeMultiplier = 0.28;
@@ -44,16 +43,16 @@ namespace AScore_DLL
 		/// <summary>
 		/// Runs the all the tools necessary to perform an ascore run
 		/// </summary>
-		/// <param name="dtaFileName">dta file path</param>
-		/// <param name="parameterFile">parameter file path</param>
-		/// <param name="datasetFileName">dataset file path</param>
-		/// <param name="outputFilePath">output file path</param>
+		/// <param name="dtaManager"></param>
+		/// <param name="datasetManager"></param>
+		/// <param name="ascoreParameters"></param>
+		/// <param name="outputFilePath"></param>
 		public void AlgorithmRun(DtaManager dtaManager, DatasetManager datasetManager,
 			ParameterFileManager ascoreParameters, string outputFilePath)
 		{
 
 			int totalRows = datasetManager.GetRowLength();
-			Dictionary<string, int> dctPeptidesProcessed = new Dictionary<string, int>();
+			var dctPeptidesProcessed = new Dictionary<string, int>();
 
 			while (datasetManager.CurrentRowNum < totalRows)
 			{
@@ -81,8 +80,8 @@ namespace AScore_DLL
 
 				string[] splittedPep = peptideSeq.Split('.');
 				string sequenceWithoutSuffixOrPrefix;
-				string front = string.Empty;
-				string back = string.Empty;
+				string front;
+				string back;
 
 				if (splittedPep.Length >= 3)
 				{
@@ -98,10 +97,7 @@ namespace AScore_DLL
 				}
 
 				string sequenceClean = GetCleanSequence(sequenceWithoutSuffixOrPrefix, ref ascoreParameters);
-				bool skipPSM = false;
-
-				if (m_filterOnMSGFScore && msgfScore > ascoreParameters.MSGFPreFilter)
-					skipPSM = true;
+				bool skipPSM = m_filterOnMSGFScore && msgfScore > ascoreParameters.MSGFPreFilter;
 
 				string scanChargePeptide = scanNumber + "_" + chargeState + "_" + sequenceWithoutSuffixOrPrefix;
 				if (dctPeptidesProcessed.ContainsKey(scanChargePeptide))
@@ -132,8 +128,7 @@ namespace AScore_DLL
 				MolecularWeights.MassType = MassType.Monoisotopic;
 
 				// Compute precursor m/z value
-				double precursorMZ;
-				precursorMZ = PHRPReader.clsPeptideMassCalculator.ConvoluteMass(expSpec.PrecursorMass, 1, chargeState);
+				double precursorMZ = PHRPReader.clsPeptideMassCalculator.ConvoluteMass(expSpec.PrecursorMass, 1, chargeState);
 
 				// Set the m/z range
 				// Remove magic numbers parameterize
@@ -146,7 +141,7 @@ namespace AScore_DLL
 				}
 
 				//Generate all combination mixtures				
-				Combinatorics.ModMixtureCombo modMixture = new Combinatorics.ModMixtureCombo(ascoreParameters.DynamicMods, sequenceClean);
+				var modMixture = new Combinatorics.ModMixtureCombo(ascoreParameters.DynamicMods, sequenceClean);
 
 				List<int[]> myPositionsList = GetMyPostionList(sequenceClean, modMixture);
 
@@ -188,7 +183,7 @@ namespace AScore_DLL
 		{
 
 			// Initialize AScore results storage
-			List<AScoreResult> lstResults = new List<AScoreResult>();
+			var lstResults = new List<AScoreResult>();
 
 			// Change the charge state to 2+ if it is 1+
 			if (chargeState == 1)
@@ -197,15 +192,24 @@ namespace AScore_DLL
 			}
 
 			// Parallel lists of scores
-			List<List<double>> peptideScores = new List<List<double>>();
-			List<List<double>> weightedScores = new List<List<double>>();
+			var peptideScores = new List<List<double>>();
+			var weightedScores = new List<List<double>>();
 
 			try
 			{
-				TheoreticalSpectra theoMono = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState,
-					new List<Mod.DynamicModification>(), MassType.Monoisotopic);
-				TheoreticalSpectra theoAve = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState,
-					new List<Mod.DynamicModification>(), MassType.Average);
+				var theoMono = new TheoreticalSpectra(
+					sequenceClean, 
+					ascoreParameters, 
+					chargeState, 
+					new List<Mod.DynamicModification>(), 
+					MassType.Monoisotopic);
+
+				var theoAve = new TheoreticalSpectra(
+					sequenceClean, 
+					ascoreParameters, 
+					chargeState, 
+					new List<Mod.DynamicModification>(), 
+					MassType.Average);
 
 				double peptideMassTheoretical = theoMono.PeptideNeutralMassWithStaticMods + GetModMassTotal(peptideSeq, ascoreParameters.DynamicMods);
 
@@ -217,19 +221,21 @@ namespace AScore_DLL
 				{
 					// Make sure the masses agree within a reasonable tolerance
 					bool bValidMatch = false;
-					double delM;
 
-					for (double chargeAdjust = 0; chargeAdjust < 0.1 && !bValidMatch; chargeAdjust += 0.005)
+					for (double chargeAdjust = 0; chargeAdjust < 0.1; chargeAdjust += 0.005)
 					{
 						for (int massAdjust = -chargeState - 3; massAdjust <= chargeState + 3; massAdjust++)
 						{
-							delM = peptideMassTheoretical - expSpec.PrecursorNeutralMass + massAdjust;
+							double delM = peptideMassTheoretical - expSpec.PrecursorNeutralMass + massAdjust * MASS_C13;
 							if (Math.Abs(delM) < 0.15 + chargeState * chargeAdjust)
 							{
 								bValidMatch = true;
 								break;
 							}
 						}
+
+						if (bValidMatch)
+							break;					
 					}
 
 					if (!bValidMatch)
@@ -237,6 +243,8 @@ namespace AScore_DLL
 
 				}
 
+				var sortByMass = new ExperimentalSpectraEntry.SortValue1();
+				var binarySearcher = new BinarySearchRange();
 				int modNumber = 0;
 				foreach (int[] myPositions in myPositionsList)
 				{
@@ -248,11 +256,12 @@ namespace AScore_DLL
 
 					for (int peakDepth = 1; peakDepth < 11; ++peakDepth)
 					{
-						List<ExperimentalSpectraEntry> peakDepthSpectra = expSpec.GetPeakDepthSpectra(peakDepth);
+						var peakDepthSpectra = expSpec.GetPeakDepthSpectra(peakDepth);
+						peakDepthSpectra.Sort(sortByMass);
+					
 						List<double> matchedIons = GetMatchedMZ(
-							peakDepth, ascoreParameters.FragmentMassTolerance,
-							myIons, peakDepthSpectra);
-
+						    peakDepth, ascoreParameters.FragmentMassTolerance,
+						    myIons, peakDepthSpectra, binarySearcher);
 
 						//Adjusted peptide score to score based on tolerance window.
 						double score = PeptideScoresManager.GetPeptideScore(
@@ -260,13 +269,12 @@ namespace AScore_DLL
 
 						// Check if there were any negative scores
 						peptideScores[modNumber].Add(score);
-						weightedScores[modNumber].Add(
-							score * ScoreWeights[peakDepth - 1]);
+						weightedScores[modNumber].Add(score * ScoreWeights[peakDepth - 1]);
 					}
 					modNumber++;
 				}
 
-				List<ValueIndexPair<double>> sortedSumScore = new List<ValueIndexPair<double>>();
+				var sortedSumScore = new List<ValueIndexPair<double>>();
 				for (int seq = 0; seq < peptideScores.Count; ++seq)
 				{
 					double score = 0.0;
@@ -281,8 +289,7 @@ namespace AScore_DLL
 				double topPeptideScore = sortedSumScore[0].Value;
 
 				// Need the phosphorylation sites for the top peptide
-				int[] topPeptidePTMsites =
-					myPositionsList[sortedSumScore[0].Index];
+				int[] topPeptidePTMsites = myPositionsList[sortedSumScore[0].Index];
 
 				SortedList<int, int> siteInfo = GetSiteDict(topPeptidePTMsites);
 
@@ -291,7 +298,7 @@ namespace AScore_DLL
 
 				for (int indSite = 0; indSite < siteInfo.Count; ++indSite)
 				{
-					AScoreResult ascoreResult = new AScoreResult();
+					var ascoreResult = new AScoreResult();
 					lstResults.Add(ascoreResult);
 
 					ascoreResult.ModInfo = LookupModInfoByID(siteInfo.Values[indSite], ascoreParameters.DynamicMods);
@@ -299,8 +306,7 @@ namespace AScore_DLL
 					int secondPeptide = 0;
 					for (secondPeptide = 0; secondPeptide < sortedSumScore.Count; ++secondPeptide)
 					{
-						SortedList<int, int> secondDict = GetSiteDict(myPositionsList[
-							sortedSumScore[secondPeptide].Index]);
+						SortedList<int, int> secondDict = GetSiteDict(myPositionsList[sortedSumScore[secondPeptide].Index]);
 
 						bool othersMatch = true;
 						if (!secondDict.ContainsKey(siteInfo.Keys[indSite]))
@@ -344,7 +350,7 @@ namespace AScore_DLL
 
 
 					// Calculate the diff score between the top and second sites
-					List<ValueIndexPair<double>> diffScore = new List<ValueIndexPair<double>>();
+					var diffScore = new List<ValueIndexPair<double>>();
 					for (int i = 0; i < peptideScores[0].Count; ++i)
 					{
 						diffScore.Add(new ValueIndexPair<double>(
@@ -366,20 +372,24 @@ namespace AScore_DLL
 					List<double> siteIons2 = GetSiteDeterminingIons(secondTopTheoIons, topTheoIons);
 
 					List<ExperimentalSpectraEntry> peakDepthSpectraFinal = expSpec.GetPeakDepthSpectra(peakDepthForAScore);
+					peakDepthSpectraFinal.Sort(sortByMass);
 
 					int bestDeterminingCount = GetMatchedMZ(peakDepthForAScore,
-						ascoreParameters.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal).Count;
+						ascoreParameters.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal, binarySearcher).Count;
+
+					int secondBestDeterminingCount = GetMatchedMZ(peakDepthForAScore,
+						ascoreParameters.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal, binarySearcher).Count;
 
 					double a1 = PeptideScoresManager.GetPeptideScore(((double)peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2) / 100,
 						siteIons1.Count, bestDeterminingCount);
+
 					double a2 = PeptideScoresManager.GetPeptideScore(((double)peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2) / 100,
-						siteIons2.Count, GetMatchedMZ(peakDepthForAScore,
-						ascoreParameters.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal).Count);
+						siteIons2.Count, secondBestDeterminingCount);
 
 					// Add the results to the list
 					ascoreResult.AScore = Math.Abs(a1 - a2);
-					ascoreResult.NumSiteIons = siteIons1.Count;
-					ascoreResult.SiteDetermineMatched = bestDeterminingCount;
+					ascoreResult.NumSiteIons = siteIons1.Count;						// numSiteIonsPoss
+					ascoreResult.SiteDetermineMatched = bestDeterminingCount;		// numSiteIonsMatched
 
 				}
 
@@ -399,7 +409,8 @@ namespace AScore_DLL
 			}
 			catch (Exception ex)
 			{
-				throw ex;
+				Console.WriteLine("Exception in ComputeAScore: " + ex.Message);
+				throw;
 			}
 		}
 
@@ -426,11 +437,11 @@ namespace AScore_DLL
 		/// </summary>
 		/// <param name="seq">unmodified sequence</param>
 		/// <param name="myParam">ascore parameters</param>
-		/// <param name="peptides">peptide modification position array</param>
+		/// <param name="peptideMods">peptide modification position array</param>
 		/// <returns></returns>
 		private string GenerateFinalSequences(string seq, ParameterFileManager myParam, int[] peptideMods)
 		{
-			System.Text.StringBuilder sbFinalSeq = new System.Text.StringBuilder(seq.Length);
+			var sbFinalSeq = new System.Text.StringBuilder(seq.Length);
 
 			for (int i = 0; i < seq.Length; i++)
 			{
@@ -449,7 +460,7 @@ namespace AScore_DLL
 					{
 						if (peptideMods[i] == dmod.UniqueID)
 						{
-							sbFinalSeq.Append(seq[i] + dmod.ModSymbol.ToString());
+							sbFinalSeq.Append(seq[i] + dmod.ModSymbol.ToString(CultureInfo.InvariantCulture));
 						}
 					}
 				}
@@ -463,13 +474,13 @@ namespace AScore_DLL
 		{
 			double modMass = 0;
 
-			for (int i = 0; i < peptideSeq.Length; i++)
+			foreach (char t in peptideSeq)
 			{
-				if (!char.IsLetter(peptideSeq[i]))
+				if (!char.IsLetter(t))
 				{
 					foreach (Mod.DynamicModification m in dynMods)
 					{
-						if (peptideSeq[i] == m.ModSymbol)
+						if (t == m.ModSymbol)
 						{
 							modMass += m.MassMonoisotopic;
 							break;
@@ -491,7 +502,7 @@ namespace AScore_DLL
 		private List<double> GetCurrentComboTheoreticalIons(double mzmax, double mzmin,
 			Dictionary<int, ChargeStateIons> mySpectra)
 		{
-			List<double> myIons = new List<double>();
+			var myIons = new List<double>();
 			foreach (ChargeStateIons csi in mySpectra.Values)
 			{
 				foreach (double ion in csi.BIons)
@@ -512,63 +523,35 @@ namespace AScore_DLL
 			return myIons;
 		}
 
-
 		/// <summary>
 		/// Matches the theoretical ions to experimental ions for some tolerance
 		/// </summary>
 		/// <param name="peakDepth">number of peaks per 100m/z range</param>
 		/// <param name="tolerance">width or window for matching</param>
 		/// <param name="tempSpec">theoretical ions</param>
-		/// <param name="peakDepthSpectra">experimental ions</param>
+		/// <param name="peakDepthSpectra">Experimental ions; assumed to be sorted by m/z</param>
+		/// <param name="binarySearcher"></param>
 		/// <returns></returns>
 		private List<double> GetMatchedMZ(int peakDepth,
-			double tolerance, List<double> tempSpec,
-			List<ExperimentalSpectraEntry> peakDepthSpectra)
+			double tolerance, IEnumerable<double> tempSpec,
+			List<ExperimentalSpectraEntry> peakDepthSpectra,
+			BinarySearchRange binarySearcher)
 		{
-			List<double> matchedMZ = new List<double>();
+			var matchedMZ = new List<double>();
 			foreach (double mz in tempSpec)
 			{
-				foreach (ExperimentalSpectraEntry entry in peakDepthSpectra)
+				int matchIndexStart;
+				int matchIndexEnd;
+
+				if (binarySearcher.FindValueRange(peakDepthSpectra, mz, tolerance, out matchIndexStart, out matchIndexEnd))
 				{
-					if (Math.Abs(entry.Value1 - mz) <= tolerance)
-					{
-						matchedMZ.Add(mz);
-						break;
-					}
-				}
+					matchedMZ.Add(mz);
+				}				
 			}
+
 			return matchedMZ;
 		}
-
-		/// </summary>
-		/// <param name="peakDepth">number of peaks per 100m/z range</param>
-		/// <param name="tolerance">width or window for matching</param>
-		/// <param name="tempSpec">theoretical ions</param>
-		/// <param name="peakDepthSpectra">experimental ions</param>
-		/// <returns></returns>
-		private List<double> GetMatchedMZStoreIntensity(int peakDepth,
-			double tolerance, List<double> tempSpec,
-			List<ExperimentalSpectraEntry> peakDepthSpectra, out List<double> intensity)
-		{
-			intensity = new List<double>();
-			List<double> matchedMZ = new List<double>();
-			foreach (double mz in tempSpec)
-			{
-				foreach (ExperimentalSpectraEntry entry in peakDepthSpectra)
-				{
-					if (Math.Abs(entry.Value1 - mz) <= tolerance)
-					{
-						matchedMZ.Add(mz);
-						intensity.Add(entry.Value2);
-						break;
-					}
-				}
-			}
-			return matchedMZ;
-		}
-
-
-
+	
 		/// <summary>
 		/// Generates the site determining ions by comparing ions of tope two spectra and removing overlapping ions
 		/// </summary>
@@ -577,7 +560,7 @@ namespace AScore_DLL
 		/// <returns>list of values unique to the toGetDetermining list</returns>
 		protected List<double> GetSiteDeterminingIons(List<double> toGetDetermining, List<double> secondSpec)
 		{
-			List<double> siteDetermined = new List<double>(toGetDetermining);
+			var siteDetermined = new List<double>(toGetDetermining);
 			foreach (double ion in secondSpec)
 			{
 				if (siteDetermined.Contains(ion))
@@ -595,7 +578,7 @@ namespace AScore_DLL
 		/// <returns></returns>
 		private SortedList<int, int> GetSiteDict(int[] topPeptidePTMsites)
 		{
-			SortedList<int, int> siteInfo = new SortedList<int, int>();
+			var siteInfo = new SortedList<int, int>();
 			for (int n = 0; n < topPeptidePTMsites.Length; n++)
 			{
 				if (topPeptidePTMsites[n] > 0)
@@ -614,10 +597,10 @@ namespace AScore_DLL
 		/// <returns></returns>
 		private List<int[]> GetMyPostionList(string sequence, Combinatorics.ModMixtureCombo modMixture)
 		{
-			List<int[]> myPositionsList = new List<int[]>();
+			var myPositionsList = new List<int[]>();
 			foreach (List<int> mycom in modMixture.FinalCombos)
 			{
-				int[] myPositions = new int[sequence.Length];
+				var myPositions = new int[sequence.Length];
 				for (int i = 0; i < mycom.Count; i++)
 				{
 					myPositions[modMixture.AllSite[i]] = mycom[i];
@@ -649,7 +632,7 @@ namespace AScore_DLL
 					ascoreParameters.DynamicMods, MassType.Average);
 			}
 			//Get ions within m/z range
-			Dictionary<int, ChargeStateIons> mySpectra = new Dictionary<int, ChargeStateIons>();
+			var mySpectra = new Dictionary<int, ChargeStateIons>();
 			if (ascoreParameters.FragmentMassTolerance <= 0.05)
 			{
 				mySpectra.Add(1, mySpectraMono[1]);

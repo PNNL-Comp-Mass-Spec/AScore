@@ -55,6 +55,7 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="MSDataFileReader">
       <HintPath>lib\MSDataFileReader.dll</HintPath>
     </Reference>
@@ -81,6 +82,7 @@
   <ItemGroup>
     <Compile Include="Algorithm.cs" />
     <Compile Include="AScoreResult.cs" />
+    <Compile Include="BinarySearchRange.cs" />
     <Compile Include="Managers\DatasetManagers\DatasetManager.cs" />
     <Compile Include="Managers\DatasetManagers\InspectFHT.cs" />
     <Compile Include="Managers\DatasetManagers\MsgfdbFHT.cs" />
