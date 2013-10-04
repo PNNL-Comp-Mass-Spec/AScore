@@ -2,8 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml;
 using AScore_DLL.Mod;
 using System.Text.RegularExpressions;
@@ -127,49 +125,49 @@ namespace AScore_DLL.Managers
 		/// <returns>ascore parameters object</returns>
 		public void ParseXml(string inputFile)
 		{
-			XmlDocument parameterFile = new XmlDocument();
+			var parameterFile = new XmlDocument();
 			parameterFile.Load(new XmlTextReader(inputFile));
 
-			XmlNode massTolerance = parameterFile.SelectSingleNode("/Run/MassTolerance");
+			XmlNode massToleranceNode = parameterFile.SelectSingleNode("/Run/MassTolerance");
+			if (massToleranceNode == null)
+				throw new ArgumentOutOfRangeException("The MassTolerance node was not found in XML file " + inputFile);
 
-			XmlNode fragmentType = parameterFile.SelectSingleNode("/Run/FragmentType");
+			XmlNode fragmentTypeNode = parameterFile.SelectSingleNode("/Run/FragmentType");
+			if (fragmentTypeNode == null)
+				throw new ArgumentOutOfRangeException("The FragmentType node was not found in XML file " + inputFile);
 
-            XmlNode msgfFilter = parameterFile.SelectSingleNode("/Run/MSGFPreFilter");
-
+            XmlNode msgfFilterNode = parameterFile.SelectSingleNode("/Run/MSGFPreFilter");
+			if (msgfFilterNode == null)
+				throw new ArgumentOutOfRangeException("The MSGFPreFilter node was not found in XML file " + inputFile);
             
-			FragmentType f = GetFragmentType(fragmentType);
-			double massTol = double.Parse(massTolerance.InnerText);
-            double msgfTol = double.Parse(msgfFilter.InnerText);
-
-			List<Modification> staticMods;
-			List<Modification> terminalMods;
-			List<DynamicModification> dynamicMods;
+			FragmentType f = GetFragmentType(fragmentTypeNode);
+			double massTol = double.Parse(massToleranceNode.InnerText);
+            double msgfTol = double.Parse(msgfFilterNode.InnerText);
 
 			int uniqueID = 1;
 
 			// Parse the static mods
-			staticMods = ParseXmlModInfo(parameterFile, "StaticSeqModifications", ref uniqueID, requireModSites: true);
+			List<Modification> staticModDefs = ParseXmlModInfo(parameterFile, "StaticSeqModifications", ref uniqueID, requireModSites: true);
 
 			// Parse the N and C terminal mods
-			terminalMods = ParseXmlModInfo(parameterFile, "TerminiModifications", ref uniqueID, requireModSites: false);
+			List<Modification> terminalModDefs = ParseXmlModInfo(parameterFile, "TerminiModifications", ref uniqueID, requireModSites: false);
 
 			// Parse the dynamic mods
-			dynamicMods = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
+			List<DynamicModification> dynamicModDefs = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
 
-			InitializeAScoreParameters(staticMods, terminalMods, dynamicMods, f, massTol, msgfTol);
+			InitializeAScoreParameters(staticModDefs, terminalModDefs, dynamicModDefs, f, massTol, msgfTol);
 		}
 
 
 		private List<Modification> ParseXmlModInfo(XmlDocument parameterFile, string sectionName, ref int uniqueID, bool requireModSites)
 		{
-			List<DynamicModification> modsToStore;
-			List<Modification> modList = new List<Modification>();
+			var modList = new List<Modification>();
 
-			modsToStore = ParseXmlDynamicModInfo(parameterFile, sectionName, ref uniqueID, requireModSites: requireModSites, requireModSymbol: false);
+			List<DynamicModification> modsToStore = ParseXmlDynamicModInfo(parameterFile, sectionName, ref uniqueID, requireModSites: requireModSites, requireModSymbol: false);
 
 			foreach (DynamicModification item in modsToStore)
 			{
-				Modification modEntry = new Modification(item);
+				var modEntry = new Modification(item);
 				modList.Add(modEntry);
 			}
 
@@ -178,7 +176,7 @@ namespace AScore_DLL.Managers
 
 		private List<DynamicModification> ParseXmlDynamicModInfo(XmlDocument parameterFile, string sectionName, ref int uniqueID, bool requireModSites, bool requireModSymbol)
 		{
-			List<DynamicModification> modList = new List<DynamicModification>();
+			var modList = new List<DynamicModification>();
 			int modNumberInSection = 0;
 
 			XmlNodeList xmlModInfo = parameterFile.SelectNodes("/Run/Modifications/" + sectionName);
@@ -190,7 +188,7 @@ namespace AScore_DLL.Managers
 					double massMonoIsotopic = 0.0;
 					double massAverage = 0.0;
 					char modSymbol = ' ';
-					List<char> possibleModSites = new List<char>();
+					var possibleModSites = new List<char>();
 					bool nTerminal = false;
 					bool cTerminal = false;
 
@@ -230,7 +228,7 @@ namespace AScore_DLL.Managers
 							}
 						}
 
-						if (massMonoIsotopic == 0)
+						if (Math.Abs(massMonoIsotopic) < 1e-6)
 						{
 							ReportError("Invalid modification definition in section " + sectionName + ", MassMonoIsotopic is zero for mod #" + modNumberInSection);
 							continue;
@@ -246,14 +244,17 @@ namespace AScore_DLL.Managers
 							continue;
 						}
 
-						DynamicModification m = new DynamicModification();
-						m.MassMonoisotopic = massMonoIsotopic;
-						m.MassAverage = massAverage;
-						m.ModSymbol = modSymbol;
-						m.PossibleModSites = possibleModSites;
-						m.nTerminus = nTerminal;
-						m.cTerminus = cTerminal;
-						m.UniqueID = uniqueID++;
+						var m = new DynamicModification
+						{
+							MassMonoisotopic = massMonoIsotopic,
+							MassAverage = massAverage,
+							ModSymbol = modSymbol,
+							PossibleModSites = possibleModSites,
+							nTerminus = nTerminal,
+							cTerminus = cTerminal,
+							UniqueID = uniqueID++
+						};
+
 						modList.Add(m);
 					}
 				}
@@ -268,20 +269,20 @@ namespace AScore_DLL.Managers
 		/// <summary>
 		/// Method to get fragment type from xml
 		/// </summary>
-		/// <param name="fragmentType">xmlnode with fragment type info</param>
+		/// <param name="fragmentTypeNode">xmlnode with fragment type info</param>
 		/// <returns>the type of fragmentation</returns>
-		private FragmentType GetFragmentType(XmlNode fragmentType)
+		private FragmentType GetFragmentType(XmlNode fragmentTypeNode)
 		{
-			FragmentType f = FragmentType.CID;
-			if (Regex.IsMatch(fragmentType.InnerText, "CID"))
+			var f = FragmentType.CID;
+			if (Regex.IsMatch(fragmentTypeNode.InnerText, "CID"))
 			{
 				f = FragmentType.CID;
 			}
-			else if (Regex.IsMatch(fragmentType.InnerText,"ETD"))
+			else if (Regex.IsMatch(fragmentTypeNode.InnerText,"ETD"))
 			{
 				f = FragmentType.ETD;
 			}
-			else if (Regex.IsMatch(fragmentType.InnerText, "HCD"))
+			else if (Regex.IsMatch(fragmentTypeNode.InnerText, "HCD"))
 			{
 				f = FragmentType.HCD;
 			}

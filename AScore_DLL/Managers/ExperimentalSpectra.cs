@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace AScore_DLL.Managers
 {
@@ -116,8 +116,7 @@ namespace AScore_DLL.Managers
 		/// <param name="peakDepth">Peak depth to use to generate the list.</param>
 		public List<ExperimentalSpectraEntry> GetPeakDepthSpectra(int peakDepth)
 		{
-			List<ExperimentalSpectraEntry> expSpecPeakDepth =
-				new List<ExperimentalSpectraEntry>();
+			var expSpecPeakDepth = new List<ExperimentalSpectraEntry>();
 			foreach (List<ExperimentalSpectraEntry> list in topTenSpectra)
 			{
 				if (list.Count >= peakDepth)
@@ -152,8 +151,7 @@ namespace AScore_DLL.Managers
 			m_minMZ = minMZ;
 			m_maxMZ = maxMZ;
 			int numSections = Convert.ToInt32(Math.Ceiling((maxMZ - minMZ) / 100.0));
-			ExperimentalSpectraEntry.SortValue2Descend descendSort =
-				new ExperimentalSpectraEntry.SortValue2Descend();
+			var descendSort = new ExperimentalSpectraEntry.SortValue2Descend();
 
 			// Start getting the top ten hits from each section
 			for (int i = 0; i < numSections; ++i)
@@ -161,8 +159,7 @@ namespace AScore_DLL.Managers
 				// Set the lower and upper bounds for this section
 				double lowerBound = minMZ + (i * 100.0);
 				double upperBound = lowerBound + 100.0;
-				List<ExperimentalSpectraEntry> currentSection =
-					new List<ExperimentalSpectraEntry>();
+				var currentSection = new List<ExperimentalSpectraEntry>();
 				// Now iterate through each mz value in this section looking for
 				// entries that are within 1.0 of the current mz value and picking
 				// the one with the highest Value2 property
@@ -177,7 +174,7 @@ namespace AScore_DLL.Managers
 						++count;
 					}
 
-					// If theres only one, just add it
+					// If there's only one, just add it
 					if (count == 1)
 					{
 						currentSection.Add(
@@ -193,35 +190,30 @@ namespace AScore_DLL.Managers
 					}
 				}
 
-				// If there are more than 10 hits for this section, sort them
-				// and chop off everything past 10.
+				// Sort the data by descending intensity
+				currentSection.Sort(descendSort);
 
-				//Adding a method here to prevent peaks from landing right next to each other
 				if (currentSection.Count >= 10)
 				{
-					List<ExperimentalSpectraEntry> notCurrentSection =
-						new List<ExperimentalSpectraEntry>();
+					// If there are more than 10 hits for this section, then
+					// only keep the top 10 most abundant ions
+
+					var currentSectionFiltered = new List<ExperimentalSpectraEntry>();
 					currentSection.Sort(descendSort);
 					foreach (ExperimentalSpectraEntry s in currentSection)
 					{
-						bool alreadyThere = false;
-						foreach (ExperimentalSpectraEntry p in notCurrentSection)
+						// Make sure the current data point is not too close in mass to the filtered data points
+						bool closeToExistingPoint = currentSectionFiltered.Any(p => Math.Abs(s.Value1 - p.Value1) < tol);
+						if (!closeToExistingPoint)
 						{
-							if (Math.Abs(s.Value1 - p.Value1) < tol)
-							{
-								alreadyThere = true;
-							}
+							currentSectionFiltered.Add(s);
+
+							if (currentSectionFiltered.Count >= 10)
+								break;
 						}
-						if (!alreadyThere)
-						{
-							notCurrentSection.Add(s);
-						}
-						if (notCurrentSection.Count >= 10)
-						{
-							break;
-						}
+					
 					}
-					currentSection = notCurrentSection;
+					currentSection = currentSectionFiltered;
 				}
 
 				// Add the current section to the top ten list
