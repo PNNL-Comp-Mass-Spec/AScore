@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace AScore_DLL.Managers
 {
@@ -74,6 +75,24 @@ namespace AScore_DLL.Managers
 		{
 			public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
 			{
+				return (x.value1.CompareTo(y.value1));
+			}
+		}
+
+		public class FindValue1InTolerance : IComparer<ExperimentalSpectraEntry>
+		{
+			private readonly double mTolerance;
+
+			public FindValue1InTolerance(double tolerance)
+			{
+				mTolerance = tolerance;
+			}
+
+			public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
+			{
+				if (Math.Abs(x.value1 - y.value1) <= mTolerance)
+					return 0;
+				
 				return (x.value1.CompareTo(y.value1));
 			}
 		}

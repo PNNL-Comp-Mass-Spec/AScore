@@ -198,17 +198,17 @@ namespace AScore_DLL
 			try
 			{
 				var theoMono = new TheoreticalSpectra(
-					sequenceClean, 
-					ascoreParameters, 
-					chargeState, 
-					new List<Mod.DynamicModification>(), 
+					sequenceClean,
+					ascoreParameters,
+					chargeState,
+					new List<Mod.DynamicModification>(),
 					MassType.Monoisotopic);
 
 				var theoAve = new TheoreticalSpectra(
-					sequenceClean, 
-					ascoreParameters, 
-					chargeState, 
-					new List<Mod.DynamicModification>(), 
+					sequenceClean,
+					ascoreParameters,
+					chargeState,
+					new List<Mod.DynamicModification>(),
 					MassType.Average);
 
 				double peptideMassTheoretical = theoMono.PeptideNeutralMassWithStaticMods + GetModMassTotal(peptideSeq, ascoreParameters.DynamicMods);
@@ -235,7 +235,7 @@ namespace AScore_DLL
 						}
 
 						if (bValidMatch)
-							break;					
+							break;
 					}
 
 					if (!bValidMatch)
@@ -258,10 +258,10 @@ namespace AScore_DLL
 					{
 						var peakDepthSpectra = expSpec.GetPeakDepthSpectra(peakDepth);
 						peakDepthSpectra.Sort(sortByMass);
-					
+
 						List<double> matchedIons = GetMatchedMZ(
-						    peakDepth, ascoreParameters.FragmentMassTolerance,
-						    myIons, peakDepthSpectra, binarySearcher);
+							peakDepth, ascoreParameters.FragmentMassTolerance,
+							myIons, peakDepthSpectra, binarySearcher);
 
 						//Adjusted peptide score to score based on tolerance window.
 						double score = PeptideScoresManager.GetPeptideScore(
@@ -538,20 +538,32 @@ namespace AScore_DLL
 			BinarySearchRange binarySearcher)
 		{
 			var matchedMZ = new List<double>();
+			
+			// Uncomment to use .NET's binary search (turns out to be 7% slower than using BinarySearchRange)
+			// var massComparer = new ExperimentalSpectraEntry.FindValue1InTolerance(tolerance);
+
 			foreach (double mz in tempSpec)
 			{
+				// Uncomment to use .NET's binary search 
+				//var searchMz = new ExperimentalSpectraEntry(mz, 0);				
+				//if (peakDepthSpectra.BinarySearch(searchMz, massComparer) > -1)
+				//{
+				//    // At least one data point is within tolerance of mz
+				//    matchedMZ.Add(mz);
+				//}
+
+				// Use BinarySearchRange
 				int matchIndexStart;
 				int matchIndexEnd;
-
 				if (binarySearcher.FindValueRange(peakDepthSpectra, mz, tolerance, out matchIndexStart, out matchIndexEnd))
 				{
 					matchedMZ.Add(mz);
-				}				
+				}
 			}
 
 			return matchedMZ;
 		}
-	
+
 		/// <summary>
 		/// Generates the site determining ions by comparing ions of tope two spectra and removing overlapping ions
 		/// </summary>

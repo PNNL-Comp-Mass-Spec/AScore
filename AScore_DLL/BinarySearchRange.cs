@@ -13,21 +13,22 @@ namespace AScore_DLL
 			// Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
 			// Otherwise, returns false
 
-			bool blnMatchFound;
-
 			matchIndexStart = 0;
 			matchIndexEnd = data.Count - 1;
 
 			if (data.Count == 0)
 			{
 				matchIndexEnd = -1;
+				return false;
 			}
-			else if (data.Count == 1)
+			
+			if (data.Count == 1)
 			{
 				if (Math.Abs(searchMZ - data[0].value1) > toleranceHalfWidth)
 				{
 					// Only one data point, and it is not within tolerance
 					matchIndexEnd = -1;
+					return false;
 				}
 			}
 			else
@@ -39,15 +40,11 @@ namespace AScore_DLL
 			{
 				matchIndexStart = -1;
 				matchIndexEnd = -1;
-				blnMatchFound = false;
-			}
-			else
-			{
-				blnMatchFound = true;
+				return false;
 			}
 
-
-			return blnMatchFound;
+			return true;
+	
 		}
 
 		private void BinarySearch(List<ExperimentalSpectraEntry> data, double searchMZ, double toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
