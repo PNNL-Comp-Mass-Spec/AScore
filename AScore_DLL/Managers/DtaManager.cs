@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Text.RegularExpressions;
 
 //TODO: leverage mzxmlfilereader and random access indexing to insert experimental spectra as needed.  may want to use an abstract class that DTAmanager can inherit from.  Make all the same calls.  
 //Need to add some intelligence fro grabbing msxml instead of dta when requesting the msgfdb results.
@@ -120,42 +120,51 @@ namespace AScore_DLL.Managers
 		public ExperimentalSpectra GetExperimentalSpectra(int scanNumber, int scanCount, int psmChargeState)
 		{
 			int dtaChargeState = psmChargeState;
-			string spectraName = String.Empty;
 
 			// Find the desired spectrum
 			// Dictionary keys are the header text for each DTA in the _DTA.txt file, for example:
 			// MyDataset.0538.0538.3.dta
-			// Note that scans could have one or more leading zeroes, so we need to account for that
+			// Note that scans could have one or more leading zeroes, so we may need to check for that
 
-			var lstCharges = new List<int> { dtaChargeState };
-			for (int alternateCharge = 1; alternateCharge < 10; alternateCharge++)
+			var spectraName = GetDtaFileName(scanNumber, scanCount, dtaChargeState);
+			if (!dtaEntries.ContainsKey(spectraName))
 			{
-				if (alternateCharge != dtaChargeState)
-					lstCharges.Add(alternateCharge);
-			}
-
-			foreach (int chargeState in lstCharges)
-			{
-				bool matchFound = false;
-				for (int padLength = 0; padLength <= 6; padLength++)
+				var lstCharges = new List<int>
 				{
-					var scanPrefixPad = new string('0', padLength);
-					spectraName = GetDtaFileName(scanNumber, scanCount, chargeState, scanPrefixPad);
+					dtaChargeState
+				};
 
-					if (dtaEntries.ContainsKey(spectraName))
-					{
-						matchFound = true;
-						break;
-					}
+				for (int alternateCharge = 1; alternateCharge < 10; alternateCharge++)
+				{
+					if (alternateCharge != dtaChargeState)
+						lstCharges.Add(alternateCharge);
 				}
-				if (matchFound)
-					break;
-			}
 
+				foreach (int chargeState in lstCharges)
+				{
+					bool matchFound = false;
+					for (int padLength = 0; padLength <= 6; padLength++)
+					{
+						var scanPrefixPad = new string('0', padLength);
+						spectraName = GetDtaFileName(scanNumber, scanCount, chargeState, scanPrefixPad);
+
+						if (dtaEntries.ContainsKey(spectraName))
+						{
+							matchFound = true;
+							break;
+						}
+					}
+					if (matchFound)
+						break;
+				}
+			}
 
 			if (!dtaEntries.ContainsKey(spectraName))
 				return null;
 
+			var reScan = new Regex(@"scan=(\d+)");
+			var reCS = new Regex(@"cs=(\d+)");
+				
 			double precursorMass = 0.0;
 			int precursorChargeState = 0;
 			var entries = new List<ExperimentalSpectraEntry>();
@@ -174,33 +183,46 @@ namespace AScore_DLL.Managers
 				return null;
 			}
 
+			var splitChars = new char[] { ' ' };
+
 			// Determine the precursor mass
 			// The mass listed in the DTA file is the M+H mass
-			int ind1 = 0;
-			int ind2 = line.IndexOf(' ');
-			double.TryParse(line.Substring(ind1, ind2), out precursorMass);
+			// Example line:
+			// 1196.03544724 3   scan=99 cs=3
 
-			// Parse out charge state
-			ind1 = ind2 + 1;
-			ind2 = line.IndexOf(' ', ind1);
-			if (ind2 > -1)
+			var precursorInfo = line.Split(splitChars, 3);
+			if (precursorInfo.Length < 1)
 			{
-				int.TryParse(line.Substring(ind1, ind2 - ind1), out precursorChargeState);
+				ReportWarning("Precursor line is empty for DTA " + spectraName);
+				return null;
+			}
+
+			double.TryParse(precursorInfo[0], out precursorMass);
+
+			// Parse out charge state			
+			if (precursorInfo.Length > 1)
+			{
+				int.TryParse(precursorInfo[1], out precursorChargeState);
 
 				// Parse out scan number (if it's present)
-				ind1 = line.IndexOf('=') + 1;
-				ind2 = line.IndexOf(' ', ind1);
-				int.TryParse(line.Substring(ind1, ind2 - ind1), out scanNumber);
+				if (precursorInfo.Length > 2)
+				{
+					var reMatch = reScan.Match(line);
+					if (reMatch.Success)
+					{
+						int.TryParse(reMatch.Groups[1].Value, out scanNumber);	
+					}
 
-				// Charge state
-				ind1 = line.LastIndexOf('=') + 1;
-				int.TryParse(line.Substring(ind1, 1), out dtaChargeState);
+					// Additional CS
+					reMatch = reCS.Match(line);
+					if (reMatch.Success)
+					{
+						int.TryParse(reMatch.Groups[1].Value, out dtaChargeState);
+					}
+				
+				}
 			}
-			else
-			{
-				int.TryParse(line.Substring(ind1), out precursorChargeState);
-			}
-
+		
 			if (precursorChargeState != dtaChargeState)
 			{
 				ReportWarning("Charge state mismatch: dtaChargeState=" + dtaChargeState + " vs. precursorChargeState=" + precursorChargeState);
@@ -211,19 +233,21 @@ namespace AScore_DLL.Managers
 			line = masterDta.ReadLine();
 			while (!string.IsNullOrWhiteSpace(line) && !line.Contains("=") && (!masterDta.EndOfStream))
 			{
-				// Get the first number
-				ind1 = 0;
-				ind2 = line.IndexOf(' ');
-				double val1 = 0.0;
-				double.TryParse(line.Substring(ind1, ind2), out val1);
+				var massAndIntensity = line.Split(splitChars, 3);
 
-				// Get the second number
-				ind1 = ind2 + 1;
-				double val2 = 0.0;
-				double.TryParse(line.Substring(ind1, line.Length - ind1), out val2);
+				if (massAndIntensity.Length > 1)
+				{
+					// Get the first number
+					double ionMz;
+					double.TryParse(massAndIntensity[0], out ionMz);
 
-				// Add this entry to the entries list
-				entries.Add(new ExperimentalSpectraEntry(val1, val2));
+					// Get the second number				
+					double ionIntensity = 0.0;
+					double.TryParse(massAndIntensity[1], out ionIntensity);
+
+					// Add this entry to the entries list
+					entries.Add(new ExperimentalSpectraEntry(ionMz, ionIntensity));
+				}
 
 				// Read the next line
 				line = masterDta.ReadLine();
