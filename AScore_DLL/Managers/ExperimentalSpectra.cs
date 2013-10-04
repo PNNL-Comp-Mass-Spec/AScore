@@ -199,7 +199,7 @@ namespace AScore_DLL.Managers
 					// only keep the top 10 most abundant ions
 
 					var currentSectionFiltered = new List<ExperimentalSpectraEntry>();
-					currentSection.Sort(descendSort);
+					
 					foreach (ExperimentalSpectraEntry s in currentSection)
 					{
 						// Make sure the current data point is not too close in mass to the filtered data points
