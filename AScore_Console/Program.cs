@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using PNNLOmicsIO.Utilities.ConsoleUtil;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
@@ -45,16 +42,15 @@ namespace AScore_Console
 		{
 			try
 			{
-				CommandLineUtil clu = new CommandLineUtil();
+				var clu = new CommandLineUtil();
 				bool read = clu.ParseCommandLine();
 
-				AScoreOptionsType ascoreOptions = new AScoreOptionsType();
+				var ascoreOptions = new AScoreOptionsType();
 				ascoreOptions.Initialize();
 				string logFilePath = string.Empty;
 
-				string outValue;
 				string syntaxError = string.Empty;
-				string supportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
+				const string supportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
 
 				if (!clu.ShowHelp)
 				{
@@ -73,6 +69,7 @@ namespace AScore_Console
 					if (!clu.RetrieveValueForParameter("O", out ascoreOptions.OutputFolderPath, false) || string.IsNullOrWhiteSpace(ascoreOptions.OutputFolderPath))
 						ascoreOptions.OutputFolderPath = ".";
 
+					string outValue;
 					if (clu.RetrieveValueForParameter("FM", out outValue, false))
 					{
 						if (!bool.TryParse(outValue, out ascoreOptions.FilterOnMSGFScore))
@@ -189,7 +186,7 @@ namespace AScore_Console
 				mLogFile.AutoFlush = true;
 			}
 
-			System.IO.DirectoryInfo diOutputFolder = new System.IO.DirectoryInfo(ascoreOptions.OutputFolderPath);
+			var diOutputFolder = new System.IO.DirectoryInfo(ascoreOptions.OutputFolderPath);
 			if (!diOutputFolder.Exists)
 			{
 				try
@@ -217,10 +214,10 @@ namespace AScore_Console
 			}
 			else
 			{
-				ParameterFileManager paramManager = new ParameterFileManager(ascoreOptions.AScoreParamFile);
+				var paramManager = new ParameterFileManager(ascoreOptions.AScoreParamFile);
 				AttachEvents(paramManager);
 
-				DtaManager dtaManager = new DtaManager(ascoreOptions.CDtaFile);
+				var dtaManager = new DtaManager(ascoreOptions.CDtaFile);
 				AttachEvents(dtaManager);
 
 				DatasetManager datasetManager;
@@ -250,7 +247,7 @@ namespace AScore_Console
 
 				ShowMessage("Parsing input file: " + ascoreOptions.FirstHitsFile);
 
-				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+				var ascoreEngine = new AScore_DLL.Algorithm();
 				AttachEvents(ascoreEngine);
 
 				// Initialize the options
@@ -265,7 +262,7 @@ namespace AScore_Console
 
 			if (ascoreOptions.CreateUpdatedFirstHitsFile)
 			{
-				AScore_DLL.PHRPResultsMerger resultsMerger = new AScore_DLL.PHRPResultsMerger();
+				var resultsMerger = new AScore_DLL.PHRPResultsMerger();
 				AttachEvents(resultsMerger);
 
 				resultsMerger.MergeResults(ascoreOptions.FirstHitsFile, ascoreResultsFilePath, ascoreOptions.UpdatedFirstHitsFileName);
@@ -284,9 +281,9 @@ namespace AScore_Console
 		/// <param name="paramManager"></param>
 		private static void AttachEvents(AScore_DLL.MessageEventBase paramManager)
 		{
-			paramManager.ErrorEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineErrorEventHandler);
-			paramManager.WarningEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineWarningEventHandler);
-			paramManager.MessageEvent += new AScore_DLL.MessageEventBase.MessageEventHandler(AScoreEngineMessageEventHandler);
+			paramManager.ErrorEvent += AScoreEngineErrorEventHandler;
+			paramManager.WarningEvent += AScoreEngineWarningEventHandler;
+			paramManager.MessageEvent += AScoreEngineMessageEventHandler;
 		}
 
 		private static void ShowMessage(string message)
