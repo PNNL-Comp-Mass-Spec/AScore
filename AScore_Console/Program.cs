@@ -8,17 +8,18 @@ namespace AScore_Console
 {
 	class Program
 	{
-		static System.IO.StreamWriter mLogFile = null;
+		static StreamWriter mLogFile = null;
 
 		struct AScoreOptionsType
 		{
 			public string SearchType;
 			public string FirstHitsFile;
 			public string CDtaFile;
+			public string JobToDatasetMapFile;
 			public string AScoreParamFile;
 			public string OutputFolderPath;
 			public bool FilterOnMSGFScore;
-			
+
 			public bool SkipExistingResults;
 			public bool CreateUpdatedFirstHitsFile;
 			public string UpdatedFirstHitsFileName;
@@ -28,6 +29,7 @@ namespace AScore_Console
 				SearchType = string.Empty;
 				FirstHitsFile = string.Empty;
 				CDtaFile = string.Empty;
+				JobToDatasetMapFile = string.Empty;
 				AScoreParamFile = string.Empty;
 				OutputFolderPath = string.Empty;
 				FilterOnMSGFScore = true;
@@ -44,6 +46,7 @@ namespace AScore_Console
 			{
 				var clu = new CommandLineUtil();
 				bool read = clu.ParseCommandLine();
+				bool multiJobMode = false;
 
 				var ascoreOptions = new AScoreOptionsType();
 				ascoreOptions.Initialize();
@@ -58,16 +61,28 @@ namespace AScore_Console
 						syntaxError = "-T:Search_Engine not defined";
 
 					if (!clu.RetrieveValueForParameter("F", out ascoreOptions.FirstHitsFile, false))
-						syntaxError = "-F:fhtfile_path not defined";
+						syntaxError = "-F:fht_file_path not defined";
 
-					if (!clu.RetrieveValueForParameter("D", out ascoreOptions.CDtaFile, false))
-						syntaxError = "-D:dta_file_path not defined";
+					if (clu.RetrieveValueForParameter("JM", out ascoreOptions.JobToDatasetMapFile, false))
+						multiJobMode = true;
+					else
+					{
+						if (!clu.RetrieveValueForParameter("D", out ascoreOptions.CDtaFile, false))
+							syntaxError = "Must use -D:dta_file_path or -JM:job_to_dataset_mapfile_path";
+					}
 
 					if (!clu.RetrieveValueForParameter("P", out ascoreOptions.AScoreParamFile, false))
 						syntaxError = "-P:parameter_file not defined";
 
 					if (!clu.RetrieveValueForParameter("O", out ascoreOptions.OutputFolderPath, false) || string.IsNullOrWhiteSpace(ascoreOptions.OutputFolderPath))
 						ascoreOptions.OutputFolderPath = ".";
+
+					// If ascoreOptions.OutputFolderPath points to a file, change it to the parent folder
+					var fiOutputFolderAsFile = new FileInfo(ascoreOptions.OutputFolderPath);
+					if (fiOutputFolderAsFile.Extension.Length > 1 && fiOutputFolderAsFile.Directory != null && fiOutputFolderAsFile.Directory.Exists)
+					{
+						ascoreOptions.OutputFolderPath = fiOutputFolderAsFile.Directory.FullName;
+					}
 
 					string outValue;
 					if (clu.RetrieveValueForParameter("FM", out outValue, false))
@@ -87,10 +102,10 @@ namespace AScore_Console
 						if (!string.IsNullOrWhiteSpace(outValue))
 							ascoreOptions.UpdatedFirstHitsFileName = string.Copy(outValue);
 					}
-					
+
 					if (clu.RetrieveValueForParameter("Skip", out outValue, false))
 					{
-						ascoreOptions.SkipExistingResults = true;						
+						ascoreOptions.SkipExistingResults = true;
 					}
 
 				}
@@ -107,25 +122,45 @@ namespace AScore_Console
 					}
 
 					Console.WriteLine("Parameters for running AScore include:");
-					Console.WriteLine(" -T:search_engine (allowed values are " + supportedSearchModes + ")");
+					Console.WriteLine(" -T:search_engine");
+					Console.WriteLine("   (allowed values are " + supportedSearchModes + ")");
 					Console.WriteLine(" -F:fht_file_path");
 					Console.WriteLine(" -D:dta_file_path");
+					Console.WriteLine(" -JM:job_to_dataset_mapfile_path");
+					Console.WriteLine("   (use -JM instead of -D if the FHT file has results from");
+					Console.WriteLine("    multiple jobs; the map file should have job numbers and");
+					Console.WriteLine("    dataset names, using column names Job and Dataset)");
 					Console.WriteLine(" -P:parameter_file_path");
-					Console.WriteLine(" -O:output_file_path");
+					Console.WriteLine(" -O:output_folder_path");
 					Console.WriteLine(" -L:log_file_path");
-					Console.WriteLine(" -FM:true  (true or false to enable/disable filtering on data in column MSGF_SpecProb; default is true)");
-					Console.WriteLine(" -U:updated_fht_file_name  (create a copy of the fht_file with updated peptide sequences plus new AScore-related columns");
-					Console.WriteLine(" -Skip    (will not re-run AScore if an existing results file already exists)");
+					Console.WriteLine(" -FM:true  (true or false to enable/disable filtering");
+					Console.WriteLine("            on data in column MSGF_SpecProb; default is true)");
+					Console.WriteLine(" -U:updated_fht_file_name");
+					Console.WriteLine("   (create a copy of the fht_file with updated peptide");
+					Console.WriteLine("    sequences plus new AScore-related columns");
+					Console.WriteLine(" -Skip     (will not re-run AScore if an existing");
+					Console.WriteLine("            results file already exists)");
 					Console.WriteLine();
-					Console.WriteLine("Example command line:");
-					Console.WriteLine(System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
+					Console.WriteLine("Example command line #1:");
+					Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
 									  " -T:sequest\n" +
-									  " -F:\"C:\\Temp\\GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_fht.txt\"\n" +
-									  " -D:\"C:\\Temp\\GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_dta.txt\"\n" +
-									  " -O:\"C:\\Temp\\GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09.txt\"\n" +
-									  " -P:C:\\Temp\\parameterFileForGmax.xml\n" +
+									  " -F:\"C:\\Temp\\DatasetName_fht.txt\"\n" +
+									  " -D:\"C:\\Temp\\DatasetName_dta.txt\"\n" +
+									  " -O:\"C:\\Temp\"\n" +
+									  " -P:C:\\Temp\\DynMetOx_stat_4plex_iodo_hcd.xml\n" +
+									  " -L:LogFile.txt\n" +
+									  " -FM:true");
+					Console.WriteLine();
+					Console.WriteLine("Example command line #2:");
+					Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
+									  " -T:msgfplus\n" +
+									  " -F:\"C:\\Temp\\Multi_Job_Results_fht.txt\"\n" +
+									  " -JM:\"C:\\Temp\\JobToDatasetNameMap.txt\"\n" +
+									  " -O:\"C:\\Temp\\\"\n" +
+									  " -P:C:\\Temp\\DynPhos_stat_6plex_iodo_hcd.xml\n" +
 									  " -L:LogFile.txt\n" +
 									  " -FM:true\n");
+
 
 					clu.PauseAtConsole(750, 250);
 					return 0;
@@ -139,9 +174,17 @@ namespace AScore_Console
 					return -10;
 				}
 
-				if (!File.Exists(ascoreOptions.CDtaFile))
+
+				if (!string.IsNullOrEmpty(ascoreOptions.CDtaFile) && !File.Exists(ascoreOptions.CDtaFile))
 				{
 					Console.WriteLine("Input file not found: " + ascoreOptions.CDtaFile);
+					clu.PauseAtConsole(2000, 333);
+					return -11;
+				}
+
+				if (!string.IsNullOrEmpty(ascoreOptions.JobToDatasetMapFile) && !File.Exists(ascoreOptions.JobToDatasetMapFile))
+				{
+					Console.WriteLine("Input file not found: " + ascoreOptions.JobToDatasetMapFile);
 					clu.PauseAtConsole(2000, 333);
 					return -11;
 				}
@@ -153,7 +196,7 @@ namespace AScore_Console
 					return -12;
 				}
 
-				int returnCode = RunAScore(ascoreOptions, logFilePath, supportedSearchModes);
+				int returnCode = RunAScore(ascoreOptions, logFilePath, supportedSearchModes, multiJobMode);
 
 				if (returnCode != 0)
 					clu.PauseAtConsole(2000, 333);
@@ -161,32 +204,32 @@ namespace AScore_Console
 			}
 			catch (Exception ex)
 			{
-			    Console.WriteLine();
-			    ShowMessage("Program failure, possibly incorrect search engine type; " + ex.Message);
-			    ShowMessage("Stack Track: " + ex.StackTrace);
+				Console.WriteLine();
+				ShowMessage("Program failure, possibly incorrect search engine type; " + ex.Message);
+				ShowMessage("Stack Track: " + ex.StackTrace);
 
-			    return ((int)ex.Message.GetHashCode());
+				return ((int)ex.Message.GetHashCode());
 			}
 			finally
 			{
-			    if (mLogFile != null)
-			        mLogFile.Close();
+				if (mLogFile != null)
+					mLogFile.Close();
 			}
 
 			return 0;
 
 		}
 
-		private static int RunAScore(AScoreOptionsType ascoreOptions, string logFilePath, string supportedSearchModes)
+		private static int RunAScore(AScoreOptionsType ascoreOptions, string logFilePath, string supportedSearchModes, bool multiJobMode)
 		{
 
 			if (!String.IsNullOrWhiteSpace(logFilePath))
 			{
-				mLogFile = new System.IO.StreamWriter(new System.IO.FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
+				mLogFile = new StreamWriter(new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 				mLogFile.AutoFlush = true;
 			}
 
-			var diOutputFolder = new System.IO.DirectoryInfo(ascoreOptions.OutputFolderPath);
+			var diOutputFolder = new DirectoryInfo(ascoreOptions.OutputFolderPath);
 			if (!diOutputFolder.Exists)
 			{
 				try
@@ -197,18 +240,14 @@ namespace AScore_Console
 				catch (Exception ex)
 				{
 					ShowMessage("Error creating the output folder: " + ex.Message);
-					diOutputFolder = new System.IO.DirectoryInfo(".");
+					diOutputFolder = new DirectoryInfo(".");
 					ShowMessage("Changed output to " + diOutputFolder.FullName);
 				}
 			}
-			else
-			{
-				ShowMessage("Writing results to " + diOutputFolder.FullName);
-			}
-			
-			string ascoreResultsFilePath = System.IO.Path.Combine(diOutputFolder.FullName, System.IO.Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile) + "_ascore.txt");
 
-			if (ascoreOptions.SkipExistingResults && System.IO.File.Exists(ascoreResultsFilePath))
+			string ascoreResultsFilePath = Path.Combine(diOutputFolder.FullName, Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile) + "_ascore.txt");
+
+			if (ascoreOptions.SkipExistingResults && File.Exists(ascoreResultsFilePath))
 			{
 				ShowMessage("Existing results file found; will not re-create");
 			}
@@ -216,27 +255,28 @@ namespace AScore_Console
 			{
 				var paramManager = new ParameterFileManager(ascoreOptions.AScoreParamFile);
 				AttachEvents(paramManager);
-
-				var dtaManager = new DtaManager(ascoreOptions.CDtaFile);
-				AttachEvents(dtaManager);
-
+			
 				DatasetManager datasetManager;
 				ascoreOptions.SearchType = ascoreOptions.SearchType.ToLower();
 
 				switch (ascoreOptions.SearchType)
 				{
 					case "xtandem":
+						ShowMessage("Caching data in " + ascoreOptions.FirstHitsFile);
 						datasetManager = new XTandemFHT(ascoreOptions.FirstHitsFile);
 						break;
 					case "sequest":
+						ShowMessage("Caching data in " + ascoreOptions.FirstHitsFile);
 						datasetManager = new SequestFHT(ascoreOptions.FirstHitsFile);
 						break;
 					case "inspect":
+						ShowMessage("Caching data in " + ascoreOptions.FirstHitsFile);
 						datasetManager = new InspectFHT(ascoreOptions.FirstHitsFile);
 						break;
 					case "msgfdb":
 					case "msgfplus":
 					case "msgf+":
+						ShowMessage("Caching data in " + ascoreOptions.FirstHitsFile);
 						datasetManager = new MsgfdbFHT(ascoreOptions.FirstHitsFile);
 						break;
 					default:
@@ -245,7 +285,10 @@ namespace AScore_Console
 						return -13;
 				}
 
-				ShowMessage("Parsing input file: " + ascoreOptions.FirstHitsFile);
+				var dtaManager = new DtaManager();
+				AttachEvents(dtaManager);
+
+				ShowMessage("Computing AScore values and Writing results to " + diOutputFolder.FullName);
 
 				var ascoreEngine = new AScore_DLL.Algorithm();
 				AttachEvents(ascoreEngine);
@@ -255,7 +298,17 @@ namespace AScore_Console
 
 
 				// Run the algorithm
-				ascoreEngine.AlgorithmRun(dtaManager, datasetManager, paramManager, ascoreResultsFilePath);
+				if (multiJobMode)
+				{
+					ascoreEngine.AlgorithmRun(ascoreOptions.JobToDatasetMapFile, dtaManager, datasetManager, paramManager, ascoreResultsFilePath);
+				}
+				else
+				{
+					dtaManager.OpenCDTAFile(ascoreOptions.CDtaFile);
+
+					ascoreEngine.AlgorithmRun(dtaManager, datasetManager, paramManager, ascoreResultsFilePath);
+				}
+				
 
 				ShowMessage("AScore Complete");
 			}
@@ -269,8 +322,6 @@ namespace AScore_Console
 
 				ShowMessage("Results merged; new file: " + resultsMerger.MergedFilePath);
 			}
-			
-
 
 			return 0;
 		}
