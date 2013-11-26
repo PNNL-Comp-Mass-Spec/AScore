@@ -16,19 +16,48 @@ namespace AScore_DLL.Managers
 
 		#region Variables
 
-		private string datasetName;
-		private StreamReader masterDta = null;
+		private string m_datasetName;
+		private StreamReader m_masterDta = null;
 		private Dictionary<string, long> dtaEntries = new Dictionary<string, long>();
+
+		private bool m_initialized;
 
 		#endregion // Variables
 
 		#region Properties
 
+		public string DatasetName
+		{
+			get
+			{
+				return m_datasetName;
+			}
+		}
+
+
+		public bool Initialized
+		{
+			get
+			{
+				return m_initialized;
+			}
+
+		}
 		#endregion // Properties
 
 		#endregion // Class Members
 
 		#region Constructor
+
+		/// <summary>
+		/// Initializes a DtaManager for which we don't yet know the path of the CDTA file to read
+		/// </summary>
+		/// <remarks>You must call UpdateDtaFilePath() prior to using GetDtaFileName() or GetExperimentalSpectra()</remarks>
+		public DtaManager()
+		{
+			m_initialized = false;
+		}
+
 
 		/// <summary>
 		/// Initializes a new instance of DtaManger.
@@ -38,25 +67,7 @@ namespace AScore_DLL.Managers
 		/// <exception cref="FileNotFoundException"></exception>
 		public DtaManager(string masterDtaPath)
 		{
-			try
-			{
-				datasetName = System.IO.Path.GetFileNameWithoutExtension(masterDtaPath);
-				datasetName = datasetName.Substring(0, datasetName.Length - 4);
-				masterDta = new StreamReader(masterDtaPath);
-				Initialize();
-			}
-			catch (DirectoryNotFoundException)
-			{
-				throw new DirectoryNotFoundException("The specified directory for " +
-					"the Master DTA could not be found!");
-			}
-			catch (FileNotFoundException)
-			{
-				string fileName = masterDtaPath.Substring(
-					masterDtaPath.LastIndexOf('\\') + 1);
-				throw new FileNotFoundException("The specified Master DTA file \"" +
-					fileName + "\" could not be found!");
-			}
+			OpenCDTAFile(masterDtaPath);			
 		}
 
 		#endregion // Constructor
@@ -69,24 +80,49 @@ namespace AScore_DLL.Managers
 		/// </summary>
 		~DtaManager()
 		{
-			dtaEntries.Clear();
-			dtaEntries = null;
-			if (masterDta != null)
-			{
-				masterDta.Close();
-				masterDta.Dispose();
-			}
+			ClearCachedData();
+			m_initialized =false;
 		}
 
 		#endregion // Destructor
 
 		#region Public Methods
 
+		public void OpenCDTAFile(string masterDtaPath)
+		{
+			if (m_initialized)
+				ClearCachedData();
+
+			try
+			{
+				m_datasetName = Path.GetFileNameWithoutExtension(masterDtaPath);
+				if (string.IsNullOrEmpty(m_datasetName))
+					throw new FileNotFoundException("Master Dta filename is empty");
+
+				if (m_datasetName.ToLower().EndsWith("_dta"))
+					m_datasetName = m_datasetName.Substring(0, m_datasetName.Length - 4);
+
+				Initialize(masterDtaPath);
+			}
+			catch (DirectoryNotFoundException)
+			{
+				throw new DirectoryNotFoundException("The specified directory for " +
+													 "the Master DTA could not be found!");
+			}
+			catch (FileNotFoundException)
+			{
+				string fileName = masterDtaPath.Substring(
+					masterDtaPath.LastIndexOf('\\') + 1);
+				throw new FileNotFoundException("The specified Master DTA file \"" +
+												fileName + "\" could not be found!");
+			}
+		}
+
 		public void Abort()
 		{
-			if (masterDta != null)
+			if (m_masterDta != null)
 			{
-				masterDta.Close();
+				m_masterDta.Close();
 			}
 		}
 
@@ -98,6 +134,9 @@ namespace AScore_DLL.Managers
 
 		public string GetDtaFileName(int scanNumber, int scanCount, int chargeState, string scanPrefixPad)
 		{
+			if (!m_initialized)
+				throw new Exception("Class has not yet been initialized; call OpenCDTAFile() before calling this function");
+
 			if (string.IsNullOrWhiteSpace(scanPrefixPad))
 				scanPrefixPad = string.Empty;
 
@@ -105,7 +144,7 @@ namespace AScore_DLL.Managers
 			string scanEnd = scanPrefixPad + (scanNumber + scanCount - 1);
 
 			return string.Format("{0}.{1}.{2}.{3}.dta",
-				datasetName, scanStart,
+				m_datasetName, scanStart,
 				scanEnd, chargeState);
 		}
 
@@ -119,6 +158,9 @@ namespace AScore_DLL.Managers
 		/// spectra name exists, null if it does not.</returns>
 		public ExperimentalSpectra GetExperimentalSpectra(int scanNumber, int scanCount, int psmChargeState)
 		{
+			if (!m_initialized)
+				throw new Exception("Class has not yet been initialized; call OpenCDTAFile() before calling this function");
+
 			int dtaChargeState = psmChargeState;
 
 			// Find the desired spectrum
@@ -170,12 +212,12 @@ namespace AScore_DLL.Managers
 			var entries = new List<ExperimentalSpectraEntry>();
 
 			// Set the Master DTAs file position to the specified spectra
-			masterDta.DiscardBufferedData();
-			masterDta.BaseStream.Position = dtaEntries[spectraName];
+			m_masterDta.DiscardBufferedData();
+			m_masterDta.BaseStream.Position = dtaEntries[spectraName];
 
 			// Read the first line of the entry and extract the precursor
 			// entries as well as the scan number and charge state
-			string line = masterDta.ReadLine();
+			string line = m_masterDta.ReadLine();
 
 			if (string.IsNullOrWhiteSpace(line))
 			{
@@ -230,8 +272,8 @@ namespace AScore_DLL.Managers
 			}
 
 			// Process the rest of the entries in this spectra
-			line = masterDta.ReadLine();
-			while (!string.IsNullOrWhiteSpace(line) && !line.Contains("=") && (!masterDta.EndOfStream))
+			line = m_masterDta.ReadLine();
+			while (!string.IsNullOrWhiteSpace(line) && !line.Contains("=") && (!m_masterDta.EndOfStream))
 			{
 				var massAndIntensity = line.Split(splitChars, 3);
 
@@ -250,7 +292,7 @@ namespace AScore_DLL.Managers
 				}
 
 				// Read the next line
-				line = masterDta.ReadLine();
+				line = m_masterDta.ReadLine();
 			}
 
 			if (precursorChargeState != psmChargeState)
@@ -274,40 +316,71 @@ namespace AScore_DLL.Managers
 
 		#region Private Methods
 
+		private void ClearCachedData()
+		{
+			if (dtaEntries != null)
+			{
+				dtaEntries.Clear();
+			}
+
+			if (m_masterDta != null)
+			{
+				m_masterDta.Close();
+				m_masterDta.Dispose();
+			}
+		}
+
 		/// <summary>
 		/// Initializes the internal dictionary with the offsets of the files located
 		/// in the master dta.
 		/// </summary>
-		private void Initialize()
+		private void Initialize(string masterDtaPath)
 		{
 			long bytesRead = 0;
 			string line = string.Empty;
 
-			while (!masterDta.EndOfStream)
+			try
 			{
-				// Find the next individual dta file entry
-				while ((!line.Contains("\"")) && (!masterDta.EndOfStream))
+				m_masterDta = new StreamReader(masterDtaPath);
+				while (!m_masterDta.EndOfStream)
 				{
-					line = masterDta.ReadLine();
-					bytesRead += line.Length + Environment.NewLine.Length;
+					// Find the next individual dta file entry
+					while ((!line.Contains("\"")) && (!m_masterDta.EndOfStream))
+					{
+						line = m_masterDta.ReadLine();
+						if (line != null)
+						{
+							bytesRead += line.Length + Environment.NewLine.Length;
+						}
+					}
+
+					// If we're not at the end of the file get the next entry
+					if (!m_masterDta.EndOfStream)
+					{
+						// First extract the name of this dta entry
+						int entryNameIndex = line.IndexOf('\"') + 1;
+						int entryNameLength = line.LastIndexOf('\"') - entryNameIndex;
+						string entryName = line.Substring(entryNameIndex, entryNameLength);
+
+						// Add it to the dictionary
+						dtaEntries.Add(entryName, bytesRead);
+
+						// Read the next line from the file
+						line = m_masterDta.ReadLine();
+						if (line != null)
+						{
+							bytesRead += line.Length + Environment.NewLine.Length;
+						}
+					}
 				}
 
-				// If we're not at the end of the file get the next entry
-				if (!masterDta.EndOfStream)
-				{
-					// First extract the name of this dta entry
-					int entryNameIndex = line.IndexOf('\"') + 1;
-					int entryNameLength = line.LastIndexOf('\"') - entryNameIndex;
-					string entryName = line.Substring(entryNameIndex, entryNameLength);
-
-					// Add it to the dictionary
-					dtaEntries.Add(entryName, bytesRead);
-
-					// Read the next line from the file
-					line = masterDta.ReadLine();
-					bytesRead += line.Length + Environment.NewLine.Length;
-				}
 			}
+			catch (Exception ex)
+			{
+				throw new Exception("Error initializing the DtaManager using " + m_masterDta + ": " + ex.Message);
+			}
+
+			m_initialized = true;
 		}
 
 		#endregion // Private Methods

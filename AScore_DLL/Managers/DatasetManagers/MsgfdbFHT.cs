@@ -7,6 +7,10 @@
 		public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, 
 			ref AScore_DLL.Managers.ParameterFileManager ascoreParam)
 		{
+
+			if (dt.Columns.Contains(RESULTS_COL_JOB))
+				m_jobNum = (string)dt.Rows[t][RESULTS_COL_JOB];		
+
 			scanNumber = int.Parse((string)dt.Rows[t]["Scan"]);
 			scanCount = 1;
 			chargeState = int.Parse((string)dt.Rows[t]["Charge"]);

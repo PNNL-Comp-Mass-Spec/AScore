@@ -1,6 +1,7 @@
 ﻿//Joshua Aldrich
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -36,28 +37,121 @@ namespace AScore_DLL
 			}
 		}
 
+
 		#endregion
 
 		#region Public Method
 
+		public void AlgorithmRun(string JobToDatasetMapFile, DtaManager dtaManager, DatasetManager datasetManager,
+								 ParameterFileManager ascoreParameters, string outputFilePath)
+		{
+			var jobToDatasetNameMap = new Dictionary<string, string>();
+
+			var lstColumnMapping = new Dictionary<string, int>();
+			var lstColumnNames = new List<string>
+			{
+				"Job",
+				"Dataset"
+			};
+
+
+			// Read the contents of JobToDatasetMapFile
+			using (var srMapFile = new StreamReader(new FileStream(JobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
+			{
+				int rowNumber = 0;
+				while (srMapFile.Peek() > -1)
+				{
+					string dataLine = srMapFile.ReadLine();
+					rowNumber++;
+
+					if (string.IsNullOrWhiteSpace(dataLine))
+						continue;
+
+					List<string> dataColumns = dataLine.Split(new[] { '\t' }).ToList();
+
+					if (rowNumber == 1)
+					{
+						// Parse the headers
+
+						foreach (var columnName in lstColumnNames)
+						{
+							int colIndex = dataColumns.IndexOf(columnName);
+							if (colIndex < 0)
+							{
+								string errorMessage = "JobToDatasetMapFile is missing column " + columnName;
+								ReportError(errorMessage);
+								throw new Exception(errorMessage);
+							}
+							lstColumnMapping.Add(columnName, colIndex);
+						}
+						continue;
+					}
+
+					if (dataColumns.Count < lstColumnMapping.Count)
+					{
+						ReportWarning("Row " + rowNumber + " has fewer than " + lstColumnMapping.Count + " columns; skipping this row");
+						continue;
+					}
+
+					var job = dataColumns[lstColumnMapping["Job"]];
+					var dataset = dataColumns[lstColumnMapping["Dataset"]];
+
+					jobToDatasetNameMap.Add(job, dataset);
+				}
+			}
+
+			AlgorithmRun(jobToDatasetNameMap, dtaManager, datasetManager, ascoreParameters, outputFilePath);
+
+		}
+
+		public void AlgorithmRun(DtaManager dtaManager, DatasetManager datasetManager,
+								 ParameterFileManager ascoreParameters, string outputFilePath)
+		{
+			var jobToDatasetNameMap = new Dictionary<string, string>
+			{
+				{datasetManager.JobNum, dtaManager.DatasetName}
+			};
+
+			if (dtaManager == null || !dtaManager.Initialized)
+				throw new Exception(
+					"dtaManager must be instantiated and initialized before calling AlgorithmRun for a single source file");
+
+			AlgorithmRun(jobToDatasetNameMap, dtaManager, datasetManager, ascoreParameters, outputFilePath);
+		}
+
 		/// <summary>
 		/// Runs the all the tools necessary to perform an ascore run
 		/// </summary>
-		/// <param name="dtaManager"></param>
+		/// <param name="jobToDatasetNameMap">Keys are job numbers (stored as strings); values are Dataset Names</param>
+		/// <param name="dtaManager">DtaManager, which the calling class must have already initialized</param>
 		/// <param name="datasetManager"></param>
 		/// <param name="ascoreParameters"></param>
 		/// <param name="outputFilePath"></param>
-		public void AlgorithmRun(DtaManager dtaManager, DatasetManager datasetManager,
-			ParameterFileManager ascoreParameters, string outputFilePath)
+		protected void AlgorithmRun(Dictionary<string, string> jobToDatasetNameMap, DtaManager dtaManager, DatasetManager datasetManager,
+									ParameterFileManager ascoreParameters, string outputFilePath)
 		{
 
 			int totalRows = datasetManager.GetRowLength();
 			var dctPeptidesProcessed = new Dictionary<string, int>();
 
+			if (jobToDatasetNameMap == null || jobToDatasetNameMap.Count == 0)
+			{
+				const string errorMessage = "Error in AlgorithmRun: jobToDatasetNameMap cannot be null or empty";
+				ReportError(errorMessage);
+				throw new ArgumentException(errorMessage);
+			}
+
+			string dtaManagerCurrentJob = jobToDatasetNameMap.First().Key;
+
+			if (!dtaManager.Initialized)
+			{
+				var dtaFilePath = GetCDTAFilePath(datasetManager, jobToDatasetNameMap.First().Value);
+				dtaManager.OpenCDTAFile(dtaFilePath);
+			}
+
 			while (datasetManager.CurrentRowNum < totalRows)
 			{
 				//	Console.Clear();
-
 
 				if (datasetManager.CurrentRowNum % 100 == 0)
 				{
@@ -112,10 +206,25 @@ namespace AScore_DLL
 					continue;
 				}
 
+				if (!string.Equals(dtaManagerCurrentJob, datasetManager.JobNum))
+				{
+					string dtaPathNew;
+					if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out dtaPathNew))
+					{
+						string errorMessage = "Input file refers to job " + datasetManager.JobNum +
+											  " but jobToDatasetNameMap does not contain that job; unable to continue";
+						ReportError(errorMessage);
+						throw new Exception(errorMessage);
+					}
+
+					var dtaFilePath = GetCDTAFilePath(datasetManager, dtaPathNew);
+					dtaManager.OpenCDTAFile(dtaFilePath);
+					dtaManagerCurrentJob = string.Copy(datasetManager.JobNum);
+					
+				}
 
 				//Get experimental spectra
-				ExperimentalSpectra expSpec = dtaManager.GetExperimentalSpectra(
-					scanNumber, scanCount, chargeState);
+				ExperimentalSpectra expSpec = dtaManager.GetExperimentalSpectra(scanNumber, scanCount, chargeState);
 
 				if (expSpec == null)
 				{
@@ -174,6 +283,17 @@ namespace AScore_DLL
 
 		}
 
+		private static string GetCDTAFilePath(DatasetManager datasetManager, string datasetName)
+		{
+			var dtaFilePath = datasetName + "_dta.txt";
+			var parentFolder = Path.GetDirectoryName(datasetManager.DatasetFilePath);
+			if (parentFolder != null)
+			{
+				dtaFilePath = Path.Combine(parentFolder, dtaFilePath);
+			}
+
+			return dtaFilePath;
+		}
 
 		#endregion
 
@@ -538,7 +658,7 @@ namespace AScore_DLL
 			BinarySearchRange binarySearcher)
 		{
 			var matchedMZ = new List<double>();
-			
+
 			// Uncomment to use .NET's binary search (turns out to be 7% slower than using BinarySearchRange)
 			// var massComparer = new ExperimentalSpectraEntry.FindValue1InTolerance(tolerance);
 

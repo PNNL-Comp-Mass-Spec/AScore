@@ -9,6 +9,9 @@
 		public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
 			out string peptideSeq, ref AScore_DLL.Managers.ParameterFileManager ascoreParam)
 		{
+			if (dt.Columns.Contains(RESULTS_COL_JOB))
+				m_jobNum = (string)dt.Rows[t][RESULTS_COL_JOB];		
+
 			scanNumber = int.Parse((string)dt.Rows[t]["ScanNum"]);
 			scanCount = int.Parse((string)dt.Rows[t]["ScanCount"]);
 			chargeState = int.Parse((string)dt.Rows[t]["ChargeState"]);
@@ -17,10 +20,8 @@
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam)
         {
-            scanNumber = int.Parse((string)dt.Rows[t]["ScanNum"]);
-            scanCount = int.Parse((string)dt.Rows[t]["ScanCount"]);
-            chargeState = int.Parse((string)dt.Rows[t]["ChargeState"]);
-            peptideSeq = (string)dt.Rows[t]["Peptide"];
+			this.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParam);
+
             msgfScore = 0;
             double.TryParse((string)dt.Rows[t]["MSGF_SpecProb"], out msgfScore);
         }

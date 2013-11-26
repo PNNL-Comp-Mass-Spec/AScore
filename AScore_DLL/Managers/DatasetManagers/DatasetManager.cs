@@ -26,7 +26,7 @@ namespace AScore_DLL.Managers.DatasetManagers
 		protected int t = 0;
 		protected int maxSteps;
 		public bool AtEnd{get; set;}
-        protected string jobNum;
+        protected string m_jobNum;
 		protected string mDatasetFilePath = string.Empty;
 
 		public string DatasetFilePath { 
@@ -35,16 +35,24 @@ namespace AScore_DLL.Managers.DatasetManagers
 			}
 		}
 
-		public DatasetManager()
+		public string JobNum
 		{
+			get
+			{
+				return m_jobNum;
+			}
 		}
 
-
-		public DatasetManager(string fhtFileName)
+	    protected DatasetManager(string fhtFileName)
 		{
 			mDatasetFilePath = fhtFileName;
 			dt = Utilities.TextFileToDataTableAssignTypeString(fhtFileName, false);
-			jobNum = (string)dt.Rows[0][RESULTS_COL_JOB];
+		    
+            if (dt.Columns.Contains(RESULTS_COL_JOB))
+		        m_jobNum = (string)dt.Rows[0][RESULTS_COL_JOB];
+		    else
+		        m_jobNum = "0";
+
 			maxSteps = dt.Rows.Count;
 			AtEnd = false;
 			InitializeAscores();
@@ -55,6 +63,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         private void InitializeAscores()
         {
             dAscores = new DataTable();
+            
 			dAscores.Columns.Add(RESULTS_COL_JOB, typeof(string));
 			dAscores.Columns.Add(RESULTS_COL_SCAN, typeof(string));
 			dAscores.Columns.Add(RESULTS_COL_ORIGINALSEQUENCE, typeof(string));
@@ -74,15 +83,15 @@ namespace AScore_DLL.Managers.DatasetManagers
 			return dt.Rows.Count;
 		}
 
-		/// <summary>
-		/// Get the row information needed to process next spectra
-		/// </summary>
-		/// <param name="scanNumber">scan number</param>
-		/// <param name="scanCount">number of scans, usually 1</param>
-		/// <param name="chargeState">charge state</param>
-		/// <param name="peptideSeq">peptide sequence</param>
-        /// 
-        public abstract void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
+	    /// <summary>
+	    /// Get the row information needed to process next spectra
+	    /// </summary>
+	    /// <param name="scanNumber">scan number</param>
+	    /// <param name="scanCount">number of scans, usually 1</param>
+	    /// <param name="chargeState">charge state</param>
+	    /// <param name="peptideSeq">peptide sequence</param>
+	    /// <param name="ascoreParam">Parameter file manager</param>
+	    public abstract void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
 			out string peptideSeq, ref AScore_DLL.Managers.ParameterFileManager ascoreParam);
 
 		public abstract void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
@@ -120,7 +129,8 @@ namespace AScore_DLL.Managers.DatasetManagers
 			//}
 
             DataRow drow = dAscores.NewRow();
-			drow[RESULTS_COL_JOB] = jobNum;
+
+			drow[RESULTS_COL_JOB] = m_jobNum;
 			drow[RESULTS_COL_SCAN] = scanNum;
 			drow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
 			drow[RESULTS_COL_BESTSEQUENCE] = bestSeq;
@@ -151,7 +161,8 @@ namespace AScore_DLL.Managers.DatasetManagers
 			//}
 
             DataRow drow = dAscores.NewRow();
-			drow[RESULTS_COL_JOB] = jobNum;
+
+            drow[RESULTS_COL_JOB] = m_jobNum;
 			drow[RESULTS_COL_SCAN] = scanNum;
 			drow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
 			drow[RESULTS_COL_BESTSEQUENCE] = peptideSeq;
