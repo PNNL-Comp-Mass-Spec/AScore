@@ -16,7 +16,7 @@ using ExtensionMethods;
 // 
 // Last modified May 23, 2014
 
-namespace FileProcessor
+namespace AScore_Console
 {
 
 	public class clsParseCommandLine

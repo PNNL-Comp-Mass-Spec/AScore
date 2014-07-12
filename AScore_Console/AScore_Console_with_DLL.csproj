@@ -68,17 +68,31 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
-    <Reference Include="PNNLOmicsIO">
-      <HintPath>lib\PNNLOmicsIO.dll</HintPath>
+    <Reference Include="PeptideToProteinMapEngine">
+      <HintPath>lib\PeptideToProteinMapEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="PHRPReader">
+      <HintPath>lib\PHRPReader.dll</HintPath>
+    </Reference>
+    <Reference Include="ProteinCoverageSummarizer">
+      <HintPath>lib\ProteinCoverageSummarizer.dll</HintPath>
+    </Reference>
+    <Reference Include="ProteinFileReader">
+      <HintPath>lib\ProteinFileReader.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.93.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="clsParseCommandLine.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -109,6 +123,14 @@
       <Project>{B319DBEA-1C29-407F-857F-6BBEF2949EEB}</Project>
       <Name>AScore_DLL</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="x64\SQLite.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
