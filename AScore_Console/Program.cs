@@ -1,13 +1,7 @@
 ﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Data;
-using System.Runtime.InteropServices;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
-using PeptideToProteinMapEngine;
 using System.IO;
-using PHRPReader;
 
 namespace AScore_Console
 {
@@ -46,7 +40,7 @@ namespace AScore_Console
 			}
 		}
 
-	    struct AScoreRunDataType
+	    public struct AScoreRunDataType
 	    {
 	        public DirectoryInfo diOutputFolder;
 	        public string AScoreResultsFilePath;
@@ -57,7 +51,7 @@ namespace AScore_Console
 	        }
 	    }
 
-	    struct FastaOptionsType
+	    public struct FastaOptionsType
 	    {
 	        public bool useFasta;
             public string FastaFilePath;
@@ -71,114 +65,32 @@ namespace AScore_Console
             }
 	    }
 
-	    struct ProteinPeptideMapType
-	    {
-	        public string peptideSequence;
-	        public string proteinName;
-	        public int residueStart;
-            public int residueEnd;
+        private static AScoreOptionsType mAScoreOptions = new AScoreOptionsType();
+        private static FastaOptionsType mFastaOptions = new FastaOptionsType();
+        static bool mMultiJobMode = false;
+        static string mLogFilePath = string.Empty;
+        const string SupportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
 
-            public void Initialize()
-            {
-                peptideSequence = string.Empty;
-                proteinName = string.Empty;
-            }
-	    }
-
+        /// <summary>
+        /// Main entry point. I know, it's a pointless comment, but the comment block helps code reading
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
 		static int Main(string[] args)
 		{
 			try
 			{
 				var clu = new clsParseCommandLine();
-                bool read = clu.ParseCommandLine(clsParseCommandLine.ALTERNATE_SWITCH_CHAR);
-				bool multiJobMode = false;
 
-				var ascoreOptions = new AScoreOptionsType();
-			    var fastaOptions = new FastaOptionsType();
-				ascoreOptions.Initialize();
-				string logFilePath = string.Empty;
+				mAScoreOptions.Initialize();
+				mLogFilePath = string.Empty;
 
 				string syntaxError = string.Empty;
-				const string supportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
 
-				if (!clu.NeedToShowHelp)
+				if (clu.ParseCommandLine(clsParseCommandLine.ALTERNATE_SWITCH_CHAR))
 				{
-					if (!clu.RetrieveValueForParameter("T", out ascoreOptions.SearchType, false))
-						syntaxError = "-T:Search_Engine not defined";
-
-					if (!clu.RetrieveValueForParameter("F", out ascoreOptions.FirstHitsFile, false))
-						syntaxError = "-F:fht_file_path not defined";
-
-					if (clu.RetrieveValueForParameter("JM", out ascoreOptions.JobToDatasetMapFile, false))
-						multiJobMode = true;
-					else
-					{
-						if (!clu.RetrieveValueForParameter("D", out ascoreOptions.CDtaFile, false))
-							syntaxError = "Must use -D:dta_file_path or -JM:job_to_dataset_mapfile_path";
-					}
-
-					if (!clu.RetrieveValueForParameter("P", out ascoreOptions.AScoreParamFile, false))
-						syntaxError = "-P:parameter_file not defined";
-
-					if (!clu.RetrieveValueForParameter("O", out ascoreOptions.OutputFolderPath, false) || string.IsNullOrWhiteSpace(ascoreOptions.OutputFolderPath))
-                        ascoreOptions.OutputFolderPath = ".";
-
-					// If ascoreOptions.OutputFolderPath points to a file, change it to the parent folder
-					var fiOutputFolderAsFile = new FileInfo(ascoreOptions.OutputFolderPath);
-					if (fiOutputFolderAsFile.Extension.Length > 1 && fiOutputFolderAsFile.Directory != null && fiOutputFolderAsFile.Directory.Exists)
-					{
-						ascoreOptions.OutputFolderPath = fiOutputFolderAsFile.Directory.FullName;
-					}
-
-					string outValue;
-					if (clu.RetrieveValueForParameter("FM", out outValue, false))
-					{
-						if (!bool.TryParse(outValue, out ascoreOptions.FilterOnMSGFScore))
-						{
-                            Console.WriteLine("Warning: '-FM:" + outValue + "' not recognized. Assuming '-FM:true'.");
-						    //syntaxError = "specify true or false for -FM; not -FM:" + outValue;
-                            // Reset it to true, bool.TryParse failed and set it to false.
-						    ascoreOptions.FilterOnMSGFScore = true;
-						}
-                    }
-
-                    // If the switch is present, disable filtering on MSGF Score
-                    if (clu.IsParameterPresent("noFM"))
-                    {
-                        ascoreOptions.FilterOnMSGFScore = false;
-                    }
-
-					if (clu.RetrieveValueForParameter("L", out outValue, false))
-						logFilePath = string.Copy(outValue);
-
-					if (clu.RetrieveValueForParameter("U", out outValue, false))
-					{
-						ascoreOptions.CreateUpdatedFirstHitsFile = true;
-						if (!string.IsNullOrWhiteSpace(outValue))
-							ascoreOptions.UpdatedFirstHitsFileName = string.Copy(outValue);
-					}
-
-					if (clu.RetrieveValueForParameter("Skip", out outValue, false))
-					{
-						ascoreOptions.SkipExistingResults = true;
-                    }
-
-				    if (!clu.RetrieveValueForParameter("Fasta", out fastaOptions.FastaFilePath, false) ||
-				        string.IsNullOrWhiteSpace(fastaOptions.FastaFilePath))
-				    {
-				        fastaOptions.FastaFilePath = string.Empty;
-				    }
-				    else
-				    {
-				        fastaOptions.useFasta = true;
-				    }
-
-				    if (clu.RetrieveValueForParameter("PD", out outValue, false) && fastaOptions.useFasta)
-                    {
-                        fastaOptions.OutputProteinDescriptions = true;
-                    }
+					ProcessCommandLine(clu, ref syntaxError);
 				}
-
 
 				//	AScore_DLL.AScoreParameters parameters = 
 				if ((args.Length == 0) || clu.NeedToShowHelp || syntaxError.Length > 0)
@@ -190,96 +102,21 @@ namespace AScore_Console
 						Console.WriteLine();
 					}
 
-					Console.WriteLine("Parameters for running AScore include:");
-					Console.WriteLine(" -T:search_engine");
-					Console.WriteLine("   (allowed values are " + supportedSearchModes + ")");
-					Console.WriteLine(" -F:fht_file_path");
-					Console.WriteLine(" -D:dta_file_path");
-					Console.WriteLine(" -JM:job_to_dataset_mapfile_path");
-					Console.WriteLine("   (use -JM instead of -D if the FHT file has results from");
-					Console.WriteLine("    multiple jobs; the map file should have job numbers and");
-					Console.WriteLine("    dataset names, using column names Job and Dataset)");
-					Console.WriteLine(" -P:parameter_file_path");
-					Console.WriteLine(" -O:output_folder_path");
-					Console.WriteLine(" -L:log_file_path");
-					Console.WriteLine(" -FM:true  (true or false to enable/disable filtering");
-                    Console.WriteLine("            on data in column MSGF_SpecProb; default is true)");
-                    Console.WriteLine(" -noFM   (disable filtering on data in column MSGF_SpecProb;");
-                    Console.WriteLine("          overrides -FM flag)");
-					Console.WriteLine(" -U:updated_fht_file_name");
-					Console.WriteLine("   (create a copy of the fht_file with updated peptide");
-					Console.WriteLine("    sequences plus new AScore-related columns");
-					Console.WriteLine(" -Skip     (will not re-run AScore if an existing");
-                    Console.WriteLine("            results file already exists)");
-				    Console.WriteLine(" -Fasta:Fasta_file_path");
-                    Console.WriteLine("             (add Protein Data from Fasta_file to the output)");
-                    Console.WriteLine(" -PD       (Include Protein Description in output;)");
-                    Console.WriteLine("        REQUIRES -Fasta:Fasta_file_path)");
-					Console.WriteLine();
-					Console.WriteLine("Example command line #1:");
-					Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
-									  " -T:sequest\n" +
-									  " -F:\"C:\\Temp\\DatasetName_fht.txt\"\n" +
-									  " -D:\"C:\\Temp\\DatasetName_dta.txt\"\n" +
-									  " -O:\"C:\\Temp\"\n" +
-									  " -P:C:\\Temp\\DynMetOx_stat_4plex_iodo_hcd.xml\n" +
-									  " -L:LogFile.txt\n" +
-									  " -FM:true");
-					Console.WriteLine();
-					Console.WriteLine("Example command line #2:");
-					Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
-									  " -T:msgfplus\n" +
-									  " -F:\"C:\\Temp\\Multi_Job_Results_fht.txt\"\n" +
-									  " -JM:\"C:\\Temp\\JobToDatasetNameMap.txt\"\n" +
-									  " -O:\"C:\\Temp\\\"\n" +
-									  " -P:C:\\Temp\\DynPhos_stat_6plex_iodo_hcd.xml\n" +
-									  " -L:LogFile.txt\n" +
-									  " -FM:true\n");
-
+					PrintHelp();
 
 					clsParseCommandLine.PauseAtConsole(750, 250);
 					return 0;
 				}
 
-
-				if (!File.Exists(ascoreOptions.AScoreParamFile))
-				{
-					Console.WriteLine("Input file not found: " + ascoreOptions.AScoreParamFile);
-					clsParseCommandLine.PauseAtConsole(2000, 333);
-					return -10;
-				}
-
-
-				if (!string.IsNullOrEmpty(ascoreOptions.CDtaFile) && !File.Exists(ascoreOptions.CDtaFile))
-				{
-					Console.WriteLine("Input file not found: " + ascoreOptions.CDtaFile);
-					clsParseCommandLine.PauseAtConsole(2000, 333);
-					return -11;
-				}
-
-				if (!string.IsNullOrEmpty(ascoreOptions.JobToDatasetMapFile) && !File.Exists(ascoreOptions.JobToDatasetMapFile))
-				{
-					Console.WriteLine("Input file not found: " + ascoreOptions.JobToDatasetMapFile);
-					clsParseCommandLine.PauseAtConsole(2000, 333);
-					return -11;
-				}
-
-				if (!File.Exists(ascoreOptions.FirstHitsFile))
-				{
-					Console.WriteLine("Input file not found: " + ascoreOptions.FirstHitsFile);
-					clsParseCommandLine.PauseAtConsole(2000, 333);
-					return -12;
-                }
-
-                if (!string.IsNullOrEmpty(fastaOptions.FastaFilePath) && !File.Exists(fastaOptions.FastaFilePath))
-                {
-                    Console.WriteLine("Fasta file not found: " + fastaOptions.FastaFilePath);
-                    clsParseCommandLine.PauseAtConsole(2000, 333);
-                    return -13;
-                }
+			    int returnCode = CheckParameters();
+                // If we encountered an error in the input - a necessary file does not exist - then exit.
+			    if (returnCode != 0)
+			    {
+			        return returnCode;
+			    }
 
 			    AScoreRunDataType aScoreRunData;
-				int returnCode = RunAScore(ascoreOptions, logFilePath, supportedSearchModes, multiJobMode, out aScoreRunData);
+				returnCode = RunAScore(mAScoreOptions, mLogFilePath, SupportedSearchModes, mMultiJobMode, out aScoreRunData);
 
 			    if (returnCode != 0)
 			    {
@@ -288,14 +125,10 @@ namespace AScore_Console
 			    }
 			    else
 			    {
-			        if (fastaOptions.useFasta)
+			        if (mFastaOptions.useFasta)
 			        {
-			            returnCode = RunProteinMapper(aScoreRunData, ascoreOptions, fastaOptions, logFilePath);
-                    }
-
-                    if (returnCode != 0)
-                    {
-                        clsParseCommandLine.PauseAtConsole(2000, 333);
+                        var proteinMapper = new AScoreProteinMapper(aScoreRunData, mFastaOptions, mLogFilePath);
+			            proteinMapper.Run();
                     }
                 }
 			}
@@ -317,210 +150,204 @@ namespace AScore_Console
 
 		}
 
-	    private static int RunProteinMapper(AScoreRunDataType aScoreRunData, AScoreOptionsType aScoreOptions,
-	        FastaOptionsType fastaOptions, string logFilePath)
+        /// <summary>
+        /// Process the command line input
+        /// </summary>
+        /// <param name="clu"></param>
+        /// <param name="syntaxError"></param>
+	    private static void ProcessCommandLine(clsParseCommandLine clu, ref string syntaxError)
 	    {
-            Console.WriteLine("Mapping peptides to proteins");
-	        string line;
-	        string ascoreResultsFilePath = Path.Combine(aScoreRunData.diOutputFolder.FullName,
-	            Path.GetFileNameWithoutExtension(aScoreRunData.AScoreResultsFilePath) + "_ProteinMap.txt");
-            string tempPeptidesFilePath = Path.Combine(aScoreRunData.diOutputFolder.FullName,
-                Path.GetFileNameWithoutExtension(aScoreRunData.AScoreResultsFilePath) + "_Peptides.txt");
+            if (!clu.RetrieveValueForParameter("T", out mAScoreOptions.SearchType, false))
+                syntaxError = "-T:Search_Engine not defined";
 
-            Dictionary<string, int> columnMapAScore = new Dictionary<string, int>();
+            if (!clu.RetrieveValueForParameter("F", out mAScoreOptions.FirstHitsFile, false))
+                syntaxError = "-F:fht_file_path not defined";
 
-            Console.WriteLine("Creating peptide list file");
-            // Write out a list of peptides for clsPeptideToProteinMapEngine
-	        using (StreamReader aScoreReader =
-                    new StreamReader(new FileStream(aScoreRunData.AScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
-	        {
-	            using (StreamWriter peptideWriter =
-	                new StreamWriter(new FileStream(tempPeptidesFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+            if (clu.RetrieveValueForParameter("JM", out mAScoreOptions.JobToDatasetMapFile, false))
+                mMultiJobMode = true;
+            else
+            {
+                if (!clu.RetrieveValueForParameter("D", out mAScoreOptions.CDtaFile, false))
+                    syntaxError = "Must use -D:dta_file_path or -JM:job_to_dataset_mapfile_path";
+            }
+
+            if (!clu.RetrieveValueForParameter("P", out mAScoreOptions.AScoreParamFile, false))
+                syntaxError = "-P:parameter_file not defined";
+
+            if (!clu.RetrieveValueForParameter("O", out mAScoreOptions.OutputFolderPath, false) || string.IsNullOrWhiteSpace(mAScoreOptions.OutputFolderPath))
+                mAScoreOptions.OutputFolderPath = ".";
+
+            // If ascoreOptions.OutputFolderPath points to a file, change it to the parent folder
+            var fiOutputFolderAsFile = new FileInfo(mAScoreOptions.OutputFolderPath);
+            if (fiOutputFolderAsFile.Extension.Length > 1 && fiOutputFolderAsFile.Directory != null && fiOutputFolderAsFile.Directory.Exists)
+            {
+                mAScoreOptions.OutputFolderPath = fiOutputFolderAsFile.Directory.FullName;
+            }
+
+            string outValue;
+            if (clu.RetrieveValueForParameter("FM", out outValue, false))
+            {
+                if (!bool.TryParse(outValue, out mAScoreOptions.FilterOnMSGFScore))
                 {
-                    if ((line = aScoreReader.ReadLine()) != null)
-                    {
-                        // Assume the first line is column names
-                        string[] columns = line.Split('\t');
-                        for (int i = 0; i < columns.Length; ++i)
-                        {
-                            columnMapAScore.Add(columns[i], i);
-                        }
-                        // Run as long as we can successfully read
-                        while ((line = aScoreReader.ReadLine()) != null)
-                        {
-                            string sequence = line.Split('\t')[columnMapAScore["BestSequence"]];
-                            peptideWriter.WriteLine(
-                                clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true));
-                        }
-                    }
-	            }
-	        }
-
-            Console.WriteLine("Running PeptideToProteinMapper");
-	        // Configure the peptide to protein mapper
-            clsPeptideToProteinMapEngine peptideToProteinMapper = new clsPeptideToProteinMapEngine();
-
-	        peptideToProteinMapper.DeleteTempFiles = true;
-	        peptideToProteinMapper.IgnoreILDifferences = false;
-	        peptideToProteinMapper.InspectParameterFilePath = string.Empty;
-
-	        if (!string.IsNullOrEmpty(logFilePath))
-	        {
-	            peptideToProteinMapper.LogMessagesToFile = true;
-	            peptideToProteinMapper.LogFolderPath = aScoreRunData.diOutputFolder.FullName;
-	        }
-	        else
-	        {
-	            peptideToProteinMapper.LogMessagesToFile = false;
-	        }
-
-	        peptideToProteinMapper.MatchPeptidePrefixAndSuffixToProtein = false;
-	        peptideToProteinMapper.OutputProteinSequence = false;
-	        peptideToProteinMapper.PeptideInputFileFormat = clsPeptideToProteinMapEngine.ePeptideInputFileFormatConstants.PeptideListFile;
-	        peptideToProteinMapper.PeptideFileSkipFirstLine = false;
-	        peptideToProteinMapper.ProteinDataRemoveSymbolCharacters = true;
-	        peptideToProteinMapper.ProteinInputFilePath = fastaOptions.FastaFilePath;
-	        peptideToProteinMapper.SaveProteinToPeptideMappingFile = true;
-	        peptideToProteinMapper.SearchAllProteinsForPeptideSequence = true;
-	        peptideToProteinMapper.SearchAllProteinsSkipCoverageComputationSteps = true;
-	        peptideToProteinMapper.ShowMessages = false;
-
-            // Note that clsPeptideToProteinMapEngine utilizes Data.SQLite.dll
-	        bool bSuccess = peptideToProteinMapper.ProcessFile(tempPeptidesFilePath, aScoreRunData.diOutputFolder.FullName, string.Empty, true);
-
-	        peptideToProteinMapper.CloseLogFileNow();
-
-	        if (bSuccess)
-	        {
-                Console.WriteLine("Reading data back");
-	            string strMapFilePath = Path.GetFileNameWithoutExtension(tempPeptidesFilePath) + "_ProteinToPeptideMapping.txt";
-	            //                            PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.FILENAME_SUFFIX_PEP_TO_PROTEIN_MAPPING;
-	            strMapFilePath = Path.Combine(aScoreRunData.diOutputFolder.FullName, strMapFilePath);
-	            Dictionary<string, List<ProteinPeptideMapType>> peptideToProteinMap = new Dictionary<string, List<ProteinPeptideMapType>>();
-	            Dictionary<string, int> columnMapPTPM = new Dictionary<string, int>();
-
-	            using (StreamReader mapReader =
-	                new StreamReader(new FileStream(strMapFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
-	            {
-	                if ((line = mapReader.ReadLine()) != null)
-	                {
-	                    // Assume the first line is column names
-	                    string[] columns = line.Split('\t');
-	                    for (int i = 0; i < columns.Length; ++i)
-	                    {
-	                        columnMapPTPM.Add(columns[i], i);
-	                    }
-	                    // Run as long as we can successfully read
-	                    while ((line = mapReader.ReadLine()) != null)
-	                    {
-	                        columns = line.Split('\t');
-	                        ProteinPeptideMapType item = new ProteinPeptideMapType();
-	                        item.residueStart = Convert.ToInt32(columns[columnMapPTPM["Residue Start"]]);
-	                        item.residueEnd = Convert.ToInt32(columns[columnMapPTPM["Residue End"]]);
-	                        item.proteinName = columns[columnMapPTPM["Protein Name"]];
-	                        item.peptideSequence = columns[columnMapPTPM["Peptide Sequence"]];
-	                        // Add the key and a new list if it doesn't yet exist
-	                        if (!peptideToProteinMap.ContainsKey(item.peptideSequence))
-	                        {
-	                            peptideToProteinMap.Add(item.peptideSequence, new List<ProteinPeptideMapType>());
-	                        }
-	                        peptideToProteinMap[item.peptideSequence].Add(item);
-	                    }
-	                }
-	            }
-                Dictionary<string, string> proteinDescriptions = new Dictionary<string, string>();
-	            if (fastaOptions.OutputProteinDescriptions)
-	            {
-	                using (StreamReader fastaReader =
-	                        new StreamReader(new FileStream(fastaOptions.FastaFilePath, FileMode.Open, FileAccess.Read,FileShare.ReadWrite)))
-	                {
-                        while ((line = fastaReader.ReadLine()) != null)
-                        {
-                            // We only care about the protein name/description line
-                            if (line[0] == '>')
-                            {
-                                int firstSpace = line.IndexOf(' ');
-                                // Skip the '>' and split at the first space
-                                proteinDescriptions.Add(line.Substring(1, firstSpace - 1), line.Substring(firstSpace + 1));
-                            }
-                        }
-	                }
-	            }
-                // Read the ascore again...
-                using (StreamReader aScoreReader =
-                        new StreamReader(new FileStream(aScoreRunData.AScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
-                {
-                    // Can't collapse these to one 'using' because they are not the same type.
-                    using (StreamWriter mappedWriter =
-                        new StreamWriter(new FileStream(ascoreResultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
-                    {
-                        
-                        // Reuse 'columnMapAScore', it is the same file.
-                        if ((line = aScoreReader.ReadLine()) != null)
-                        {
-                            // Output the header information, with the new additions
-                            mappedWriter.Write(line + "\t");
-                            mappedWriter.Write("ProteinName\t");
-                            if (fastaOptions.OutputProteinDescriptions)
-                            {
-                                mappedWriter.Write("Description\t");
-                            }
-                            mappedWriter.WriteLine("ProteinCount\tResidue\tPosition");
-                            // Run as long as we can successfully read
-                            while ((line = aScoreReader.ReadLine()) != null)
-                            {
-                                string sequence = line.Split('\t')[columnMapAScore["BestSequence"]];
-                                string cleanSequence =
-                                    clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(
-                                        sequence, true);
-                                string noPrefixSequence = string.Empty;
-                                string prefix = string.Empty;
-                                string suffix = string.Empty;
-                                clsPeptideCleavageStateCalculator.SplitPrefixAndSuffixFromSequence(sequence,
-                                    ref noPrefixSequence, ref prefix, ref suffix);
-                                List<int> mods = new List<int>();
-                                int modPosAdj = 0;
-                                for (int i = 0; i < noPrefixSequence.Length; ++i)
-                                {
-                                    if (noPrefixSequence[i] == '*')
-                                    {
-                                        mods.Add(i);
-                                    }
-                                }
-                                if (noPrefixSequence[0] == '.')
-                                {
-                                    ++modPosAdj;
-                                }
-                                foreach (var match in peptideToProteinMap[cleanSequence])
-                                {
-                                    for (int i = 0; i < mods.Count; ++i)
-                                    {
-                                        // Original AScore data
-                                        mappedWriter.Write(line + "\t");
-                                        // Protein Name
-                                        mappedWriter.Write(match.proteinName + "\t");
-                                        // Protein Description
-                                        if (fastaOptions.OutputProteinDescriptions)
-                                        {
-                                            mappedWriter.Write(proteinDescriptions[match.proteinName] + "\t");
-                                        }
-                                        // # of proteins occurred in
-                                        mappedWriter.Write(peptideToProteinMap[cleanSequence].Count + "\t");
-                                        // Residue of mod
-                                        mappedWriter.Write(noPrefixSequence[mods[i] - 1] + "\t");
-                                        // Position of residue
-                                        // With multiple residues, we need to adjust the position of each subsequent residue by the number of residues we have read
-                                        mappedWriter.WriteLine(match.residueStart + mods[i] - i - 1);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    Console.WriteLine("Warning: '-FM:" + outValue + "' not recognized. Assuming '-FM:true'.");
+                    //syntaxError = "specify true or false for -FM; not -FM:" + outValue;
+                    // Reset it to true, bool.TryParse failed and set it to false.
+                    mAScoreOptions.FilterOnMSGFScore = true;
                 }
-	        }
-	        return 0;
+            }
+
+            // If the switch is present, disable filtering on MSGF Score
+            if (clu.IsParameterPresent("noFM"))
+            {
+                mAScoreOptions.FilterOnMSGFScore = false;
+            }
+
+            if (clu.RetrieveValueForParameter("L", out outValue, false))
+                mLogFilePath = string.Copy(outValue);
+
+            if (clu.RetrieveValueForParameter("U", out outValue, false))
+            {
+                mAScoreOptions.CreateUpdatedFirstHitsFile = true;
+                if (!string.IsNullOrWhiteSpace(outValue))
+                    mAScoreOptions.UpdatedFirstHitsFileName = string.Copy(outValue);
+            }
+
+            if (clu.RetrieveValueForParameter("Skip", out outValue, false))
+            {
+                mAScoreOptions.SkipExistingResults = true;
+            }
+
+            if (!clu.RetrieveValueForParameter("Fasta", out mFastaOptions.FastaFilePath, false) ||
+                string.IsNullOrWhiteSpace(mFastaOptions.FastaFilePath))
+            {
+                mFastaOptions.FastaFilePath = string.Empty;
+            }
+            else
+            {
+                mFastaOptions.useFasta = true;
+            }
+
+            if (clu.RetrieveValueForParameter("PD", out outValue, false) && mFastaOptions.useFasta)
+            {
+                mFastaOptions.OutputProteinDescriptions = true;
+            }
 	    }
 
+        /// <summary>
+        /// Output the help for the program
+        /// </summary>
+	    private static void PrintHelp()
+	    {
+            Console.WriteLine("Parameters for running AScore include:");
+            Console.WriteLine(" -T:search_engine");
+            Console.WriteLine("   (allowed values are " + SupportedSearchModes + ")");
+            Console.WriteLine(" -F:fht_file_path");
+            Console.WriteLine(" -D:dta_file_path");
+            Console.WriteLine(" -JM:job_to_dataset_mapfile_path");
+            Console.WriteLine("   (use -JM instead of -D if the FHT file has results from");
+            Console.WriteLine("    multiple jobs; the map file should have job numbers and");
+            Console.WriteLine("    dataset names, using column names Job and Dataset)");
+            Console.WriteLine(" -P:parameter_file_path");
+            Console.WriteLine(" -O:output_folder_path");
+            Console.WriteLine(" -L:log_file_path");
+            Console.WriteLine(" -FM:true  (true or false to enable/disable filtering");
+            Console.WriteLine("            on data in column MSGF_SpecProb; default is true)");
+            Console.WriteLine(" -noFM   (disable filtering on data in column MSGF_SpecProb;");
+            Console.WriteLine("          overrides -FM flag)");
+            Console.WriteLine(" -U:updated_fht_file_name");
+            Console.WriteLine("   (create a copy of the fht_file with updated peptide");
+            Console.WriteLine("    sequences plus new AScore-related columns");
+            Console.WriteLine(" -Skip     (will not re-run AScore if an existing");
+            Console.WriteLine("            results file already exists)");
+            Console.WriteLine(" -Fasta:Fasta_file_path");
+            Console.WriteLine("             (add Protein Data from Fasta_file to the output)");
+            Console.WriteLine(" -PD       (Include Protein Description in output;)");
+            Console.WriteLine("        REQUIRES -Fasta:Fasta_file_path)");
+            Console.WriteLine();
+            Console.WriteLine("Example command line #1:");
+            Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
+                              " -T:sequest\n" +
+                              " -F:\"C:\\Temp\\DatasetName_fht.txt\"\n" +
+                              " -D:\"C:\\Temp\\DatasetName_dta.txt\"\n" +
+                              " -O:\"C:\\Temp\"\n" +
+                              " -P:C:\\Temp\\DynMetOx_stat_4plex_iodo_hcd.xml\n" +
+                              " -L:LogFile.txt");
+            Console.WriteLine();
+            Console.WriteLine("Example command line #2:");
+            Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
+                              " -T:msgfplus\n" +
+                              " -F:\"C:\\Temp\\Multi_Job_Results_fht.txt\"\n" +
+                              " -JM:\"C:\\Temp\\JobToDatasetNameMap.txt\"\n" +
+                              " -O:\"C:\\Temp\\\"\n" +
+                              " -P:C:\\Temp\\DynPhos_stat_6plex_iodo_hcd.xml\n" +
+                              " -L:LogFile.txt\n" +
+                              " -noFM");
+            Console.WriteLine();
+            Console.WriteLine("Example command line #3:");
+            Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
+                              " -T:msgfplus\n" +
+                              " -F:\"C:\\Temp\\Multi_Job_Results_fht.txt\"\n" +
+                              " -JM:\"C:\\Temp\\JobToDatasetNameMap.txt\"\n" +
+                              " -O:\"C:\\Temp\\\"\n" +
+                              " -P:C:\\Temp\\DynPhos_stat_6plex_iodo_hcd.xml\n" +
+                              " -L:LogFile.txt\n" +
+                              " -Fasta:C:\\Temp\\H_sapiens_Uniprot_SPROT_2013-09-18.fasta\n" +
+                              " -PD");
+
+	    }
+
+        /// <summary>
+        /// Check the command line input for path errors
+        /// </summary>
+        /// <returns>Error return code for exit status</returns>
+	    private static int CheckParameters()
+	    {
+            if (!File.Exists(mAScoreOptions.AScoreParamFile))
+            {
+                Console.WriteLine("Input file not found: " + mAScoreOptions.AScoreParamFile);
+                clsParseCommandLine.PauseAtConsole(2000, 333);
+                return -10;
+            }
+
+            if (!string.IsNullOrEmpty(mAScoreOptions.CDtaFile) && !File.Exists(mAScoreOptions.CDtaFile))
+            {
+                Console.WriteLine("Input file not found: " + mAScoreOptions.CDtaFile);
+                clsParseCommandLine.PauseAtConsole(2000, 333);
+                return -11;
+            }
+
+            if (!string.IsNullOrEmpty(mAScoreOptions.JobToDatasetMapFile) && !File.Exists(mAScoreOptions.JobToDatasetMapFile))
+            {
+                Console.WriteLine("Input file not found: " + mAScoreOptions.JobToDatasetMapFile);
+                clsParseCommandLine.PauseAtConsole(2000, 333);
+                return -11;
+            }
+
+            if (!File.Exists(mAScoreOptions.FirstHitsFile))
+            {
+                Console.WriteLine("Input file not found: " + mAScoreOptions.FirstHitsFile);
+                clsParseCommandLine.PauseAtConsole(2000, 333);
+                return -12;
+            }
+
+            if (!string.IsNullOrEmpty(mFastaOptions.FastaFilePath) && !File.Exists(mFastaOptions.FastaFilePath))
+            {
+                Console.WriteLine("Fasta file not found: " + mFastaOptions.FastaFilePath);
+                clsParseCommandLine.PauseAtConsole(2000, 333);
+                return -13;
+            }
+            return 0;
+	    }
+
+        /// <summary>
+        /// Configure and run the AScore DLL
+        /// </summary>
+        /// <param name="ascoreOptions"></param>
+        /// <param name="logFilePath"></param>
+        /// <param name="supportedSearchModes"></param>
+        /// <param name="multiJobMode"></param>
+        /// <param name="aScoreRunData"></param>
+        /// <returns></returns>
 		private static int RunAScore(AScoreOptionsType ascoreOptions, string logFilePath, string supportedSearchModes, bool multiJobMode, out AScoreRunDataType aScoreRunData)
 		{
 
@@ -667,8 +494,5 @@ namespace AScore_Console
 			ShowMessage("Warning: " + e.Message);
 		}
 		#endregion
-
-
-
 	}
 }
