@@ -23,9 +23,9 @@ namespace AScore_DLL
 
 		private bool m_filterOnMSGFScore = true;
 
-		#region "Properties"
+        #region "Properties"
 
-		public bool FilterOnMSGFScore
+        public bool FilterOnMSGFScore
 		{
 			get
 			{
@@ -42,8 +42,18 @@ namespace AScore_DLL
 
 		#region Public Method
 
+        /// <summary>
+        /// Configure and run the AScore algorithm, optionally can add protein mapping information
+        /// </summary>
+        /// <param name="JobToDatasetMapFile"></param>
+        /// <param name="dtaManager"></param>
+        /// <param name="datasetManager"></param>
+        /// <param name="ascoreParameters"></param>
+        /// <param name="outputFilePath">Name of the output file</param>
+        /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
+        /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
 		public void AlgorithmRun(string JobToDatasetMapFile, DtaManager dtaManager, DatasetManager datasetManager,
-								 ParameterFileManager ascoreParameters, string outputFilePath)
+								 ParameterFileManager ascoreParameters, string outputFilePath, string fastaFilePath = "", bool outputDescriptions = false)
 		{
 			var jobToDatasetNameMap = new Dictionary<string, string>();
 
@@ -102,10 +112,20 @@ namespace AScore_DLL
 
 			AlgorithmRun(jobToDatasetNameMap, dtaManager, datasetManager, ascoreParameters, outputFilePath);
 
+            ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
 		}
 
+        /// <summary>
+        /// Configure and run the AScore algorithm, optionally can add protein mapping information
+        /// </summary>
+        /// <param name="dtaManager"></param>
+        /// <param name="datasetManager"></param>
+        /// <param name="ascoreParameters"></param>
+        /// <param name="outputFilePath">Name of the output file</param>
+        /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
+        /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
 		public void AlgorithmRun(DtaManager dtaManager, DatasetManager datasetManager,
-								 ParameterFileManager ascoreParameters, string outputFilePath)
+                                 ParameterFileManager ascoreParameters, string outputFilePath, string fastaFilePath = "", bool outputDescriptions = false)
 		{
 			var jobToDatasetNameMap = new Dictionary<string, string>
 			{
@@ -117,7 +137,18 @@ namespace AScore_DLL
 					"dtaManager must be instantiated and initialized before calling AlgorithmRun for a single source file");
 
 			AlgorithmRun(jobToDatasetNameMap, dtaManager, datasetManager, ascoreParameters, outputFilePath);
+
+            ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
 		}
+
+	    protected void ProteinMapperTestRun(string outputFilePath, string fastaFilePath, bool outputDescriptions)
+	    {
+	        if (!string.IsNullOrWhiteSpace(fastaFilePath))
+	        {
+                AScoreProteinMapper mapProteins = new AScoreProteinMapper(outputFilePath, fastaFilePath, outputDescriptions);
+                mapProteins.Run();
+	        }
+	    }
 
 		/// <summary>
 		/// Runs the all the tools necessary to perform an ascore run

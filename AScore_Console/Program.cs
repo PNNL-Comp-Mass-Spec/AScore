@@ -21,7 +21,10 @@ namespace AScore_Console
 
 			public bool SkipExistingResults;
 			public bool CreateUpdatedFirstHitsFile;
-			public string UpdatedFirstHitsFileName;
+            public string UpdatedFirstHitsFileName;
+
+            public string FastaFilePath;
+            public bool OutputProteinDescriptions;
 
 			public void Initialize()
 			{
@@ -37,36 +40,12 @@ namespace AScore_Console
 				CreateUpdatedFirstHitsFile = false;
 				UpdatedFirstHitsFileName = string.Empty;
 
+                FastaFilePath = string.Empty;
+                OutputProteinDescriptions = false;
 			}
 		}
 
-	    public struct AScoreRunDataType
-	    {
-	        public DirectoryInfo diOutputFolder;
-	        public string AScoreResultsFilePath;
-
-	        public void Initialize()
-	        {
-	            AScoreResultsFilePath = string.Empty;
-	        }
-	    }
-
-	    public struct FastaOptionsType
-	    {
-	        public bool useFasta;
-            public string FastaFilePath;
-            public bool OutputProteinDescriptions;
-
-            public void Initialize()
-            {
-                useFasta = false;
-                FastaFilePath = string.Empty;
-                OutputProteinDescriptions = false;
-            }
-	    }
-
         private static AScoreOptionsType mAScoreOptions = new AScoreOptionsType();
-        private static FastaOptionsType mFastaOptions = new FastaOptionsType();
         static bool mMultiJobMode = false;
         static string mLogFilePath = string.Empty;
         const string SupportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
@@ -115,22 +94,12 @@ namespace AScore_Console
 			        return returnCode;
 			    }
 
-			    AScoreRunDataType aScoreRunData;
-				returnCode = RunAScore(mAScoreOptions, mLogFilePath, SupportedSearchModes, mMultiJobMode, out aScoreRunData);
+				returnCode = RunAScore(mAScoreOptions, mLogFilePath, SupportedSearchModes, mMultiJobMode);
 
 			    if (returnCode != 0)
 			    {
 			        clsParseCommandLine.PauseAtConsole(2000, 333);
-			        return returnCode;
 			    }
-			    else
-			    {
-			        if (mFastaOptions.useFasta)
-			        {
-                        var proteinMapper = new AScoreProteinMapper(aScoreRunData, mFastaOptions, mLogFilePath);
-			            proteinMapper.Run();
-                    }
-                }
 			}
 			catch (Exception ex)
 			{
@@ -217,19 +186,15 @@ namespace AScore_Console
                 mAScoreOptions.SkipExistingResults = true;
             }
 
-            if (!clu.RetrieveValueForParameter("Fasta", out mFastaOptions.FastaFilePath, false) ||
-                string.IsNullOrWhiteSpace(mFastaOptions.FastaFilePath))
+            if (!clu.RetrieveValueForParameter("Fasta", out mAScoreOptions.FastaFilePath, false) ||
+                string.IsNullOrWhiteSpace(mAScoreOptions.FastaFilePath))
             {
-                mFastaOptions.FastaFilePath = string.Empty;
-            }
-            else
-            {
-                mFastaOptions.useFasta = true;
+                mAScoreOptions.FastaFilePath = string.Empty;
             }
 
-            if (clu.RetrieveValueForParameter("PD", out outValue, false) && mFastaOptions.useFasta)
+            if (clu.RetrieveValueForParameter("PD", out outValue, false) && !string.IsNullOrEmpty(mAScoreOptions.FastaFilePath))
             {
-                mFastaOptions.OutputProteinDescriptions = true;
+                mAScoreOptions.OutputProteinDescriptions = true;
             }
 	    }
 
@@ -330,9 +295,9 @@ namespace AScore_Console
                 return -12;
             }
 
-            if (!string.IsNullOrEmpty(mFastaOptions.FastaFilePath) && !File.Exists(mFastaOptions.FastaFilePath))
+            if (!string.IsNullOrEmpty(mAScoreOptions.FastaFilePath) && !File.Exists(mAScoreOptions.FastaFilePath))
             {
-                Console.WriteLine("Fasta file not found: " + mFastaOptions.FastaFilePath);
+                Console.WriteLine("Fasta file not found: " + mAScoreOptions.FastaFilePath);
                 clsParseCommandLine.PauseAtConsole(2000, 333);
                 return -13;
             }
@@ -346,9 +311,8 @@ namespace AScore_Console
         /// <param name="logFilePath"></param>
         /// <param name="supportedSearchModes"></param>
         /// <param name="multiJobMode"></param>
-        /// <param name="aScoreRunData"></param>
         /// <returns></returns>
-		private static int RunAScore(AScoreOptionsType ascoreOptions, string logFilePath, string supportedSearchModes, bool multiJobMode, out AScoreRunDataType aScoreRunData)
+		private static int RunAScore(AScoreOptionsType ascoreOptions, string logFilePath, string supportedSearchModes, bool multiJobMode)
 		{
 
 			if (!String.IsNullOrWhiteSpace(logFilePath))
@@ -374,10 +338,7 @@ namespace AScore_Console
 			}
 
 			string ascoreResultsFilePath = Path.Combine(diOutputFolder.FullName, Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile) + "_ascore.txt");
-		    aScoreRunData = new AScoreRunDataType();
-            aScoreRunData.diOutputFolder = diOutputFolder;
-		    aScoreRunData.AScoreResultsFilePath = ascoreResultsFilePath;
-
+		    
 			if (ascoreOptions.SkipExistingResults && File.Exists(ascoreResultsFilePath))
 			{
 				ShowMessage("Existing results file found; will not re-create");
@@ -431,13 +392,13 @@ namespace AScore_Console
 				// Run the algorithm
 				if (multiJobMode)
 				{
-					ascoreEngine.AlgorithmRun(ascoreOptions.JobToDatasetMapFile, dtaManager, datasetManager, paramManager, ascoreResultsFilePath);
+					ascoreEngine.AlgorithmRun(ascoreOptions.JobToDatasetMapFile, dtaManager, datasetManager, paramManager, ascoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
 				}
 				else
 				{
 					dtaManager.OpenCDTAFile(ascoreOptions.CDtaFile);
 
-					ascoreEngine.AlgorithmRun(dtaManager, datasetManager, paramManager, ascoreResultsFilePath);
+                    ascoreEngine.AlgorithmRun(dtaManager, datasetManager, paramManager, ascoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
 				}
 				
 
