@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Data.SQLite; // The DLL is required for execution of the PeptideToProteinMapper
+using System.Linq;
 using PeptideToProteinMapEngine;
 using PHRPReader;
 using ProteinCoverageSummarizer;
@@ -9,6 +11,8 @@ namespace AScore_Console
 {
     class AScoreProteinMapper
     {
+        private const int MaxUnfoundPeptidesOutput = 30;
+
         private struct ProteinPeptideMapType
         {
             public string peptideSequence;
@@ -33,6 +37,14 @@ namespace AScore_Console
         private string mMappingResultsFilePath;
         Dictionary<string, List<ProteinPeptideMapType>> mPeptideToProteinMap;
         private Dictionary<string, string> mProteinDescriptions;
+        private Dictionary<string, int> mPeptidesNotFound;
+        private Dictionary<string, int> mPeptidesReallyNotFound;
+        private int mTotalPeptidesNotFound;
+        private int mTotalPeptides;
+        private int mDistinctPeptides;
+        private int mDistinctReverseHits;
+        private int mTotalReverseHits;
+        private int mTotalPeptidesReallyNotFound;
 
 
         /// <summary>
@@ -55,6 +67,30 @@ namespace AScore_Console
 
             mPeptideToProteinMap = new Dictionary<string, List<ProteinPeptideMapType>>();
             mProteinDescriptions = new Dictionary<string, string>();
+            mPeptidesNotFound = new Dictionary<string, int>();
+            mPeptidesReallyNotFound = new Dictionary<string, int>();
+
+            mTotalPeptidesNotFound = 0;
+            mTotalPeptides = 0;
+            mDistinctPeptides = 0;
+            mDistinctReverseHits = 0;
+            mTotalReverseHits = 0;
+            mTotalPeptidesReallyNotFound = 0;
+        }
+
+        /// <summary>
+        /// Destructor: remove the temporary files.
+        /// </summary>
+        ~AScoreProteinMapper()
+        {
+            if (File.Exists(mPeptideListFilePath))
+            {
+                File.Delete(mPeptideListFilePath);
+            }
+            if (File.Exists(mProteinToPeptideMapFilePath))
+            {
+                File.Delete(mProteinToPeptideMapFilePath);
+            }
         }
 
         /// <summary>
@@ -80,6 +116,92 @@ namespace AScore_Console
                 }
                 // Read the ascore again, and output a combined results file
                 CombineAScoreAndProteinData();
+
+                if (mTotalPeptidesNotFound > 0)
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    CheckReversedPeptides();
+
+                    Console.WriteLine("Peptide match failures:");
+                    Console.WriteLine("\tDistinct Reverse Hits: \t\t" + mDistinctReverseHits + " \t(" + (mDistinctReverseHits / (double)mDistinctPeptides).ToString("P") + ")");
+                    Console.WriteLine("\tTotal Reverse Hits: \t\t" + mTotalReverseHits + " \t(" + (mTotalReverseHits / (double)mTotalPeptides).ToString("P") + ")");
+                    Console.WriteLine("\tDistinct Peptides Not Found: \t" + mPeptidesReallyNotFound.Count + " \t(" + (mPeptidesReallyNotFound.Count / (double)mDistinctPeptides).ToString("P") + ")");
+                    Console.WriteLine("\tTotal Peptides Not Found: \t" + mTotalPeptidesReallyNotFound + " \t(" + (mTotalPeptidesReallyNotFound / (double)mTotalPeptides).ToString("P") + ")");
+                    
+                    if (mPeptidesReallyNotFound.Count > 0)
+                    {
+                        Console.WriteLine("\nWarning: Some peptide sequences were not found, and are not reverse hits.");
+                        Console.WriteLine("\tYou may be using the WRONG FASTA file.");
+
+                        if (mPeptidesReallyNotFound.Count < MaxUnfoundPeptidesOutput)
+                        {
+                            Console.WriteLine("\tCount\tPeptide");
+                            foreach (var peptide in mPeptidesReallyNotFound)
+                            {
+                                Console.WriteLine("\t" + peptide.Value + "\t" + peptide.Key);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Error: Failed to map the peptides to proteins. See Log file \"" + mLogFilePath + "\" for details.");
+            }
+        }
+
+        /// <summary>
+        /// Re-run the mapping with not found peptides reversed to see if they are reverse hits
+        /// </summary>
+        private void CheckReversedPeptides()
+        {
+            CreateReversedPeptideList();
+            bool bSuccess = MapProteins();
+            if (bSuccess)
+            {
+                ReadBackMap();
+                foreach (var peptide in mPeptidesNotFound)
+                {
+                    if (mPeptideToProteinMap.ContainsKey(Reverse(peptide.Key)))
+                    {
+                        ++mDistinctReverseHits;
+                        mTotalReverseHits += peptide.Value;
+                    }
+                    else
+                    {
+                        mPeptidesReallyNotFound.Add(peptide.Key, peptide.Value);
+                        mTotalPeptidesReallyNotFound += peptide.Value;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Simple string reversing function to check for reverse hits
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string Reverse(string s)
+        {
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
+        /// <summary>
+        /// Output the list of not found peptides to a file, and 
+        /// </summary>
+        private void CreateReversedPeptideList()
+        {
+            // Write out a list of peptides for clsPeptideToProteinMapEngine
+            using (StreamWriter peptideWriter =
+                new StreamWriter(new FileStream(mPeptideListFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+            {
+                foreach (var peptide in mPeptidesNotFound)
+                {
+                        peptideWriter.WriteLine(Reverse(peptide.Key));
+                }
             }
         }
 
@@ -90,6 +212,7 @@ namespace AScore_Console
         {
             string line;
             Dictionary<string, int> columnMap = new Dictionary<string, int>();
+            Dictionary<string, int> peptides = new Dictionary<string, int>();
             // Write out a list of peptides for clsPeptideToProteinMapEngine
             using (StreamReader aScoreReader =
                     new StreamReader(new FileStream(mAScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
@@ -109,12 +232,19 @@ namespace AScore_Console
                         while ((line = aScoreReader.ReadLine()) != null)
                         {
                             string sequence = line.Split('\t')[columnMap["BestSequence"]];
-                            peptideWriter.WriteLine(
-                                clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true));
+                            string cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
+                            if (!peptides.ContainsKey(cleanSequence))
+                            {
+                                peptides.Add(cleanSequence, 0);
+                            }
+                            // We are only looking for total distinct peptides, we don't need to keep a count.
+                            //peptides[cleanSequence]++;
+                            peptideWriter.WriteLine(cleanSequence);
                         }
                     }
                 }
             }
+            mDistinctPeptides = peptides.Count;
         }
 
         /// <summary>
@@ -153,7 +283,7 @@ namespace AScore_Console
 
             // Note that clsPeptideToProteinMapEngine utilizes Data.SQLite.dll
             bool bSuccess = peptideToProteinMapper.ProcessFile(mPeptideListFilePath, mOutputFolderPath, String.Empty, true);
-
+            
             peptideToProteinMapper.CloseLogFileNow();
 
             return bSuccess;
@@ -259,45 +389,59 @@ namespace AScore_Console
                             string cleanSequence =
                                 clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(
                                     sequence, true);
-                            string noPrefixSequence = String.Empty;
-                            string prefix = String.Empty;
-                            string suffix = String.Empty;
-                            clsPeptideCleavageStateCalculator.SplitPrefixAndSuffixFromSequence(sequence,
-                                ref noPrefixSequence, ref prefix, ref suffix);
-                            List<int> mods = new List<int>();
-                            int modPosAdj = 0;
-                            for (int i = 0; i < noPrefixSequence.Length; ++i)
+                            ++mTotalPeptides;
+                            if (mPeptideToProteinMap.ContainsKey(cleanSequence))
                             {
-                                if (noPrefixSequence[i] == '*')
+                                string noPrefixSequence = String.Empty;
+                                string prefix = String.Empty;
+                                string suffix = String.Empty;
+                                clsPeptideCleavageStateCalculator.SplitPrefixAndSuffixFromSequence(sequence,
+                                    ref noPrefixSequence, ref prefix, ref suffix);
+                                List<int> mods = new List<int>();
+                                int modPosAdj = 0;
+                                for (int i = 0; i < noPrefixSequence.Length; ++i)
                                 {
-                                    mods.Add(i);
-                                }
-                            }
-                            if (noPrefixSequence[0] == '.')
-                            {
-                                ++modPosAdj;
-                            }
-                            foreach (var match in mPeptideToProteinMap[cleanSequence])
-                            {
-                                for (int i = 0; i < mods.Count; ++i)
-                                {
-                                    // Original AScore data
-                                    mappedWriter.Write(line + "\t");
-                                    // Protein Name
-                                    mappedWriter.Write(match.proteinName + "\t");
-                                    // Protein Description - if it contains key-value pairs, use it.
-                                    if (mOutputProteinDescriptions)
+                                    if (noPrefixSequence[i] == '*')
                                     {
-                                        mappedWriter.Write(mProteinDescriptions[match.proteinName] + "\t");
+                                        mods.Add(i);
                                     }
-                                    // # of proteins occurred in
-                                    mappedWriter.Write(mPeptideToProteinMap[cleanSequence].Count + "\t");
-                                    // Residue of mod
-                                    mappedWriter.Write(noPrefixSequence[mods[i] - 1] + "\t");
-                                    // Position of residue
-                                    // With multiple residues, we need to adjust the position of each subsequent residue by the number of residues we have read
-                                    mappedWriter.WriteLine(match.residueStart + mods[i] - i - 1);
                                 }
+                                if (noPrefixSequence[0] == '.')
+                                {
+                                    ++modPosAdj;
+                                }
+                                foreach (var match in mPeptideToProteinMap[cleanSequence])
+                                {
+                                    for (int i = 0; i < mods.Count; ++i)
+                                    {
+                                        // Original AScore data
+                                        mappedWriter.Write(line + "\t");
+                                        // Protein Name
+                                        mappedWriter.Write(match.proteinName + "\t");
+                                        // Protein Description - if it contains key-value pairs, use it.
+                                        if (mOutputProteinDescriptions)
+                                        {
+                                            mappedWriter.Write(mProteinDescriptions[match.proteinName] + "\t");
+                                        }
+                                        // # of proteins occurred in
+                                        mappedWriter.Write(mPeptideToProteinMap[cleanSequence].Count + "\t");
+                                        // Residue of mod
+                                        mappedWriter.Write(noPrefixSequence[mods[i] - 1] + "\t");
+                                        // Position of residue
+                                        // With multiple residues, we need to adjust the position of each subsequent residue by the number of residues we have read
+                                        mappedWriter.WriteLine(match.residueStart + mods[i] - i - 1);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                mappedWriter.WriteLine(line);
+                                if (!mPeptidesNotFound.ContainsKey(cleanSequence))
+                                {
+                                    mPeptidesNotFound.Add(cleanSequence, 0);
+                                }
+                                mPeptidesNotFound[cleanSequence]++;
+                                ++mTotalPeptidesNotFound;
                             }
                         }
                     }
