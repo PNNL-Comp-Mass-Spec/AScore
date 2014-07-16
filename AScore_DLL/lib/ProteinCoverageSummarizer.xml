@@ -6,32 +6,7 @@ ProteinCoverageSummarizer
 </name>
 </assembly>
 <members>
-<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptide(System.String,System.Char,System.Char,System.String)">
-	<summary>
- Searches for proteins that contain peptide strPeptideSequence.  
- If strProteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
- </summary>
-	<param name="strPeptideSequence">The peptide sequence to find</param>
-	<param name="chPrefixResidue">The prefix for the peptide</param>
-	<param name="chSuffixResidue">The suffix for the peptide</param>
-	<param name="strProteinNameForPeptide">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
-	<remarks></remarks>
-</member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptideList(System.Collections.Hashtable@,System.String)">
-	<summary>
- Searches for proteins that contain the peptides in htPeptideList  
- If strProteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
- Otherwise, only searches protein strProteinNameForPeptide
- </summary>
-	<param name="htPeptideList">Hash table containing the peptides to search; peptides must be in the format Prefix.Peptide.Suffix where Prefix and Suffix are single characters; peptides are assumed to only contain letters (no symbols)</param>
-	<param name="strProteinNameForPeptides">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
-	<remarks></remarks>
-</member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ReadProteinInfoChunk(System.Int32,System.Int32,System.Boolean[]@,System.Boolean)">
-	<summary>
- Read the next chunk of proteins from the database (SequenceID, ProteinName, ProteinSequence)
- </summary>
-	<returns>The number of records read</returns>
-	<remarks></remarks>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.LoadSettings">
+<member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.LoadSettings">
 	<summary>
  Loads the settings for the defined Xml Settings File.  Assumes names are not case sensitive
  </summary>
@@ -423,6 +398,31 @@ ProteinCoverageSummarizer
 	<summary>
   A strongly-typed resource class, for looking up localized strings, etc.
 </summary>
+</member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptide(System.String,System.Char,System.Char,System.String)">
+	<summary>
+ Searches for proteins that contain peptide strPeptideSequence.  
+ If strProteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
+ </summary>
+	<param name="strPeptideSequence">The peptide sequence to find</param>
+	<param name="chPrefixResidue">The prefix for the peptide</param>
+	<param name="chSuffixResidue">The suffix for the peptide</param>
+	<param name="strProteinNameForPeptide">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
+	<remarks></remarks>
+</member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptideList(System.Collections.Hashtable@,System.String)">
+	<summary>
+ Searches for proteins that contain the peptides in htPeptideList  
+ If strProteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
+ Otherwise, only searches protein strProteinNameForPeptide
+ </summary>
+	<param name="htPeptideList">Hash table containing the peptides to search; peptides must be in the format Prefix.Peptide.Suffix where Prefix and Suffix are single characters; peptides are assumed to only contain letters (no symbols)</param>
+	<param name="strProteinNameForPeptides">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
+	<remarks></remarks>
+</member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ReadProteinInfoChunk(System.Int32,System.Int32,System.Boolean[]@,System.Boolean)">
+	<summary>
+ Read the next chunk of proteins from the database (SequenceID, ProteinName, ProteinSequence)
+ </summary>
+	<returns>The number of records read</returns>
+	<remarks></remarks>
 </member>
 </members>
 </doc>
