@@ -308,6 +308,8 @@ namespace AScore_DLL
 
 			}
 
+			Console.WriteLine();
+
 			ReportMessage("Writing " + datasetManager.ResultsCount + " rows to the output file: " + outputFilePath);
 
 			datasetManager.WriteToFile(outputFilePath);
