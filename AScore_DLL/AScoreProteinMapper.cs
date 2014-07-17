@@ -422,26 +422,27 @@ namespace AScore_DLL
 							}
 						}
 
-						bool matchFound = false;
-
 						foreach (var match in mPeptideToProteinMap[cleanSequence])
 						{
+							// Protein Name
+							string proteinName = match.proteinName;
+
+							string proteinDescription = string.Empty;
+
+							// Protein Description - if it contains key-value pairs, use it.
+							if (mOutputProteinDescriptions)
+							{
+								proteinDescription = mProteinDescriptions[match.proteinName];
+							}
+
+							// # of proteins occurred in
+							int proteinCount = mPeptideToProteinMap[cleanSequence].Count;
+
+							bool matchFound = false;
+
 							for (int i = 0; i < mods.Count; ++i)
 							{
 								matchFound = true;
-
-								// Protein Name
-								string proteinName = match.proteinName;
-
-								string proteinDescription = string.Empty;
-
-								// Protein Description - if it contains key-value pairs, use it.
-								if (mOutputProteinDescriptions)
-								{
-									proteinDescription = mProteinDescriptions[match.proteinName];
-								}
-								// # of proteins occurred in
-								int proteinCount = mPeptideToProteinMap[cleanSequence].Count;
 
 								char modifiedResidue = ' ';
 
@@ -455,12 +456,19 @@ namespace AScore_DLL
 
 								WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
 							}
+
+							if (!matchFound)
+							{
+								const char modifiedResidue = ' ';
+								const int residuePosition = 0;
+
+								WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);								
+							}
+							
 						}
 
-						if (!matchFound)
-							WriteCombinedLine(mappedWriter, line);
-
 					}
+
 				} // End Using
 			} // End Using
 
