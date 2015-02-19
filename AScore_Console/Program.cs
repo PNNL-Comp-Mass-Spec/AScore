@@ -1,13 +1,14 @@
 ﻿using System;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
+using FileProcessor;
 using System.IO;
 
 namespace AScore_Console
 {
 	class Program
 	{
-		static StreamWriter mLogFile = null;
+		static StreamWriter mLogFile;
 
 		struct AScoreOptionsType
 		{
@@ -45,8 +46,8 @@ namespace AScore_Console
 			}
 		}
 
-        private static AScoreOptionsType mAScoreOptions = new AScoreOptionsType();
-        static bool mMultiJobMode = false;
+        private static AScoreOptionsType mAScoreOptions;
+        static bool mMultiJobMode;
         static string mLogFilePath = string.Empty;
         const string SupportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
 
@@ -71,10 +72,10 @@ namespace AScore_Console
 					ProcessCommandLine(clu, ref syntaxError);
 				}
 
-				//	AScore_DLL.AScoreParameters parameters = 
+                Console.WriteLine();
+
 				if ((args.Length == 0) || clu.NeedToShowHelp || syntaxError.Length > 0)
 				{
-					Console.WriteLine();
 					if (syntaxError.Length > 0)
 					{
 						Console.WriteLine("Error, " + syntaxError);
@@ -107,7 +108,7 @@ namespace AScore_Console
 				ShowMessage("Program failure, possibly incorrect search engine type; " + ex.Message);
 				ShowMessage("Stack Track: " + ex.StackTrace);
 
-				return ((int)ex.Message.GetHashCode());
+				return ex.Message.GetHashCode();
 			}
 			finally
 			{
@@ -154,7 +155,8 @@ namespace AScore_Console
             }
 
             string outValue;
-			/// Deprecating starting 2/17/2015; default is true, and the "noFM"switch is all that is needed.
+			
+            // Deprecating starting February 17, 2015; default is true, and the "noFM" switch is all that is needed.
             if (clu.RetrieveValueForParameter("FM", out outValue, false))
             {
                 if (!bool.TryParse(outValue, out mAScoreOptions.FilterOnMSGFScore))
@@ -217,8 +219,7 @@ namespace AScore_Console
             Console.WriteLine(" -P:parameter_file_path");
             Console.WriteLine(" -O:output_folder_path");
             Console.WriteLine(" -L:log_file_path");
-            //Console.WriteLine(" -FM:true  (true or false to enable/disable filtering");
-            //Console.WriteLine("            on data in column MSGF_SpecProb; default is true)");
+                        
             Console.WriteLine(" -noFM   (disable filtering on data in column MSGF_SpecProb; default is enabled)");
             Console.WriteLine(" -U:updated_fht_file_name");
             Console.WriteLine("   (create a copy of the fht_file with updated peptide");
@@ -318,8 +319,10 @@ namespace AScore_Console
 
 			if (!String.IsNullOrWhiteSpace(logFilePath))
 			{
-				mLogFile = new StreamWriter(new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
-				mLogFile.AutoFlush = true;
+				mLogFile = new StreamWriter(new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+				{
+				    AutoFlush = true
+				};
 			}
 
 			var diOutputFolder = new DirectoryInfo(ascoreOptions.OutputFolderPath);
@@ -355,21 +358,21 @@ namespace AScore_Console
 				switch (ascoreOptions.SearchType)
 				{
 					case "xtandem":
-						ShowMessage("Caching data in " + ascoreOptions.FirstHitsFile);
+						ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
 						datasetManager = new XTandemFHT(ascoreOptions.FirstHitsFile);
 						break;
 					case "sequest":
-						ShowMessage("Caching data in " + ascoreOptions.FirstHitsFile);
+                        ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
 						datasetManager = new SequestFHT(ascoreOptions.FirstHitsFile);
 						break;
 					case "inspect":
-						ShowMessage("Caching data in " + ascoreOptions.FirstHitsFile);
+						ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
 						datasetManager = new InspectFHT(ascoreOptions.FirstHitsFile);
 						break;
 					case "msgfdb":
 					case "msgfplus":
 					case "msgf+":
-						ShowMessage("Caching data in " + ascoreOptions.FirstHitsFile);
+						ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
 						datasetManager = new MsgfdbFHT(ascoreOptions.FirstHitsFile);
 						break;
 					default:
@@ -381,14 +384,13 @@ namespace AScore_Console
 				var dtaManager = new DtaManager();
 				AttachEvents(dtaManager);
 
-				ShowMessage("Computing AScore values and Writing results to " + diOutputFolder.FullName);
+				ShowMessage("Output folder: " + diOutputFolder.FullName);
 
 				var ascoreEngine = new AScore_DLL.Algorithm();
 				AttachEvents(ascoreEngine);
 
 				// Initialize the options
 				ascoreEngine.FilterOnMSGFScore = ascoreOptions.FilterOnMSGFScore;
-
 
 				// Run the algorithm
 				if (multiJobMode)
@@ -413,7 +415,7 @@ namespace AScore_Console
 
 				resultsMerger.MergeResults(ascoreOptions.FirstHitsFile, ascoreResultsFilePath, ascoreOptions.UpdatedFirstHitsFileName);
 
-				ShowMessage("Results merged; new file: " + resultsMerger.MergedFilePath);
+				ShowMessage("Results merged; new file: " + Path.GetFileName(resultsMerger.MergedFilePath));
 			}
 
 			return 0;
@@ -435,7 +437,7 @@ namespace AScore_Console
 			Console.WriteLine(message);
 
 			if (mLogFile != null)
-				mLogFile.WriteLine(System.DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + message);
+				mLogFile.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + message);
 		}
 
 		#region "Event handlers for AutoUIMFCalibration"

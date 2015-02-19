@@ -15,7 +15,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         {
             try
             {
-                datasetName = System.IO.Path.GetFileNameWithoutExtension(mzxmlPath);
+                datasetName = Path.GetFileNameWithoutExtension(mzxmlPath);
                 datasetName = datasetName.Substring(0, datasetName.Length - 4);
                 mzAccessor = new clsMzXMLFileAccessor();
                 mzAccessor.OpenFile(mzxmlPath);

@@ -152,7 +152,8 @@ namespace AScore_DLL.Combinatorics
 					}
 				}
 				finalCombos.Add(aFinalCombo);
-				currentList.RemoveAt(currentList.Count - 1);
+                if (currentList.Count > 0)
+				    currentList.RemoveAt(currentList.Count - 1);
 			}
 			else
 			{

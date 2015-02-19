@@ -14,9 +14,9 @@ using ExtensionMethods;
 // Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/
 // -------------------------------------------------------------------------------
 // 
-// Last modified May 23, 2014
+// Last modified August 29, 2014
 
-namespace AScore_Console
+namespace FileProcessor
 {
 
 	public class clsParseCommandLine
@@ -262,7 +262,7 @@ namespace AScore_Console
 					return false;
 				}
 				
-				if (strCmdLine.IndexOf(chSwitchStartChar + "?") > 0 | strCmdLine.ToLower().IndexOf(chSwitchStartChar + "help") > 0)
+				if (strCmdLine.IndexOf(chSwitchStartChar + "?") > 0 || strCmdLine.ToLower().IndexOf(chSwitchStartChar + "help") > 0)
 				{
 					mShowHelp = true;
 					return false;

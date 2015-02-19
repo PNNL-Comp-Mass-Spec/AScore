@@ -5,7 +5,7 @@
 		public MsgfdbFHT(string fhtFileName) : base(fhtFileName) { }
 
 		public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, 
-			ref AScore_DLL.Managers.ParameterFileManager ascoreParam)
+			ref ParameterFileManager ascoreParam)
 		{
 
 			if (dt.Columns.Contains(RESULTS_COL_JOB))
@@ -44,7 +44,7 @@
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam)
         {
-			this.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParam);
+			GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParam);
 
 			msgfScore = 0;
 

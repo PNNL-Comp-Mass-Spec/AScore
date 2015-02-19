@@ -27,8 +27,8 @@ namespace AScore_DLL
 			foreach (string a in ascore)
 			{
 				string myFht = Path.Combine(fhtPath, a);
-				string myDta = System.IO.Path.Combine(dtapath, a.Substring(0, a.Length - 8) + "_dta.txt");
-				string outFile = System.IO.Path.Combine(fhtPath, a.Substring(0, a.Length - 8) + "_AScore.txt");
+				string myDta = Path.Combine(dtapath, a.Substring(0, a.Length - 8) + "_dta.txt");
+				string outFile = Path.Combine(fhtPath, a.Substring(0, a.Length - 8) + "_AScore.txt");
 				DatasetManager datasetMan = new SequestFHT(myFht);
 				DtaManager dtaManager = new DtaManager(myDta);
 				ParameterFileManager paramFile = new ParameterFileManager(parFile);
@@ -272,10 +272,10 @@ namespace AScore_DLL
 
 			for (int i = 0; i < fhtFiles.Count; i++)
 			{
-				string tempfht = System.IO.Path.Combine(direct, fhtFiles[i]);
-				string tempdta = System.IO.Path.Combine(direct, dtaFiles[i]);
-				string ascP = System.IO.Path.Combine(direct, ascoreP);
-				string tempout = System.IO.Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
+				string tempfht = Path.Combine(direct, fhtFiles[i]);
+				string tempdta = Path.Combine(direct, dtaFiles[i]);
+				string ascP = Path.Combine(direct, ascoreP);
+				string tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
 
 				DatasetManager dsman = new MsgfdbFHT(tempfht);
 				DtaManager dtman = new DtaManager(tempdta);
@@ -330,10 +330,10 @@ namespace AScore_DLL
 
             for (int i = 0; i < fhtFiles.Count; i++)
             {
-                string tempfht = System.IO.Path.Combine(direct, fhtFiles[i]);
-                string tempdta = System.IO.Path.Combine(direct, dtaFiles[i]);
-                string ascP = System.IO.Path.Combine(direct, ascoreP);
-                string tempout = System.IO.Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore2.txt");
+                string tempfht = Path.Combine(direct, fhtFiles[i]);
+                string tempdta = Path.Combine(direct, dtaFiles[i]);
+                string ascP = Path.Combine(direct, ascoreP);
+                string tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore2.txt");
 
                 DatasetManager dsman = new SequestFHT(tempfht);
                 DtaManager dtman = new DtaManager(tempdta);
@@ -349,9 +349,9 @@ namespace AScore_DLL
         public void TestMSGFFilter()
         {
             string direct = @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase";
-            string fht = System.IO.Path.Combine(direct, "689706_GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_fht.txt");
-            string param = System.IO.Path.Combine(direct, "parameterFileForGmax.xml");
-            string dta = System.IO.Path.Combine(direct, "GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_dta.txt");
+            string fht = Path.Combine(direct, "689706_GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_fht.txt");
+            string param = Path.Combine(direct, "parameterFileForGmax.xml");
+            string dta = Path.Combine(direct, "GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_dta.txt");
 
             DatasetManager dfht = new SequestFHT(fht);
             ParameterFileManager pfile = new ParameterFileManager(param);
@@ -425,10 +425,10 @@ namespace AScore_DLL
                         ascoreP = ascorePCID;
                     }
 
-                    string tempfht = System.IO.Path.Combine(direct, fhtFiles[i]);
-                    string tempdta = System.IO.Path.Combine(direct2, dtaFiles[i]);
-                    string ascP = System.IO.Path.Combine(direct, ascoreP);
-                    string tempout = System.IO.Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
+                    string tempfht = Path.Combine(direct, fhtFiles[i]);
+                    string tempdta = Path.Combine(direct2, dtaFiles[i]);
+                    string ascP = Path.Combine(direct, ascoreP);
+                    string tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
 
                     DatasetManager dsman = new SequestFHT(tempfht);
                     DtaManager dtman = new DtaManager(tempdta);
@@ -496,10 +496,10 @@ namespace AScore_DLL
                         fht = msgfdbFile[i];
                     }
 
-                    string tempfht = System.IO.Path.Combine(direct, fht);
-                    string tempdta = System.IO.Path.Combine(direct2, dtaFiles[i]);
-                    string ascP = System.IO.Path.Combine(direct2, ascoreP);
-                    string tempout = System.IO.Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
+                    string tempfht = Path.Combine(direct, fht);
+                    string tempdta = Path.Combine(direct2, dtaFiles[i]);
+                    string ascP = Path.Combine(direct2, ascoreP);
+                    string tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
                     DatasetManager dsman = null;
                     if (j == 0)
                     {

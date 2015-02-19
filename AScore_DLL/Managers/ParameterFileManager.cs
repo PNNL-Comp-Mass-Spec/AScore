@@ -15,9 +15,9 @@ namespace AScore_DLL.Managers
 	{
 
 		#region Member Variables
-		private List<Mod.Modification> staticMods;
-		private List<Mod.Modification> terminiMods;
-		private List<Mod.DynamicModification> dynamMods;
+		private List<Modification> staticMods;
+		private List<Modification> terminiMods;
+		private List<DynamicModification> dynamMods;
 		private FragmentType fragmentType;
 		private double fragmentMassTolerance;
 		private double fragmentMassToleranceCID = 0.5;
@@ -29,21 +29,14 @@ namespace AScore_DLL.Managers
 
 
 		#region Public Properties
-		public List<Mod.Modification> StaticMods { get {return staticMods;} }
-		public List<Mod.Modification> TerminiMods { get { return terminiMods; } }
-		public List<Mod.DynamicModification> DynamicMods { get { return dynamMods; }  }
+		public List<Modification> StaticMods { get {return staticMods;} }
+		public List<Modification> TerminiMods { get { return terminiMods; } }
+		public List<DynamicModification> DynamicMods { get { return dynamMods; }  }
 		public FragmentType FragmentType { get { return fragmentType; } 
 			set 
 			{
 				fragmentType = value;
-				//if (fragmentType == FragmentType.HCD)
-				//{
-				//	fragmentMassTolerance = 0.05;
-				//}
-				//else
-				//{
-				//	fragmentMassTolerance = 0.5;
-				//}
+				
 				switch (fragmentType)
 				{
 					case FragmentType.CID:
@@ -77,20 +70,20 @@ namespace AScore_DLL.Managers
 
 			if (MultiDissociationParamFile)
 			{
-				Console.WriteLine("CID Mass Tolerance: " + FragmentMassToleranceCID + " Da");
-				Console.WriteLine("ETD Mass Tolerance: " + FragmentMassToleranceETD + " Da");
-				Console.WriteLine("HCD Mass Tolerance: " + FragmentMassToleranceHCD + " Da");
+				ReportMessage("CID Mass Tolerance: " + FragmentMassToleranceCID + " Da");
+                ReportMessage("ETD Mass Tolerance: " + FragmentMassToleranceETD + " Da");
+                ReportMessage("HCD Mass Tolerance: " + FragmentMassToleranceHCD + " Da");
 			}
 			else
 			{
-				Console.WriteLine("Fragment Type:  " + FragmentType.ToString());
-				Console.WriteLine("Mass Tolerance: " + FragmentMassTolerance + " Da");
+                ReportMessage("Fragment Type:  " + FragmentType);
+                ReportMessage("Mass Tolerance: " + FragmentMassTolerance + " Da");
 			}
 		}
 
 
-		public ParameterFileManager(List<Mod.Modification> stat, List<Mod.Modification> term, 
-			List<Mod.DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
+		public ParameterFileManager(List<Modification> stat, List<Modification> term, 
+			List<DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
 		{
 			
 			staticMods = stat;
@@ -105,8 +98,8 @@ namespace AScore_DLL.Managers
 
 		#region Initializers
 
-		public void InitializeAScoreParameters(List<Mod.Modification> stat, List<Mod.Modification> term, 
-			List<Mod.DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
+		public void InitializeAScoreParameters(List<Modification> stat, List<Modification> term, 
+			List<DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
 		{
 			
 			staticMods = stat;
@@ -118,10 +111,10 @@ namespace AScore_DLL.Managers
 			MultiDissociationParamFile = false;
 		}
 
-		public void InitializeAScoreParameters(List<Mod.Modification> stat, FragmentType f, double tol)
+		public void InitializeAScoreParameters(List<Modification> stat, FragmentType f, double tol)
 		{
 			staticMods = stat;
-			terminiMods = new List<Mod.Modification>();
+			terminiMods = new List<Modification>();
 			//		dynamMods = new List<Mod.DynamicModification>();
 			fragmentType = f;
 			fragmentMassTolerance = tol;
@@ -130,8 +123,8 @@ namespace AScore_DLL.Managers
 
 		public void InitializeAScoreParameters(FragmentType f, double tol)
 		{
-			staticMods = new List<Mod.Modification>();
-			terminiMods = new List<Mod.Modification>();
+			staticMods = new List<Modification>();
+			terminiMods = new List<Modification>();
 			//		dynamMods = new List<Mod.DynamicModification>();
 			fragmentType = f;
 			fragmentMassTolerance = tol;
@@ -148,8 +141,8 @@ namespace AScore_DLL.Managers
 		/// 
 		public ParameterFileManager Copy()
 		{
-			return new ParameterFileManager(new List<Mod.Modification>(staticMods), new List<Mod.Modification>(terminiMods),
-				new List<Mod.DynamicModification>(dynamMods), fragmentType, fragmentMassTolerance, msgfPreFilter);
+			return new ParameterFileManager(new List<Modification>(staticMods), new List<Modification>(terminiMods),
+				new List<DynamicModification>(dynamMods), fragmentType, fragmentMassTolerance, msgfPreFilter);
 
 		}
 
@@ -176,8 +169,8 @@ namespace AScore_DLL.Managers
 			if ((fragmentTypeNode == null || massToleranceNode == null) && (massTolCID == null || massTolETD == null || massTolHCD == null))
 				throw new ArgumentOutOfRangeException("The FragmentType and/or MassTolerance nodes were not found in XML file " + inputFile + ", and alternate parameters were not present");
 
-			FragmentType f = FragmentType.CID;
-			double massTol = 0.5;
+			var f = FragmentType.CID;
+			double massTol;
 			bool multiDissociationParams = false;
 			if (fragmentTypeNode != null && massToleranceNode != null)
 			{
@@ -287,18 +280,20 @@ namespace AScore_DLL.Managers
 							ReportError("Invalid modification definition in section " + sectionName + ", MassMonoIsotopic is zero for mod #" + modNumberInSection);
 							continue;
 						}
-						else if (requireModSymbol && modSymbol == ' ')
-						{
-							ReportError("Invalid modification definition in section " + sectionName + ", ModSymbol is empty is for mod #" + modNumberInSection);
-							continue;
-						}
-						else if (requireModSites && possibleModSites.Count == 0)
-						{
-							ReportError("Invalid modification definition in section " + sectionName + ", PossibleModSites is missing and/or does not have any <Pos> sub-elements for mod #" + modNumberInSection);
-							continue;
-						}
+					
+                        if (requireModSymbol && modSymbol == ' ')
+					    {
+					        ReportError("Invalid modification definition in section " + sectionName + ", ModSymbol is empty is for mod #" + modNumberInSection);
+					        continue;
+					    }
+					    
+                        if (requireModSites && possibleModSites.Count == 0)
+					    {
+					        ReportError("Invalid modification definition in section " + sectionName + ", PossibleModSites is missing and/or does not have any <Pos> sub-elements for mod #" + modNumberInSection);
+					        continue;
+					    }
 
-						var m = new DynamicModification
+					    var m = new DynamicModification
 						{
 							MassMonoisotopic = massMonoIsotopic,
 							MassAverage = massAverage,

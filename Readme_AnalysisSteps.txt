@@ -1,4 +1,4 @@
-The Ascore program can process first-hits files from MSGF+, Sequest, or X!Tandem
+The Ascore program can process first-hits or synopsis files from MSGF+, Sequest, or X!Tandem
 to compute confidence scores for the position of phosphorylated residues.  Use the
 following steps to manually analyze results from a set of DMS analysis jobs.
 
@@ -30,8 +30,8 @@ Create the JobToDatasetMap.txt file with columns Job and Dataset
 Run AScore, using the -JM switch
 
 pushd \\floyd\software\AScore
-AScore_Console.exe -T:msgfplus -F:"F:\Temp\AScore\Leishmania_TMT_NiNTA_msgfdb_fht.txt" -JM:"F:\Temp\AScore\JobToDatasetMap.txt" -O:"F:\Temp\AScore\" -P:F:\Temp\AScore\DynPhos_stat_6plex_iodo_hcd.xml -L:LogFile.txt -FM:true
-AScore_Console.exe -T:msgfplus -F:"F:\Temp\AScore\Leishmania_TMT_NiNTA_filtered_results.txt" -JM:"F:\Temp\AScore\JobToDatasetMap.txt" -O:"F:\Temp\AScore\" -P:F:\Temp\AScore\DynPhos_stat_6plex_iodo_hcd.xml -L:LogFile.txt -FM:true
+AScore_Console.exe -T:msgfplus -F:"F:\Temp\AScore\Leishmania_TMT_NiNTA_msgfdb_fht.txt" -JM:"F:\Temp\AScore\JobToDatasetMap.txt" -O:"F:\Temp\AScore\" -P:F:\Temp\AScore\DynPhos_stat_6plex_iodo_hcd.xml -L:LogFile.txt
+AScore_Console.exe -T:msgfplus -F:"F:\Temp\AScore\Leishmania_TMT_NiNTA_filtered_results.txt" -JM:"F:\Temp\AScore\JobToDatasetMap.txt" -O:"F:\Temp\AScore\" -P:F:\Temp\AScore\DynPhos_stat_6plex_iodo_hcd.xml -L:LogFile.txt
 popd 
 
 Results files are Leishmania_TMT_NiNTA_msgfdb_fht_ascore.txt and

@@ -30,22 +30,22 @@ namespace AScore_DLL
 		/// <summary>
 		/// Unspecified fragment type
 		/// </summary>
-		Unspecified,
+		Unspecified = 0,
 
 		/// <summary>
 		/// CID fragment type
 		/// </summary>
-		CID,
+		CID = 1,
 
 		/// <summary>
 		/// ETD fragment type
 		/// </summary>
-		ETD,
+		ETD = 2,
 
 		/// <summary>
 		/// HCD fragment type
 		/// </summary>
-		HCD
+		HCD = 3
 	}
 
 	/// <summary>

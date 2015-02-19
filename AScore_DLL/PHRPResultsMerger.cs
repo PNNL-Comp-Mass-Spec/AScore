@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AScore_DLL.Managers.DatasetManagers;
 using PHRPReader;
@@ -13,7 +14,7 @@ namespace AScore_DLL
 	public class PHRPResultsMerger : MessageEventBase
 	{
 		protected string m_MergedFilePath = string.Empty;
-		protected PHRPReader.clsPHRPReader mPHRPReader;
+		protected clsPHRPReader mPHRPReader;
 
 		protected struct AScoreResultsType
 		{
@@ -36,10 +37,10 @@ namespace AScore_DLL
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(m_MergedFilePath))
+			    if (string.IsNullOrEmpty(m_MergedFilePath))
 					return string.Empty;
-				else
-					return m_MergedFilePath;
+			    
+                return m_MergedFilePath;
 			}
 		}
 		#endregion
@@ -51,22 +52,16 @@ namespace AScore_DLL
 
 		public bool MergeResults(string phrpDataFilePath, string ascoreResultsFilePath, string mergedPhrpDataFileName)
 		{
-			bool success;
-
-			System.IO.FileInfo fiInputFile;
-			System.IO.FileInfo fiAScoreResultsFile;
-			System.IO.FileInfo fiOutputFilePath;
-
-			try
+		    try
 			{
-				fiInputFile = new System.IO.FileInfo(phrpDataFilePath);
+				var fiInputFile = new FileInfo(phrpDataFilePath);
 				if (!fiInputFile.Exists)
 				{
 					ReportError("PHRP Data File not found: " + fiInputFile.FullName);
 					return false;
 				}
 
-				fiAScoreResultsFile = new System.IO.FileInfo(ascoreResultsFilePath);
+				var fiAScoreResultsFile = new FileInfo(ascoreResultsFilePath);
 				if (!fiAScoreResultsFile.Exists)
 				{
 					ReportError("AScore results file not found: " + fiAScoreResultsFile.FullName);
@@ -74,18 +69,18 @@ namespace AScore_DLL
 				}
 
 				// Initialize the PHRPReader
-				success = InitializeReader(fiInputFile);
+				bool success = InitializeReader(fiInputFile);
 				if (!success)
 					return false;
 
 				if (string.IsNullOrEmpty(mergedPhrpDataFileName))
 				{
 					// Auto-define mergedPhrpDataFileName
-					mergedPhrpDataFileName = System.IO.Path.GetFileNameWithoutExtension(fiInputFile.Name) + "_WithAScore" + fiInputFile.Extension;
+					mergedPhrpDataFileName = Path.GetFileNameWithoutExtension(fiInputFile.Name) + "_WithAScore" + fiInputFile.Extension;
 				}
 
-				m_MergedFilePath = System.IO.Path.Combine(fiAScoreResultsFile.Directory.FullName, mergedPhrpDataFileName);
-				fiOutputFilePath = new System.IO.FileInfo(m_MergedFilePath);
+				m_MergedFilePath = Path.Combine(fiAScoreResultsFile.Directory.FullName, mergedPhrpDataFileName);
+				var fiOutputFilePath = new FileInfo(m_MergedFilePath);
 
 
 				if (FilePathsMatch(fiInputFile, fiOutputFilePath))
@@ -102,13 +97,13 @@ namespace AScore_DLL
 				
 
 				// Cache the AScore results in memory
-				Dictionary<string, AScoreResultsType> cachedAscoreResults = new Dictionary<string, AScoreResultsType>();
+				var cachedAscoreResults = new Dictionary<string, AScoreResultsType>();
 
 				success = CacheAScoreResults(ascoreResultsFilePath, cachedAscoreResults);
 				if (!success)
 					return false;
 
-				success = MakeUpdatedPHRPFile(fiInputFile, fiOutputFilePath, mPHRPReader, cachedAscoreResults);
+				MakeUpdatedPHRPFile(fiInputFile, fiOutputFilePath, mPHRPReader, cachedAscoreResults);
 
 			}
 			catch (Exception ex)
@@ -124,14 +119,13 @@ namespace AScore_DLL
 
 		private bool CacheAScoreResults(string ascoreResultsFilePath, Dictionary<string, AScoreResultsType> cachedAscoreResults)
 		{
-			string lineIn;
-			bool headersParsed = false;
-			SortedDictionary<string, int> columnHeaders = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
+		    bool headersParsed = false;
+			var columnHeaders = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
 
 			try
 			{
 
-				if (!System.IO.File.Exists(ascoreResultsFilePath))
+				if (!File.Exists(ascoreResultsFilePath))
 				{
 					ReportError("File not found: " + ascoreResultsFilePath);
 					return false;
@@ -149,11 +143,11 @@ namespace AScore_DLL
 				columnHeaders.Add(DatasetManager.RESULTS_COL_SECONDSEQUENCE, 8);
 				columnHeaders.Add(DatasetManager.RESULTS_COL_MODINFO, 9);
 
-				using (System.IO.StreamReader srInFile = new System.IO.StreamReader(new System.IO.FileStream(ascoreResultsFilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read)))
+				using (var srInFile = new StreamReader(new FileStream(ascoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
 				{
 					while (srInFile.Peek() > -1)
 					{
-						lineIn = srInFile.ReadLine();
+						string lineIn = srInFile.ReadLine();
 						if (string.IsNullOrEmpty(lineIn))
 							continue;
 
@@ -212,12 +206,12 @@ namespace AScore_DLL
 
 		protected string ConstructScanPeptideKey(int scanNumber, string peptideSequence)
 		{
-			return scanNumber.ToString() + "_" + peptideSequence;
+			return scanNumber + "_" + peptideSequence;
 		}
 
 		protected SortedSet<string> DetermineModInfoNames(Dictionary<string, AScoreResultsType> cachedAscoreResults)
 		{
-			SortedSet<string> modInfoNames = new SortedSet<string>();
+			var modInfoNames = new SortedSet<string>();
 
 			foreach (KeyValuePair<string, AScoreResultsType> ascoreResult in cachedAscoreResults)
 			{
@@ -225,7 +219,7 @@ namespace AScore_DLL
 				{
 					// Unmodified peptides will have a ModInfo key of "-"
 					// Skip these entries 
-					if (modInfoEntry.Key != AScore_DLL.Algorithm.MODINFO_NO_MODIFIED_RESIDUES)
+					if (modInfoEntry.Key != Algorithm.MODINFO_NO_MODIFIED_RESIDUES)
 					{
 						if (!modInfoNames.Contains(modInfoEntry.Key))
 							modInfoNames.Add(modInfoEntry.Key);
@@ -237,34 +231,35 @@ namespace AScore_DLL
 			return modInfoNames;
 		}
 
-		protected bool InitializeReader(System.IO.FileInfo fiInputFile)
+		protected bool InitializeReader(FileInfo fiInputFile)
 		{
 			try
 			{
-				PHRPReader.clsPHRPReader.ePeptideHitResultType ePeptideHitResultType;
-				ePeptideHitResultType = PHRPReader.clsPHRPReader.AutoDetermineResultType(fiInputFile.FullName);
+			    clsPHRPReader.ePeptideHitResultType ePeptideHitResultType = clsPHRPReader.AutoDetermineResultType(fiInputFile.FullName);
 
-				if (ePeptideHitResultType == PHRPReader.clsPHRPReader.ePeptideHitResultType.Unknown)
+				if (ePeptideHitResultType == clsPHRPReader.ePeptideHitResultType.Unknown)
 				{
 					ReportError("Error: Could not determine the format of the PHRP data file: " + fiInputFile.FullName);
 					return false;
 				}
 
 				// Open the data file and read the data
-				mPHRPReader = new PHRPReader.clsPHRPReader(fiInputFile.FullName, PHRPReader.clsPHRPReader.ePeptideHitResultType.Unknown, false, false, false);
-				mPHRPReader.EchoMessagesToConsole = false;
-				mPHRPReader.SkipDuplicatePSMs = false;
+				mPHRPReader = new clsPHRPReader(fiInputFile.FullName, clsPHRPReader.ePeptideHitResultType.Unknown, false, false, false)
+				{
+				    EchoMessagesToConsole = false,
+				    SkipDuplicatePSMs = false
+				};
 
-				if (!mPHRPReader.CanRead)
+			    if (!mPHRPReader.CanRead)
 				{
 					ReportError("Aborting since PHRPReader is not ready: " + mPHRPReader.ErrorMessage);
 					return false;
 				}
 
 				// Attach the events
-				mPHRPReader.ErrorEvent += new clsPHRPReader.ErrorEventEventHandler(mPHRPReader_ErrorEvent);
-				mPHRPReader.WarningEvent += new clsPHRPReader.WarningEventEventHandler(mPHRPReader_WarningEvent);
-				mPHRPReader.MessageEvent += new clsPHRPReader.MessageEventEventHandler(mPHRPReader_MessageEvent);
+				mPHRPReader.ErrorEvent += mPHRPReader_ErrorEvent;
+				mPHRPReader.WarningEvent += mPHRPReader_WarningEvent;
+				mPHRPReader.MessageEvent += mPHRPReader_MessageEvent;
 
 			}
 			catch (Exception ex)
@@ -276,7 +271,11 @@ namespace AScore_DLL
 			return true;
 
 		}
-		private bool MakeUpdatedPHRPFile(System.IO.FileInfo fiInputFile, System.IO.FileInfo fiOutputFilePath, PHRPReader.clsPHRPReader oPHRPReader, Dictionary<string, AScoreResultsType> cachedAscoreResults)
+		private bool MakeUpdatedPHRPFile(
+            FileInfo fiInputFile, 
+            FileInfo fiOutputFilePath, 
+            clsPHRPReader oPHRPReader, 
+            Dictionary<string, AScoreResultsType> cachedAscoreResults)
 		{
 
 			try
@@ -287,9 +286,9 @@ namespace AScore_DLL
 				SortedSet<string> modInfoNames = DetermineModInfoNames(cachedAscoreResults);
 
 				// Create the output file
-				using (System.IO.StreamWriter swOutFile = new System.IO.StreamWriter(new System.IO.FileStream(fiOutputFilePath.FullName, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.Read)))
+				using (var swOutFile = new StreamWriter(new FileStream(fiOutputFilePath.FullName, FileMode.Create, FileAccess.Write, FileShare.Read)))
 				{
-					System.Text.StringBuilder outLine = new System.Text.StringBuilder();
+					var outLine = new System.Text.StringBuilder();
 
 					// Write the header line
 					outLine.Append(outputHeaderLine);
@@ -302,16 +301,21 @@ namespace AScore_DLL
 					}
 					swOutFile.WriteLine(outLine);
 
+				    int skipCount = 0;
+
 					while (oPHRPReader.MoveNext())
 					{
-						PHRPReader.clsPSM oPSM = oPHRPReader.CurrentPSM;
+						clsPSM oPSM = oPHRPReader.CurrentPSM;
 
 						string scanPeptideKey = ConstructScanPeptideKey(oPSM.ScanNumber, oPSM.Peptide);
 						AScoreResultsType ascoreResult;
 
 						if (!cachedAscoreResults.TryGetValue(scanPeptideKey, out ascoreResult))
 						{
-							Console.WriteLine("  Skipping PHRP result without AScore result: " + scanPeptideKey);
+                            skipCount++;
+                            if (skipCount < 10)
+							    Console.WriteLine("  Skipping PHRP result without AScore result: " + scanPeptideKey);
+						    
 							continue;
 						}
 
@@ -324,7 +328,7 @@ namespace AScore_DLL
 						outLine.Append("\t" + MathUtilities.ValueToString(ascoreResult.PeptideScore));
 						
 						// Count the number of modInfo entries that are not "-"
-						int modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != AScore_DLL.Algorithm.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
+						int modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != Algorithm.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
 						outLine.Append("\t" + modTypeCount);
 
 						foreach (string modInfoName in modInfoNames)
@@ -344,9 +348,13 @@ namespace AScore_DLL
 						}
 
 						swOutFile.WriteLine(outLine);
-
-						//UpdateProgress(oPHRPReader.PercentComplete);					
+						
 					}
+
+                  
+                    if (skipCount > 0)
+                        ReportMessage("  Skipped " + skipCount + " PHRP results without an AScore result");
+
 				}
 			}
 			catch (Exception ex)
@@ -358,22 +366,22 @@ namespace AScore_DLL
 			return true;
 		}
 
-		protected bool FilePathsMatch(System.IO.FileInfo fiFile1, System.IO.FileInfo fiFile2)
+		protected bool FilePathsMatch(FileInfo fiFile1, FileInfo fiFile2)
 		{
-			string filePath1 = System.IO.Path.GetFullPath(fiFile1.FullName);
-			string filePath2 = System.IO.Path.GetFullPath(fiFile2.FullName);
+			string filePath1 = Path.GetFullPath(fiFile1.FullName);
+			string filePath2 = Path.GetFullPath(fiFile2.FullName);
 
 			if (filePath1.ToLower() == filePath2.ToLower())
 				return true;
-			else
-				return false;
+		    
+            return false;
 		}
 
 		protected string ReadHeaderLine(string filePath)
 		{
 			string headerLine = string.Empty;
 
-			using (System.IO.StreamReader srInFile = new System.IO.StreamReader(new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read)))
+			using (var srInFile = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
 			{
 				if (srInFile.Peek() > -1)
 				{
