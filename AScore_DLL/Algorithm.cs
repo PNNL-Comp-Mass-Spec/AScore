@@ -179,6 +179,7 @@ namespace AScore_DLL
 				var dtaFilePath = GetCDTAFilePath(datasetManager, jobToDatasetNameMap.First().Value);
 				dtaManager.OpenCDTAFile(dtaFilePath);
 			}
+			ModSummaryFileManager.ReadModSummary(dtaManager, datasetManager, ascoreParameters);
 
 			while (datasetManager.CurrentRowNum < totalRows)
 			{
@@ -203,6 +204,27 @@ namespace AScore_DLL
 					msgfScore = 1;
 				}
 
+				// Get the correct dta file for the match
+				if (!string.Equals(dtaManagerCurrentJob, datasetManager.JobNum))
+				{
+					string dtaPathNew;
+					if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out dtaPathNew))
+					{
+						string errorMessage = "Input file refers to job " + datasetManager.JobNum +
+											  " but jobToDatasetNameMap does not contain that job; unable to continue";
+						ReportError(errorMessage);
+						throw new Exception(errorMessage);
+					}
+
+					var dtaFilePath = GetCDTAFilePath(datasetManager, dtaPathNew);
+					dtaManager.OpenCDTAFile(dtaFilePath);
+					dtaManagerCurrentJob = string.Copy(datasetManager.JobNum);
+					Console.Write("\r");
+					ModSummaryFileManager.ReadModSummary(dtaManager, datasetManager, ascoreParameters);
+					Console.Write("\rPercent Completion " + Math.Round((double)datasetManager.CurrentRowNum / totalRows * 100) + "%");
+				}
+
+				// perform work on the match
 				string[] splittedPep = peptideSeq.Split('.');
 				string sequenceWithoutSuffixOrPrefix;
 				string front;
@@ -235,23 +257,6 @@ namespace AScore_DLL
 				{
 					datasetManager.IncrementRow();
 					continue;
-				}
-
-				if (!string.Equals(dtaManagerCurrentJob, datasetManager.JobNum))
-				{
-					string dtaPathNew;
-					if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out dtaPathNew))
-					{
-						string errorMessage = "Input file refers to job " + datasetManager.JobNum +
-											  " but jobToDatasetNameMap does not contain that job; unable to continue";
-						ReportError(errorMessage);
-						throw new Exception(errorMessage);
-					}
-
-					var dtaFilePath = GetCDTAFilePath(datasetManager, dtaPathNew);
-					dtaManager.OpenCDTAFile(dtaFilePath);
-					dtaManagerCurrentJob = string.Copy(datasetManager.JobNum);
-					
 				}
 
 				//Get experimental spectra

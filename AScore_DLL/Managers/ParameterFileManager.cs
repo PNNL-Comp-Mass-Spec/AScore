@@ -20,6 +20,9 @@ namespace AScore_DLL.Managers
 		private List<Mod.DynamicModification> dynamMods;
 		private FragmentType fragmentType;
 		private double fragmentMassTolerance;
+		private double fragmentMassToleranceCID = 0.5;
+		private double fragmentMassToleranceETD = 0.5;
+		private double fragmentMassToleranceHCD = 0.05;
         private double msgfPreFilter;
 		#endregion
 
@@ -33,19 +36,35 @@ namespace AScore_DLL.Managers
 			set 
 			{
 				fragmentType = value;
-				if (fragmentType == FragmentType.HCD)
+				//if (fragmentType == FragmentType.HCD)
+				//{
+				//	fragmentMassTolerance = 0.05;
+				//}
+				//else
+				//{
+				//	fragmentMassTolerance = 0.5;
+				//}
+				switch (fragmentType)
 				{
-					fragmentMassTolerance = 0.05;
-				}
-				else
-				{
-					fragmentMassTolerance = 0.5;
+					case FragmentType.CID:
+						fragmentMassTolerance = fragmentMassToleranceCID;
+						break;
+					case FragmentType.ETD:
+						fragmentMassTolerance = fragmentMassToleranceETD;
+						break;
+					case FragmentType.HCD:
+						fragmentMassTolerance = fragmentMassToleranceHCD;
+						break;
 				}
 			} 
 		}
 		public double FragmentMassTolerance { get { return fragmentMassTolerance; } }
         public double MSGFPreFilter { get { return msgfPreFilter; } }
 
+		public bool MultiDissociationParamFile { get; private set; }
+		public double FragmentMassToleranceCID { get { return fragmentMassToleranceCID; } }
+		public double FragmentMassToleranceETD { get { return fragmentMassToleranceETD; } }
+		public double FragmentMassToleranceHCD { get { return fragmentMassToleranceHCD; } }
 		#endregion
 
 
@@ -55,6 +74,18 @@ namespace AScore_DLL.Managers
 		public ParameterFileManager(string inputFile)
 		{
 			ParseXml(inputFile);
+
+			if (MultiDissociationParamFile)
+			{
+				Console.WriteLine("CID Mass Tolerance: " + FragmentMassToleranceCID + " Da");
+				Console.WriteLine("ETD Mass Tolerance: " + FragmentMassToleranceETD + " Da");
+				Console.WriteLine("HCD Mass Tolerance: " + FragmentMassToleranceHCD + " Da");
+			}
+			else
+			{
+				Console.WriteLine("Fragment Type:  " + FragmentType.ToString());
+				Console.WriteLine("Mass Tolerance: " + FragmentMassTolerance + " Da");
+			}
 		}
 
 
@@ -68,6 +99,7 @@ namespace AScore_DLL.Managers
 			fragmentType = f;
 			fragmentMassTolerance = tol;
             msgfPreFilter = msgfnum;
+			MultiDissociationParamFile = false;
 		}
 		#endregion
 
@@ -82,7 +114,8 @@ namespace AScore_DLL.Managers
 			dynamMods = dynam;
 			fragmentType = f;
 			fragmentMassTolerance = tol;
-            msgfPreFilter = msgfnum;
+			msgfPreFilter = msgfnum;
+			MultiDissociationParamFile = false;
 		}
 
 		public void InitializeAScoreParameters(List<Mod.Modification> stat, FragmentType f, double tol)
@@ -92,6 +125,7 @@ namespace AScore_DLL.Managers
 			//		dynamMods = new List<Mod.DynamicModification>();
 			fragmentType = f;
 			fragmentMassTolerance = tol;
+			MultiDissociationParamFile = false;
 		}
 
 		public void InitializeAScoreParameters(FragmentType f, double tol)
@@ -101,6 +135,7 @@ namespace AScore_DLL.Managers
 			//		dynamMods = new List<Mod.DynamicModification>();
 			fragmentType = f;
 			fragmentMassTolerance = tol;
+			MultiDissociationParamFile = false;
 		}
 
 		#endregion
@@ -129,20 +164,38 @@ namespace AScore_DLL.Managers
 			parameterFile.Load(new XmlTextReader(inputFile));
 
 			XmlNode massToleranceNode = parameterFile.SelectSingleNode("/Run/MassTolerance");
-			if (massToleranceNode == null)
-				throw new ArgumentOutOfRangeException("The MassTolerance node was not found in XML file " + inputFile);
-
 			XmlNode fragmentTypeNode = parameterFile.SelectSingleNode("/Run/FragmentType");
-			if (fragmentTypeNode == null)
-				throw new ArgumentOutOfRangeException("The FragmentType node was not found in XML file " + inputFile);
-
             XmlNode msgfFilterNode = parameterFile.SelectSingleNode("/Run/MSGFPreFilter");
 			if (msgfFilterNode == null)
 				throw new ArgumentOutOfRangeException("The MSGFPreFilter node was not found in XML file " + inputFile);
-            
-			FragmentType f = GetFragmentType(fragmentTypeNode);
-			double massTol = double.Parse(massToleranceNode.InnerText);
-            double msgfTol = double.Parse(msgfFilterNode.InnerText);
+
+			XmlNode massTolCID = parameterFile.SelectSingleNode("/Run/CIDMassTolerance");
+			XmlNode massTolETD = parameterFile.SelectSingleNode("/Run/ETDMassTolerance");
+			XmlNode massTolHCD = parameterFile.SelectSingleNode("/Run/HCDMassTolerance");
+
+			if ((fragmentTypeNode == null || massToleranceNode == null) && (massTolCID == null || massTolETD == null || massTolHCD == null))
+				throw new ArgumentOutOfRangeException("The FragmentType and/or MassTolerance nodes were not found in XML file " + inputFile + ", and alternate parameters were not present");
+
+			FragmentType f = FragmentType.CID;
+			double massTol = 0.5;
+			bool multiDissociationParams = false;
+			if (fragmentTypeNode != null && massToleranceNode != null)
+			{
+				f = GetFragmentType(fragmentTypeNode);
+				massTol = double.Parse(massToleranceNode.InnerText);
+				MultiDissociationParamFile = false;
+			}
+			else
+			{
+				fragmentMassToleranceCID = double.Parse(massTolCID.InnerText);
+				fragmentMassToleranceETD = double.Parse(massTolETD.InnerText);
+				fragmentMassToleranceHCD = double.Parse(massTolHCD.InnerText);
+				MultiDissociationParamFile = true;
+				multiDissociationParams = true;
+				massTol = fragmentMassToleranceCID;
+			}
+
+			double msgfTol = double.Parse(msgfFilterNode.InnerText);
 
 			int uniqueID = 1;
 
@@ -156,6 +209,7 @@ namespace AScore_DLL.Managers
 			List<DynamicModification> dynamicModDefs = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
 
 			InitializeAScoreParameters(staticModDefs, terminalModDefs, dynamicModDefs, f, massTol, msgfTol);
+			MultiDissociationParamFile = multiDissociationParams;
 		}
 
 

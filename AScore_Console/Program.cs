@@ -154,6 +154,7 @@ namespace AScore_Console
             }
 
             string outValue;
+			/// Deprecating starting 2/17/2015; default is true, and the "noFM"switch is all that is needed.
             if (clu.RetrieveValueForParameter("FM", out outValue, false))
             {
                 if (!bool.TryParse(outValue, out mAScoreOptions.FilterOnMSGFScore))
@@ -207,7 +208,8 @@ namespace AScore_Console
             Console.WriteLine(" -T:search_engine");
             Console.WriteLine("   (allowed values are " + SupportedSearchModes + ")");
             Console.WriteLine(" -F:fht_file_path");
-            Console.WriteLine(" -D:dta_file_path");
+			Console.WriteLine(" -D:dta_file_path");
+			//Console.WriteLine(" -MZML:mzML_file_path");
             Console.WriteLine(" -JM:job_to_dataset_mapfile_path");
             Console.WriteLine("   (use -JM instead of -D if the FHT file has results from");
             Console.WriteLine("    multiple jobs; the map file should have job numbers and");
@@ -215,10 +217,9 @@ namespace AScore_Console
             Console.WriteLine(" -P:parameter_file_path");
             Console.WriteLine(" -O:output_folder_path");
             Console.WriteLine(" -L:log_file_path");
-            Console.WriteLine(" -FM:true  (true or false to enable/disable filtering");
-            Console.WriteLine("            on data in column MSGF_SpecProb; default is true)");
-            Console.WriteLine(" -noFM   (disable filtering on data in column MSGF_SpecProb;");
-            Console.WriteLine("          overrides -FM flag)");
+            //Console.WriteLine(" -FM:true  (true or false to enable/disable filtering");
+            //Console.WriteLine("            on data in column MSGF_SpecProb; default is true)");
+            Console.WriteLine(" -noFM   (disable filtering on data in column MSGF_SpecProb; default is enabled)");
             Console.WriteLine(" -U:updated_fht_file_name");
             Console.WriteLine("   (create a copy of the fht_file with updated peptide");
             Console.WriteLine("    sequences plus new AScore-related columns");
@@ -227,7 +228,7 @@ namespace AScore_Console
             Console.WriteLine(" -Fasta:Fasta_file_path");
             Console.WriteLine("             (add Protein Data from Fasta_file to the output)");
             Console.WriteLine(" -PD       (Include Protein Description in output;)");
-            Console.WriteLine("        REQUIRES -Fasta:Fasta_file_path)");
+			Console.WriteLine("        REQUIRES -Fasta:Fasta_file_path)");
             Console.WriteLine();
             Console.WriteLine("Example command line #1:");
             Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +

@@ -101,6 +101,7 @@
     <Compile Include="Managers\DatasetManagers\DatasetManager.cs" />
     <Compile Include="Managers\DatasetManagers\InspectFHT.cs" />
     <Compile Include="Managers\DatasetManagers\MsgfdbFHT.cs" />
+    <Compile Include="Managers\ModSummaryFileManager.cs" />
     <Compile Include="Managers\MzxmlManager.cs" />
     <Compile Include="Managers\DatasetManagers\SequestFHT.cs" />
     <Compile Include="Managers\DatasetManagers\XTandemFHT.cs" />

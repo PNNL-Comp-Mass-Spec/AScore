@@ -48,9 +48,16 @@
 
 			msgfScore = 0;
 
-			if (dt.Columns.Contains("MSGF_SpecProb"))
-				if (!double.TryParse((string)dt.Rows[t]["MSGF_SpecProb"], out msgfScore))
+	        if (dt.Columns.Contains("MSGF_SpecProb"))
+	        {
+		        if (!double.TryParse((string) dt.Rows[t]["MSGF_SpecProb"], out msgfScore))
+			        msgfScore = 0;
+	        }
+			else if (dt.Columns.Contains("MSGFDB_SpecEValue"))
+			{
+				if (!double.TryParse((string)dt.Rows[t]["MSGFDB_SpecEValue"], out msgfScore))
 					msgfScore = 0;
+			}
         }
 
 	}
