@@ -109,6 +109,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="ThermoRawFileReaderDLL">
+      <HintPath>..\AScore_DLL\lib\ThermoRawFileReaderDLL.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsParseCommandLine.cs" />
