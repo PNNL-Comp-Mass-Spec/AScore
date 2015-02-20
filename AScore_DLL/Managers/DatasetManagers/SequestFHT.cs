@@ -23,7 +23,9 @@
 			this.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParam);
 
             msgfScore = 0;
-            double.TryParse((string)dt.Rows[t]["MSGF_SpecProb"], out msgfScore);
+            if (dt.Columns.Contains("MSGF_SpecProb"))           
+                double.TryParse((string)dt.Rows[t]["MSGF_SpecProb"], out msgfScore);
+
         }
 
 	}
