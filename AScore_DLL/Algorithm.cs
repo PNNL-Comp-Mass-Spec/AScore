@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
+using AScore_DLL.Managers.SpectraManagers;
 
 
 namespace AScore_DLL
@@ -46,23 +47,23 @@ namespace AScore_DLL
         /// Configure and run the AScore algorithm, optionally can add protein mapping information
         /// </summary>
         /// <param name="JobToDatasetMapFile"></param>
-        /// <param name="dtaManager"></param>
+        /// <param name="spectraManager"></param>
         /// <param name="datasetManager"></param>
         /// <param name="ascoreParameters"></param>
         /// <param name="outputFilePath">Name of the output file</param>
         /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
-        public void AlgorithmRun(string JobToDatasetMapFile, DtaManager dtaManager, DatasetManager datasetManager,
+        public void AlgorithmRun(string JobToDatasetMapFile, SpectraManagerCache spectraManager, DatasetManager datasetManager,
                                  ParameterFileManager ascoreParameters, string outputFilePath, string fastaFilePath = "", bool outputDescriptions = false)
         {
             var jobToDatasetNameMap = new Dictionary<string, string>();
 
             var lstColumnMapping = new Dictionary<string, int>();
             var lstColumnNames = new List<string>
-			{
-				"Job",
-				"Dataset"
-			};
+            {
+                "Job",
+                "Dataset"
+            };
 
 
             // Read the contents of JobToDatasetMapFile
@@ -110,7 +111,7 @@ namespace AScore_DLL
                 }
             }
 
-            AlgorithmRun(jobToDatasetNameMap, dtaManager, datasetManager, ascoreParameters, outputFilePath);
+            AlgorithmRun(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -118,25 +119,25 @@ namespace AScore_DLL
         /// <summary>
         /// Configure and run the AScore algorithm, optionally can add protein mapping information
         /// </summary>
-        /// <param name="dtaManager"></param>
+        /// <param name="spectraManager"></param>
         /// <param name="datasetManager"></param>
         /// <param name="ascoreParameters"></param>
         /// <param name="outputFilePath">Name of the output file</param>
         /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
-        public void AlgorithmRun(DtaManager dtaManager, DatasetManager datasetManager,
+        public void AlgorithmRun(SpectraManagerCache spectraManager, DatasetManager datasetManager,
                                  ParameterFileManager ascoreParameters, string outputFilePath, string fastaFilePath = "", bool outputDescriptions = false)
         {
             var jobToDatasetNameMap = new Dictionary<string, string>
-			{
-				{datasetManager.JobNum, dtaManager.DatasetName}
-			};
+            {
+                {datasetManager.JobNum, spectraManager.DatasetName}
+            };
 
-            if (dtaManager == null || !dtaManager.Initialized)
+            if (spectraManager == null || !spectraManager.Initialized)
                 throw new Exception(
-                    "dtaManager must be instantiated and initialized before calling AlgorithmRun for a single source file");
+                    "spectraManager must be instantiated and initialized before calling AlgorithmRun for a single source file");
 
-            AlgorithmRun(jobToDatasetNameMap, dtaManager, datasetManager, ascoreParameters, outputFilePath);
+            AlgorithmRun(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -154,11 +155,11 @@ namespace AScore_DLL
         /// Runs the all the tools necessary to perform an ascore run
         /// </summary>
         /// <param name="jobToDatasetNameMap">Keys are job numbers (stored as strings); values are Dataset Names</param>
-        /// <param name="dtaManager">DtaManager, which the calling class must have already initialized</param>
+        /// <param name="spectraManager">DtaManager, which the calling class must have already initialized</param>
         /// <param name="datasetManager"></param>
         /// <param name="ascoreParameters"></param>
         /// <param name="outputFilePath"></param>
-        protected void AlgorithmRun(Dictionary<string, string> jobToDatasetNameMap, DtaManager dtaManager, DatasetManager datasetManager,
+        protected void AlgorithmRun(Dictionary<string, string> jobToDatasetNameMap, SpectraManagerCache spectraManager, DatasetManager datasetManager,
                                     ParameterFileManager ascoreParameters, string outputFilePath)
         {
 
@@ -172,17 +173,21 @@ namespace AScore_DLL
                 throw new ArgumentException(errorMessage);
             }
 
-            string dtaManagerCurrentJob = jobToDatasetNameMap.First().Key;
-
-            if (!dtaManager.Initialized)
-            {
-                var dtaFilePath = GetCDTAFilePath(datasetManager, jobToDatasetNameMap.First().Value);
-                dtaManager.OpenCDTAFile(dtaFilePath);
-            }
+            string spectraManagerCurrentJob = null; // Force open after first read from fht
 
             var modSummaryManager = new ModSummaryFileManager();
             modSummaryManager.MessageEvent += modSummaryManager_MessageEvent;
-            modSummaryManager.ReadModSummary(dtaManager, datasetManager, ascoreParameters);
+
+            //string spectraManagerCurrentJob = jobToDatasetNameMap.First().Key;
+
+            //if (!spectraManager.Initialized)
+            //{
+            //    var filePath = spectraManager.GetFilePath(datasetManager, jobToDatasetNameMap.First().Value);
+            //    spectraManager.OpenFile(filePath);
+            //}
+
+            //modSummaryManager.ReadModSummary(spectraManager.DatasetName, datasetManager.DatasetFilePath, ascoreParameters);
+            ISpectraManager spectraFile = new DtaManager();
 
             if (this.FilterOnMSGFScore)
             {
@@ -194,7 +199,7 @@ namespace AScore_DLL
 
             while (datasetManager.CurrentRowNum < totalRows)
             {
-                //	Console.Clear();
+                //  Console.Clear();
 
                 if (datasetManager.CurrentRowNum % 100 == 0)
                 {
@@ -231,12 +236,12 @@ namespace AScore_DLL
                         break;
                 }
 
-                if (!string.Equals(dtaManagerCurrentJob, datasetManager.JobNum))
+                if (!string.Equals(spectraManagerCurrentJob, datasetManager.JobNum))
                 {
                     // New dataset
                     // Get the correct dta file for the match
-                    string dtaPathNew;
-                    if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out dtaPathNew))
+                    string spectraPathNew;
+                    if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out spectraPathNew))
                     {
                         string errorMessage = "Input file refers to job " + datasetManager.JobNum +
                                               " but jobToDatasetNameMap does not contain that job; unable to continue";
@@ -244,12 +249,13 @@ namespace AScore_DLL
                         throw new Exception(errorMessage);
                     }
 
-                    var dtaFilePath = GetCDTAFilePath(datasetManager, dtaPathNew);
-                    dtaManager.OpenCDTAFile(dtaFilePath);
-                    dtaManagerCurrentJob = string.Copy(datasetManager.JobNum);
+                    //var filePath = spectraManager.GetFilePath(datasetManager, spectraPathNew);
+                    //spectraManager.OpenFile(filePath);
+                    spectraFile = spectraManager.GetSpectraManagerForFile(datasetManager.DatasetFilePath, spectraPathNew);
+                    spectraManagerCurrentJob = string.Copy(datasetManager.JobNum);
                     Console.Write("\r");
 
-                    modSummaryManager.ReadModSummary(dtaManager, datasetManager, ascoreParameters);
+                    modSummaryManager.ReadModSummary(spectraFile.DatasetName, datasetManager.DatasetFilePath, ascoreParameters);
 
                     Console.Write("\rPercent Completion " + Math.Round((double)datasetManager.CurrentRowNum / totalRows * 100) + "%");
                 }
@@ -290,11 +296,11 @@ namespace AScore_DLL
                 }
 
                 //Get experimental spectra
-                ExperimentalSpectra expSpec = dtaManager.GetExperimentalSpectra(scanNumber, scanCount, chargeState);
+                ExperimentalSpectra expSpec = spectraFile.GetExperimentalSpectra(scanNumber, scanCount, chargeState);
 
                 if (expSpec == null)
                 {
-                    ReportWarning("Scan " + scanNumber + " not found in DTA file for peptide " + peptideSeq);
+                    ReportWarning("Scan " + scanNumber + " not found in spectra file for peptide " + peptideSeq);
                     datasetManager.IncrementRow();
                     continue;
                 }
@@ -315,7 +321,7 @@ namespace AScore_DLL
                     mzmin = minRange;
                 }
 
-                //Generate all combination mixtures				
+                //Generate all combination mixtures
                 var modMixture = new Combinatorics.ModMixtureCombo(ascoreParameters.DynamicMods, sequenceClean);
 
                 List<int[]> myPositionsList = GetMyPostionList(sequenceClean, modMixture);
@@ -366,18 +372,6 @@ namespace AScore_DLL
 
         }
 
-        private static string GetCDTAFilePath(DatasetManager datasetManager, string datasetName)
-        {
-            var dtaFilePath = datasetName + "_dta.txt";
-            var parentFolder = Path.GetDirectoryName(datasetManager.DatasetFilePath);
-            if (parentFolder != null)
-            {
-                dtaFilePath = Path.Combine(parentFolder, dtaFilePath);
-            }
-
-            return dtaFilePath;
-        }
-
         #endregion
 
         #region Private Methods
@@ -418,7 +412,7 @@ namespace AScore_DLL
 
                 if (Math.Abs(peptideMassTheoretical - expSpec.PrecursorNeutralMass) > 20)
                 {
-                    ReportWarning("Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is more than 20 Da away from the computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da");
+                    ReportWarning("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is more than 20 Da away from the computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da");
                 }
                 else
                 {
@@ -442,7 +436,7 @@ namespace AScore_DLL
                     }
 
                     if (!bValidMatch)
-                        ReportError("Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
+                        ReportError("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
 
                 }
 
@@ -591,8 +585,8 @@ namespace AScore_DLL
 
                     // Add the results to the list
                     ascoreResult.AScore = Math.Abs(a1 - a2);
-                    ascoreResult.NumSiteIons = siteIons1.Count;						// numSiteIonsPoss
-                    ascoreResult.SiteDetermineMatched = bestDeterminingCount;		// numSiteIonsMatched
+                    ascoreResult.NumSiteIons = siteIons1.Count;                     // numSiteIonsPoss
+                    ascoreResult.SiteDetermineMatched = bestDeterminingCount;       // numSiteIonsMatched
 
                 }
 
@@ -747,8 +741,8 @@ namespace AScore_DLL
 
             foreach (double mz in tempSpec)
             {
-                // Uncomment to use .NET's binary search 
-                //var searchMz = new ExperimentalSpectraEntry(mz, 0);				
+                // Uncomment to use .NET's binary search
+                //var searchMz = new ExperimentalSpectraEntry(mz, 0);
                 //if (peakDepthSpectra.BinarySearch(searchMz, massComparer) > -1)
                 //{
                 //    // At least one data point is within tolerance of mz

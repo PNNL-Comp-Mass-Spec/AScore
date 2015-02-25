@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using AScore_DLL.Managers.DatasetManagers;
 using AScore_DLL.Mod;
 
 namespace AScore_DLL.Managers
@@ -24,17 +22,16 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Look for the mod summary file for the given data file
         /// </summary>
-        /// <param name="dtaManager"></param>
-        /// <param name="datasetManager"></param>
+        /// <param name="datasetName"></param>
+        /// <param name="datasetFilePath"></param>
         /// <param name="ascoreParams"></param>
         /// <returns>True if a mod summary file is found and successfully processed, otherwise false</returns>
         public bool ReadModSummary(
-            DtaManager dtaManager,
-            DatasetManager datasetManager,
+            string datasetName,
+            string datasetFilePath,
             ParameterFileManager ascoreParams)
         {
-            var datasetName = dtaManager.DatasetName;
-            var fiDataFile = new FileInfo(datasetManager.DatasetFilePath);
+            var fiDataFile = new FileInfo(datasetFilePath);
             var diWorkingDirectory = fiDataFile.Directory;
             if (diWorkingDirectory == null)
                 return false;

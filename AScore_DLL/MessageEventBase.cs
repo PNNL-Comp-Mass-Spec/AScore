@@ -43,7 +43,25 @@
 		{
 			if (WarningEvent != null)
 				WarningEvent(this, e);
-		}
+        }
+
+        protected void OnErrorMessage(object sender, MessageEventArgs e)
+        {
+            if (ErrorEvent != null)
+                ErrorEvent(sender, e);
+        }
+
+        protected void OnMessage(object sender, MessageEventArgs e)
+        {
+            if (MessageEvent != null)
+                MessageEvent(sender, e);
+        }
+
+        protected void OnWarningMessage(object sender, MessageEventArgs e)
+        {
+            if (WarningEvent != null)
+                WarningEvent(sender, e);
+        }
 		#endregion
 	}
 

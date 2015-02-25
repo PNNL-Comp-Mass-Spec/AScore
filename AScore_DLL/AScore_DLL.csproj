@@ -102,7 +102,12 @@
     <Compile Include="Managers\DatasetManagers\InspectFHT.cs" />
     <Compile Include="Managers\DatasetManagers\MsgfdbFHT.cs" />
     <Compile Include="Managers\ModSummaryFileManager.cs" />
-    <Compile Include="Managers\MzxmlManager.cs" />
+    <Compile Include="Managers\SpectraManagers\MzMLManager.cs" />
+    <Compile Include="Managers\SpectraManagers\MZML\IsolationWindow.cs" />
+    <Compile Include="Managers\SpectraManagers\MZML\MzMLReader.cs" />
+    <Compile Include="Managers\SpectraManagers\MZML\Peak.cs" />
+    <Compile Include="Managers\SpectraManagers\MZML\MS2_Spectrum.cs" />
+    <Compile Include="Managers\SpectraManagers\MzxmlManager.cs" />
     <Compile Include="Managers\DatasetManagers\SequestFHT.cs" />
     <Compile Include="Managers\DatasetManagers\XTandemFHT.cs" />
     <Compile Include="Managers\ChargeStateIons.cs" />
@@ -110,10 +115,11 @@
     <Compile Include="Combinatorics\GenerateOption.cs" />
     <Compile Include="Combinatorics\IMetaCollection.cs" />
     <Compile Include="Combinatorics\ModMixtureCombo.cs" />
-    <Compile Include="Managers\DtaManager.cs" />
+    <Compile Include="Managers\SpectraManagers\DtaManager.cs" />
     <Compile Include="Managers\ExperimentalSpectra.cs" />
     <Compile Include="Managers\ExperimentalSpectraEntry.cs" />
-    <Compile Include="Managers\SpectraManager.cs" />
+    <Compile Include="Managers\SpectraManagers\SpectraManagerCache.cs" />
+    <Compile Include="Managers\SpectraManagers\ISpectraManager.cs" />
     <Compile Include="MessageEventBase.cs" />
     <Compile Include="Mod\DynamicModification.cs" />
     <Compile Include="Combinatorics\Permutations.cs" />

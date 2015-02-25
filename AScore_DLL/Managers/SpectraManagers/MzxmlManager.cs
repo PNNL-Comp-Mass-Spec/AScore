@@ -1,15 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AScore_DLL.Managers.SpectraManagers;
 using MSDataFileReader;
 
 namespace AScore_DLL.Managers.DatasetManagers
 {
-    public class MzxmlManager : SpectraManager
+    public class MzxmlManager : ISpectraManager
     {
-
+        private bool initialized = false;
         private string datasetName;
         private clsMzXMLFileAccessor mzAccessor;
+
+        public bool Initialized
+        {
+            get { return initialized; }
+        }
+
+        public string DatasetName
+        {
+            get { return datasetName; }
+        }
 
         private MzxmlManager(string mzxmlPath)
         {
@@ -42,12 +53,6 @@ namespace AScore_DLL.Managers.DatasetManagers
         public void Abort()
         {
             mzAccessor.CloseFile();
-
-        }
-
-        public string GetDtaFileName(int scanNumber, int scanCount, int chargeState)
-        {
-            throw new NotImplementedException();
 
         }
 
@@ -85,12 +90,18 @@ namespace AScore_DLL.Managers.DatasetManagers
 
             }
             return expSpec;
-            
-           
+
+
         }
 
+        public void OpenFile(string filePath)
+        {
+            throw new NotImplementedException();
+        }
 
-
-
+        public string GetFilePath(string datasetFilePath, string datasetName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

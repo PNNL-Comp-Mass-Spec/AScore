@@ -217,7 +217,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         }
 
         /// <summary>
-        /// Increment the row number 
+        /// Increment the row number
         /// </summary>
         public void IncrementRow()
         {
@@ -227,8 +227,6 @@ namespace AScore_DLL.Managers.DatasetManagers
                 AtEnd = true;
             }
         }
-
-
-
+	
     }
 }

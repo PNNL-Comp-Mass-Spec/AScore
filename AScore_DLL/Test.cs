@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
+using AScore_DLL.Managers.SpectraManagers;
 using System.IO;
 
 
@@ -30,11 +31,14 @@ namespace AScore_DLL
 				string myDta = Path.Combine(dtapath, a.Substring(0, a.Length - 8) + "_dta.txt");
 				string outFile = Path.Combine(fhtPath, a.Substring(0, a.Length - 8) + "_AScore.txt");
 				DatasetManager datasetMan = new SequestFHT(myFht);
-				DtaManager dtaManager = new DtaManager(myDta);
+				//DtaManager dtaManager = new DtaManager(myDta);
+                SpectraManagerCache spectraCache = new SpectraManagerCache();
+                spectraCache.OpenFile(myDta);
 				ParameterFileManager paramFile = new ParameterFileManager(parFile);
 
 				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
 
 			}
 		}
@@ -47,13 +51,16 @@ namespace AScore_DLL
             string mypar = @"C:\DMS_WorkDir\Step_1_ASCORE\DynMWPYOx_EmH20_QmNH3_cid.xml";
 
             DatasetManager dataman = new XTandemFHT(myfht);
-            DtaManager dta = new DtaManager(mydta);
+            //DtaManager dta = new DtaManager(mydta);
+            SpectraManagerCache spectraCache = new SpectraManagerCache();
+            spectraCache.OpenFile(mydta);
             ParameterFileManager par = new ParameterFileManager(mypar);
             string fileOutput = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt_ascore.txt";
 			AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-			ascoreEngine.AlgorithmRun(dta, dataman, par, fileOutput);
-
+            //ascoreEngine.AlgorithmRun(dta, dataman, par, fileOutput);
+            ascoreEngine.AlgorithmRun(spectraCache, dataman, par, fileOutput);
         }
+
         [Test]
         public void SisiConfirm()
         {
@@ -92,10 +99,13 @@ namespace AScore_DLL
                     Path.GetDirectoryName(datasetname[i]),
                     Path.GetFileNameWithoutExtension(datasetname[i]) + "_AScore.txt");
                 DatasetManager datasetMan = new MsgfdbFHT(datasetname[i]);
-                DtaManager dtaManager = new DtaManager(dtaname[i]);
+                //DtaManager dtaManager = new DtaManager(dtaname[i]);
+                SpectraManagerCache spectraCache = new SpectraManagerCache();
+                spectraCache.OpenFile(dtaname[i]);
                 ParameterFileManager paramFile = new ParameterFileManager(ascParam[i]);
 				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
             }
 
         }
@@ -133,10 +143,13 @@ namespace AScore_DLL
 			{
 				string outFile = datasetname[i].Substring(0, datasetname[i].Length - 8) + "_AScoreNoN2.txt";
 				DatasetManager datasetMan = new SequestFHT(datasetname[i]);
-				DtaManager dtaManager = new DtaManager(dtaname[i]);
+                //DtaManager dtaManager = new DtaManager(dtaname[i]);
+                SpectraManagerCache spectraCache = new SpectraManagerCache();
+                spectraCache.OpenFile(dtaname[i]);
 				ParameterFileManager paramFile = new ParameterFileManager(ascParam[i]);
-				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+                //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
 			}
 
 
@@ -158,10 +171,13 @@ namespace AScore_DLL
 			{
 				string outFile = datasetname[i].Substring(0, datasetname[i].Length - 8) + "_AScoreTry.txt";
 				DatasetManager datasetMan = new SequestFHT(datasetname[i]);
-				DtaManager dtaManager = new DtaManager(dtaname[i]);
+                //DtaManager dtaManager = new DtaManager(dtaname[i]);
+                SpectraManagerCache spectraCache = new SpectraManagerCache();
+                spectraCache.OpenFile(dtaname[i]);
 				ParameterFileManager paramFile = new ParameterFileManager(ascParam[i]);
 				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
 			}
 
 
@@ -183,10 +199,13 @@ namespace AScore_DLL
 			{
 				string outFile = datasetname[i].Substring(0, datasetname[i].Length - 8) + "_AScoreTry.txt";
 				DatasetManager datasetMan = new SequestFHT(datasetname[i]);
-				DtaManager dtaManager = new DtaManager(dtaname[i]);
+                //DtaManager dtaManager = new DtaManager(dtaname[i]);
+                SpectraManagerCache spectraCache = new SpectraManagerCache();
+                spectraCache.OpenFile(dtaname[i]);
 				ParameterFileManager paramFile = new ParameterFileManager(ascParam[i]);
 				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-				ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
+                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
 			}
 
 
@@ -278,17 +297,16 @@ namespace AScore_DLL
 				string tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
 
 				DatasetManager dsman = new MsgfdbFHT(tempfht);
-				DtaManager dtman = new DtaManager(tempdta);
+                //DtaManager dtman = new DtaManager(tempdta);
+                SpectraManagerCache spectraCache = new SpectraManagerCache();
+                spectraCache.OpenFile(tempdta);
 				ParameterFileManager pman = new ParameterFileManager(ascP);
 
-				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-				ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
+                AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
+                //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
+                ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
 
 			}
-
-
-
-
 		}
 
 
@@ -336,11 +354,14 @@ namespace AScore_DLL
                 string tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore2.txt");
 
                 DatasetManager dsman = new SequestFHT(tempfht);
-                DtaManager dtman = new DtaManager(tempdta);
+                //DtaManager dtman = new DtaManager(tempdta);
+                SpectraManagerCache spectraCache = new SpectraManagerCache();
+                spectraCache.OpenFile(tempdta);
                 ParameterFileManager pman = new ParameterFileManager(ascP);
 
 				AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-				ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
+                //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
+                ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
 
             }
         }
@@ -355,13 +376,15 @@ namespace AScore_DLL
 
             DatasetManager dfht = new SequestFHT(fht);
             ParameterFileManager pfile = new ParameterFileManager(param);
-            DtaManager dtaman = new DtaManager(dta);
-
+            //DtaManager dtaman = new DtaManager(dta);
+            SpectraManagerCache spectraCache = new SpectraManagerCache();
+            spectraCache.OpenFile(dta);
 
             System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
 			AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-			ascoreEngine.AlgorithmRun(dtaman, dfht, pfile, @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase\TestMSGFFilter.txt");
+            //ascoreEngine.AlgorithmRun(dtaman, dfht, pfile, @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase\TestMSGFFilter.txt");
+            ascoreEngine.AlgorithmRun(spectraCache, dfht, pfile, @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase\TestMSGFFilter.txt");
 
             sw.Stop();
             Console.WriteLine("Time used (float): {0} ms", sw.Elapsed.TotalMilliseconds);
@@ -431,11 +454,14 @@ namespace AScore_DLL
                     string tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
 
                     DatasetManager dsman = new SequestFHT(tempfht);
-                    DtaManager dtman = new DtaManager(tempdta);
+                    //DtaManager dtman = new DtaManager(tempdta);
+                    SpectraManagerCache spectraCache = new SpectraManagerCache();
+                    spectraCache.OpenFile(tempdta);
                     ParameterFileManager pman = new ParameterFileManager(ascP);
 
 					AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-					ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
+                    //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
+                    ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
 
                 }
             }
@@ -513,11 +539,14 @@ namespace AScore_DLL
                     {
                         Console.WriteLine("Failed to load fht");
                     }
-                    DtaManager dtman = new DtaManager(tempdta);
+                    //DtaManager dtman = new DtaManager(tempdta);
+                    SpectraManagerCache spectraCache = new SpectraManagerCache();
+                    spectraCache.OpenFile(tempdta);
                     ParameterFileManager pman = new ParameterFileManager(ascP);
 
 					AScore_DLL.Algorithm ascoreEngine = new AScore_DLL.Algorithm();
-					ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
+                    //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
+                    ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
 
                 }
             }

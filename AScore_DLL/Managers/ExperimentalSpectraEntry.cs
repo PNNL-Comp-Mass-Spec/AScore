@@ -62,40 +62,40 @@ namespace AScore_DLL.Managers
             value2 = copy.value2;
         }
 
-	    public override string ToString()
-	    {
-		    return (value1 + ", " + value2);
-	    }
+        public override string ToString()
+        {
+            return (value1 + ", " + value2);
+        }
 
         #endregion // Constructor
 
         #region Comparison Classes
 
-		public class SortValue1 : IComparer<ExperimentalSpectraEntry>
-		{
-			public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
-			{
-				return (x.value1.CompareTo(y.value1));
-			}
-		}
+        public class SortValue1 : IComparer<ExperimentalSpectraEntry>
+        {
+            public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
+            {
+                return (x.value1.CompareTo(y.value1));
+            }
+        }
 
-		public class FindValue1InTolerance : IComparer<ExperimentalSpectraEntry>
-		{
-			private readonly double mTolerance;
+        public class FindValue1InTolerance : IComparer<ExperimentalSpectraEntry>
+        {
+            private readonly double mTolerance;
 
-			public FindValue1InTolerance(double tolerance)
-			{
-				mTolerance = tolerance;
-			}
+            public FindValue1InTolerance(double tolerance)
+            {
+                mTolerance = tolerance;
+            }
 
-			public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
-			{
-				if (Math.Abs(x.value1 - y.value1) <= mTolerance)
-					return 0;
-				
-				return (x.value1.CompareTo(y.value1));
-			}
-		}
+            public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
+            {
+                if (Math.Abs(x.value1 - y.value1) <= mTolerance)
+                    return 0;
+
+                return (x.value1.CompareTo(y.value1));
+            }
+        }
 
         /// <summary>
         /// Sorts Value2 of the ExperimentalSpectraEntry's in descending order
@@ -110,5 +110,5 @@ namespace AScore_DLL.Managers
 
         #endregion // Comparison Classes
 
-	}
+    }
 }
