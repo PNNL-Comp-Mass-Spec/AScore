@@ -78,7 +78,11 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// </summary>
         ~MzMLManager()
         {
-            ClearCachedData();
+            //ClearCachedData();
+            foreach (var reader in m_readers.Values)
+            {
+                reader.Close();
+            }
             m_initialized =false;
         }
 
@@ -154,7 +158,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (!m_initialized)
                 throw new Exception("Class has not yet been initialized; call OpenFile() before calling this function");
 
-            var spectrum = m_MzMLReader.ReadSpectrum(scanNumber);
+            var spectrum = m_MzMLReader.ReadMassSpectrum(scanNumber);
 
             // Find the desired spectrum
             // Dictionary keys are the header text for each DTA in the _DTA.txt file, for example:
@@ -210,7 +214,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         {
             foreach (var reader in m_readers.Values)
             {
-                reader.Close();
+                reader.ClearDataCache();
             }
         }
 
@@ -222,7 +226,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         {
             if (!m_readers.ContainsKey(mzMLPath))
             {
-                m_readers.Add(mzMLPath, new MzMLReader(mzMLPath));
+                m_readers.Add(mzMLPath, new MzMLReader(mzMLPath, true));
             }
 
             m_MzMLReader = m_readers[mzMLPath];

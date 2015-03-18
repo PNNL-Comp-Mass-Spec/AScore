@@ -59,8 +59,10 @@ namespace AScore_Console
         /// <returns></returns>
         static int Main(string[] args)
         {
+#if (!DEBUG)
             try
             {
+#endif
                 var clu = new clsParseCommandLine();
 
                 mAScoreOptions.Initialize();
@@ -102,6 +104,7 @@ namespace AScore_Console
                 {
                     clsParseCommandLine.PauseAtConsole(2000, 333);
                 }
+#if (!DEBUG)
             }
             catch (Exception ex)
             {
@@ -116,6 +119,7 @@ namespace AScore_Console
                 if (mLogFile != null)
                     mLogFile.Close();
             }
+#endif
 
             return 0;
 
