@@ -410,7 +410,7 @@ namespace AScore_DLL
 						string noPrefixSequence = String.Empty;
 						string prefix = String.Empty;
 						string suffix = String.Empty;
-						clsPeptideCleavageStateCalculator.SplitPrefixAndSuffixFromSequence(sequence, ref noPrefixSequence, ref prefix, ref suffix);
+                        clsPeptideCleavageStateCalculator.SplitPrefixAndSuffixFromSequence(sequence, out noPrefixSequence, out prefix, out suffix);
 
 						var mods = new List<int>();
 

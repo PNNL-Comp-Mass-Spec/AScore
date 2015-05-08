@@ -155,20 +155,20 @@ namespace AScore_DLL
 
 						if (!headersParsed)
 						{
-							clsPHRPReader.ParseColumnHeaders(splitLine, ref columnHeaders);
+							clsPHRPReader.ParseColumnHeaders(splitLine, columnHeaders);
 							headersParsed = true;
 							continue;
 						}
 
-						int scanNumber = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_SCAN, ref columnHeaders, -1);
-						string originalPeptide = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_ORIGINALSEQUENCE, ref columnHeaders, string.Empty);
-						string bestSequence = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_BESTSEQUENCE, ref columnHeaders, string.Empty);
-						double peptideScore = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_PEPTIDESCORE, ref columnHeaders, 0.0);
-						double ascoreValue = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_ASCORE, ref columnHeaders, 0.0);
-						//int numSiteIonsPossible = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_NUMSITEIONSPOSS, ref columnHeaders, 0);
-						//int numSitIonsMatched = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_NUMSITEIONSMATCHED, ref columnHeaders, 0);
-						//string secondSequence = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_SECONDSEQUENCE, ref columnHeaders, string.Empty);
-						string modInfo = clsPHRPReader.LookupColumnValue(ref splitLine, DatasetManager.RESULTS_COL_MODINFO, ref columnHeaders, string.Empty);
+						int scanNumber = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_SCAN, columnHeaders, -1);
+						string originalPeptide = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ORIGINALSEQUENCE, columnHeaders, string.Empty);
+						string bestSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_BESTSEQUENCE, columnHeaders, string.Empty);
+						double peptideScore = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_PEPTIDESCORE, columnHeaders, 0.0);
+						double ascoreValue = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
+						//int numSiteIonsPossible = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_NUMSITEIONSPOSS, columnHeaders, 0);
+						//int numSitIonsMatched = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_NUMSITEIONSMATCHED, columnHeaders, 0);
+						//string secondSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_SECONDSEQUENCE, columnHeaders, string.Empty);
+						string modInfo = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_MODINFO, columnHeaders, string.Empty);
 
 						string scanPeptideKey = ConstructScanPeptideKey(scanNumber, originalPeptide);
 						AScoreResultsType ascoreResult;
