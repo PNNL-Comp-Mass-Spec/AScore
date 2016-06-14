@@ -60,7 +60,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         {
             ExperimentalSpectra expSpec = null;
             clsSpectrumInfo specInfo = null;
-            if (mzAccessor.GetSpectrumByScanNumber(scanNumber, ref specInfo))
+            if (mzAccessor.GetSpectrumByScanNumber(scanNumber, out specInfo))
             {
                 double precursorMass = 0.0;
                 int precursorChargeState = 0;

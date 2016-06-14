@@ -6,14 +6,7 @@ PeptideToProteinMapEngine
 </name>
 </assembly>
 <members>
-<member name="P:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.DeleteInspectTempFiles">
-	<summary>
- Legacy property; superseded by DeleteTempFiles
- </summary>
-	<value></value>
-	<returns></returns>
-	<remarks></remarks>
-</member><member name="P:PeptideToProteinMapEngine.My.Resources.Resources.ResourceManager">
+<member name="P:PeptideToProteinMapEngine.My.Resources.Resources.ResourceManager">
 	<summary>
   Returns the cached ResourceManager instance used by this class.
 </summary>
@@ -103,7 +96,7 @@ PeptideToProteinMapEngine
 	<remarks>
  Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
  Created in October 2013
- Last updated in November 2013
+ Last updated in October 2015
  </remarks>
 </member><member name="M:PeptideToProteinMapEngine.clsProcessFilesBaseClass.#ctor">
 	<summary>
@@ -128,6 +121,13 @@ PeptideToProteinMapEngine
  Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
  Started November 9, 2003
  </remarks>
+</member><member name="P:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.DeleteInspectTempFiles">
+	<summary>
+ Legacy property; superseded by DeleteTempFiles
+ </summary>
+	<value></value>
+	<returns></returns>
+	<remarks></remarks>
 </member>
 </members>
 </doc>

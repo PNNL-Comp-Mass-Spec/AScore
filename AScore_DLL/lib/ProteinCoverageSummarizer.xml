@@ -6,7 +6,20 @@ ProteinCoverageSummarizer
 </name>
 </assembly>
 <members>
-<member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.LoadSettings">
+<member name="P:ProteinCoverageSummarizer.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:ProteinCoverageSummarizer.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:ProteinCoverageSummarizer.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.LoadSettings">
 	<summary>
  Loads the settings for the defined Xml Settings File.  Assumes names are not case sensitive
  </summary>
@@ -385,19 +398,6 @@ ProteinCoverageSummarizer
 	<summary>
  Tools to manipulates XML Settings files.
  </summary>
-</member><member name="P:ProteinCoverageSummarizer.My.Resources.Resources.ResourceManager">
-	<summary>
-  Returns the cached ResourceManager instance used by this class.
-</summary>
-</member><member name="P:ProteinCoverageSummarizer.My.Resources.Resources.Culture">
-	<summary>
-  Overrides the current thread's CurrentUICulture property for all
-  resource lookups using this strongly typed resource class.
-</summary>
-</member><member name="T:ProteinCoverageSummarizer.My.Resources.Resources">
-	<summary>
-  A strongly-typed resource class, for looking up localized strings, etc.
-</summary>
 </member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptide(System.String,System.Char,System.Char,System.String)">
 	<summary>
  Searches for proteins that contain peptide strPeptideSequence.  
