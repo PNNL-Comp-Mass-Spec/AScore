@@ -505,6 +505,16 @@ PHRPReader
  When set to true, then calls to MoveNext will read the next data line, but will skip several additional processing steps for performance reasons
  </summary>
 	<remarks>If the peptide is a peptide of interest, then call FinalizeCurrentPSM</remarks>
+</member><member name="F:PHRPReader.clsPHRPReader.mParentIonMzMatchNonMsx">
+	<summary>
+ RegEx to extract parent ions from filter strings that do not have Full msx
+ </summary>
+	<remarks>Shared (aka static) only to speed up unit tests</remarks>
+</member><member name="F:PHRPReader.clsPHRPReader.mParentIonMzMatchMsx">
+	<summary>
+ RegEx to extract parent ions from filter strings that have Full msx
+ </summary>
+	<remarks>Shared (aka static) only to speed up unit tests</remarks>
 </member><member name="P:PHRPReader.clsPHRPReader.CanRead">
 	<summary>
  Returns True if the input file was successfully opened and data remains to be read
@@ -992,6 +1002,14 @@ PHRPReader
  </summary>
 	<returns>True if a line was read, false if not more data is available</returns>
 	<remarks>When FastReadMode is True, you should call FinalizeCurrentPSM to populate the remaining fields if the peptide is a peptide of interest</remarks>
+</member><member name="M:PHRPReader.clsPHRPReader.ExtractParentIonMzFromFilterText(System.String,System.Double@)">
+	<summary>
+ This function extracts the Parent Ion m/z from the filter string
+ </summary>
+	<param name="filterText"></param>
+	<param name="parentIonMz"></param>
+	<returns>True if parsing successful</returns>
+	<remarks>The original version of this code (C#) is in ThermoRawFileReader.XRawFileIO.ExtractParentIonMZFromFilterText(string, out double)</remarks>
 </member><member name="M:PHRPReader.clsPHRPReader.FinalizeCurrentPSM">
 	<summary>
  When FastReadMode is True, you first call MoveNext to read the peptide scores, then if the peptide
