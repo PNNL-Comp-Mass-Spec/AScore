@@ -15,7 +15,7 @@ namespace AScore_DLL
     public class Algorithm : MessageEventBase
     {
         public const string MODINFO_NO_MODIFIED_RESIDUES = "-";
-        protected const double MASS_C13 = 1.00335483;
+        private const double MASS_C13 = 1.00335483;
 
         private readonly double[] ScoreWeights = { 0.5, 0.75, 1.0, 1.0, 1.0, 1.0, 0.75, 0.5, 0.25, 0.25 };
         private const double lowRangeMultiplier = 0.28;
@@ -142,7 +142,7 @@ namespace AScore_DLL
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
 
-        protected void ProteinMapperTestRun(string outputFilePath, string fastaFilePath, bool outputDescriptions)
+        private void ProteinMapperTestRun(string outputFilePath, string fastaFilePath, bool outputDescriptions)
         {
             if (!string.IsNullOrWhiteSpace(fastaFilePath))
             {
@@ -154,13 +154,17 @@ namespace AScore_DLL
         /// <summary>
         /// Runs the all the tools necessary to perform an ascore run
         /// </summary>
-        /// <param name="jobToDatasetNameMap">Keys are job numbers (stored as strings); values are Dataset Names</param>
+        /// <param name="jobToDatasetNameMap">Keys are job numbers (stored as strings); values are Dataset Names or the path to the _dta.txt file</param>
         /// <param name="spectraManager">DtaManager, which the calling class must have already initialized</param>
         /// <param name="datasetManager"></param>
         /// <param name="ascoreParameters"></param>
         /// <param name="outputFilePath"></param>
-        protected void AlgorithmRun(Dictionary<string, string> jobToDatasetNameMap, SpectraManagerCache spectraManager, DatasetManager datasetManager,
-                                    ParameterFileManager ascoreParameters, string outputFilePath)
+        private void AlgorithmRun(
+            Dictionary<string, string> jobToDatasetNameMap, 
+            SpectraManagerCache spectraManager, 
+            DatasetManager datasetManager,
+            ParameterFileManager ascoreParameters, 
+            string outputFilePath)
         {
 
             int totalRows = datasetManager.GetRowLength();
@@ -178,15 +182,6 @@ namespace AScore_DLL
             var modSummaryManager = new ModSummaryFileManager();
             modSummaryManager.MessageEvent += modSummaryManager_MessageEvent;
 
-            //string spectraManagerCurrentJob = jobToDatasetNameMap.First().Key;
-
-            //if (!spectraManager.Initialized)
-            //{
-            //    var filePath = spectraManager.GetFilePath(datasetManager, jobToDatasetNameMap.First().Value);
-            //    spectraManager.OpenFile(filePath);
-            //}
-
-            //modSummaryManager.ReadModSummary(spectraManager.DatasetName, datasetManager.DatasetFilePath, ascoreParameters);
             ISpectraManager spectraFile = new DtaManager();
 
             if (this.FilterOnMSGFScore)
@@ -236,12 +231,12 @@ namespace AScore_DLL
                         break;
                 }
 
-                if (!string.Equals(spectraManagerCurrentJob, datasetManager.JobNum))
+                if (string.IsNullOrEmpty(spectraManagerCurrentJob) || !string.Equals(spectraManagerCurrentJob, datasetManager.JobNum))
                 {
                     // New dataset
                     // Get the correct dta file for the match
-                    string spectraPathNew;
-                    if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out spectraPathNew))
+                    string datasetName;
+                    if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out datasetName))
                     {
                         string errorMessage = "Input file refers to job " + datasetManager.JobNum +
                                               " but jobToDatasetNameMap does not contain that job; unable to continue";
@@ -249,9 +244,10 @@ namespace AScore_DLL
                         throw new Exception(errorMessage);
                     }
 
-                    //var filePath = spectraManager.GetFilePath(datasetManager, spectraPathNew);
-                    //spectraManager.OpenFile(filePath);
-                    spectraFile = spectraManager.GetSpectraManagerForFile(datasetManager.DatasetFilePath, spectraPathNew);
+                    datasetName = GetDatasetName(datasetName);
+
+                    spectraFile = spectraManager.GetSpectraManagerForFile(datasetManager.DatasetFilePath, datasetName);
+
                     spectraManagerCurrentJob = string.Copy(datasetManager.JobNum);
                     Console.Write("\r");
 
@@ -767,7 +763,7 @@ namespace AScore_DLL
         /// <param name="toGetDetermining">list to get unique from</param>
         /// <param name="secondSpec">list which contains overlap to remove from first list</param>
         /// <returns>list of values unique to the toGetDetermining list</returns>
-        protected List<double> GetSiteDeterminingIons(List<double> toGetDetermining, List<double> secondSpec)
+        private List<double> GetSiteDeterminingIons(List<double> toGetDetermining, List<double> secondSpec)
         {
             var siteDetermined = new List<double>(toGetDetermining);
             foreach (double ion in secondSpec)
@@ -863,7 +859,7 @@ namespace AScore_DLL
         }
 
 
-        protected string LookupModInfoByID(int uniqueID, List<Mod.DynamicModification> dynamicMods)
+        private string LookupModInfoByID(int uniqueID, List<Mod.DynamicModification> dynamicMods)
         {
             string modInfo = string.Empty;
 
@@ -888,6 +884,31 @@ namespace AScore_DLL
             ReportMessage(fragTypeText + " peptides: " + statsByType[(int)fragmentType]);
         }
 
+        private string GetDatasetName(string dataFilepath)
+        {
+            var suffixes = new List<string> {
+                "_dta.txt",
+                "_syn.txt",
+                "_fht.txt",
+                ".mzML",
+                ".mzXML"};
+
+            var dataFileName = Path.GetFileName(dataFilepath);
+            if (dataFileName == null)
+            {
+                throw new Exception("Unable to determine the file name of the data file path in GetDatasetName");
+            }
+
+            foreach (var suffix in suffixes)
+            {
+                if (dataFileName.ToLower().EndsWith(suffix.ToLower()))
+                {
+                    return dataFileName.Substring(0, dataFileName.Length - suffix.Length);
+                }
+            }
+
+            return Path.GetFileNameWithoutExtension(dataFileName);
+        }
 
         #endregion
 
