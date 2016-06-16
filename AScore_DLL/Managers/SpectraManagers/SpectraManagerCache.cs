@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace AScore_DLL.Managers.SpectraManagers
@@ -24,22 +25,54 @@ namespace AScore_DLL.Managers.SpectraManagers
             get { return _lastOpened != null && _lastOpened.Initialized; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="datasetFilePath">_fht.txt or _syn.txt file</param>
+        /// <param name="datasetName">_dta.txt or .mzML file</param>
+        /// <returns></returns>
         public string GetFilePath(string datasetFilePath, string datasetName)
         {
-            var mzMLFile = MzMLManager.GetFilePath(datasetFilePath, datasetName);
-            var dtaFile = DtaManager.GetFilePath(datasetFilePath, datasetName);
-            if (File.Exists(mzMLFile))
+            var fiDatasetFile = new FileInfo(datasetFilePath);
+            if (fiDatasetFile.Directory == null)
             {
-                return mzMLFile;
+                throw new DirectoryNotFoundException("Unable to determine the parent directory for " + datasetFilePath);
             }
-            if (File.Exists(dtaFile))
+            var foldersToCheck = new List<DirectoryInfo> { fiDatasetFile.Directory };
+
+            if (fiDatasetFile.Directory.Parent != null)
             {
-                return dtaFile;
+                foldersToCheck.Add(fiDatasetFile.Directory.Parent);
             }
-            ReportError("Could not file spectra file for dataset \"" + datasetName + "\"");
+
+            foreach (var folder in foldersToCheck)
+            {
+                var mzMLFile = MzMLManager.GetFilePath(folder, datasetName);
+                var dtaFile = DtaManager.GetFilePath(folder, datasetName);
+
+                if (File.Exists(mzMLFile))
+                {
+                    return mzMLFile;
+                }
+                if (File.Exists(dtaFile))
+                {
+                    return dtaFile;
+                }
+            }
+
+            // _dta.txt or .mzML file not found (checked both the folder with the dataset file and the parent folder)
+
+            ReportError(string.Format("Could not find the spectra file for dataset \"{0}\" in {1} or one folder up", datasetName, fiDatasetFile.Directory.FullName));
+
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="datasetFilePath">_fht.txt or _syn.txt file</param>
+        /// <param name="datasetName">dataset name</param>
+        /// <returns></returns>
         public ISpectraManager GetSpectraManagerForFile(string datasetFilePath, string datasetName)
         {
             var filePath = GetFilePath(datasetFilePath, datasetName);

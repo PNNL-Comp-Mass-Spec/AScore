@@ -10,12 +10,18 @@ namespace AScore_DLL.Managers.SpectraManagers
     {
         public static string GetFilePath(string datasetFilePath, string datasetName)
         {
+            var datasetFile = new FileInfo(datasetFilePath);
+            return GetFilePath(datasetFile.Directory, datasetName);
+        }
+
+        public static string GetFilePath(DirectoryInfo datasetFolder, string datasetName)
+        {
             var mzMLFilePath = datasetName + ".mzML";
-            var parentFolder = Path.GetDirectoryName(datasetFilePath);
-            if (parentFolder != null)
+            if (datasetFolder != null)
             {
-                mzMLFilePath = Path.Combine(parentFolder, mzMLFilePath);
+                mzMLFilePath = Path.Combine(datasetFolder.FullName, mzMLFilePath);
             }
+
             // Only grab a gzipped mzML file if an unzipped one doesn't exist.
             if (File.Exists(mzMLFilePath + ".gz") && !File.Exists(mzMLFilePath))
             {

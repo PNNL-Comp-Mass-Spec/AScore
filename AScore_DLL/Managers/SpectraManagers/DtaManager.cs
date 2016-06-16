@@ -15,11 +15,16 @@ namespace AScore_DLL.Managers.SpectraManagers
     {
         public static string GetFilePath(string datasetFilePath, string datasetName)
         {
+            var datasetFile = new FileInfo(datasetFilePath);
+            return GetFilePath(datasetFile.Directory, datasetName);
+        }
+
+        public static string GetFilePath(DirectoryInfo datasetFolder, string datasetName)
+        {
             var dtaFilePath = datasetName + "_dta.txt";
-            var parentFolder = Path.GetDirectoryName(datasetFilePath);
-            if (parentFolder != null)
+            if (datasetFolder != null)
             {
-                dtaFilePath = Path.Combine(parentFolder, dtaFilePath);
+                dtaFilePath = Path.Combine(datasetFolder.FullName, dtaFilePath);
             }
 
             return dtaFilePath;
