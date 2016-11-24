@@ -12,6 +12,8 @@ namespace AScore_DLL.Managers.DatasetManagers
         private string datasetName;
         private clsMzXMLFileAccessor mzAccessor;
 
+        private PHRPReader.clsPeptideMassCalculator mPeptideMassCalculator;
+
         public bool Initialized
         {
             get { return initialized; }
@@ -22,8 +24,15 @@ namespace AScore_DLL.Managers.DatasetManagers
             get { return datasetName; }
         }
 
-        private MzxmlManager(string mzxmlPath)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mzxmlPath"></param>
+        /// <param name="peptideMassCalculator"></param>
+        private MzxmlManager(string mzxmlPath, PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
         {
+            mPeptideMassCalculator = peptideMassCalculator;
+
             try
             {
                 datasetName = Path.GetFileNameWithoutExtension(mzxmlPath);
@@ -85,7 +94,7 @@ namespace AScore_DLL.Managers.DatasetManagers
                 }
 
                 expSpec = new ExperimentalSpectra(scanNumber, chargeState,
-                    precursorMass, precursorChargeState, entries);
+                    precursorMass, precursorChargeState, entries, mPeptideMassCalculator);
 
 
             }

@@ -6,15 +6,18 @@ namespace AScore_DLL.Managers.SpectraManagers
 {
     public class SpectraManagerCache : AScore_DLL.MessageEventBase
     {
-        private MzMLManager _mzMLManager;
-        private DtaManager _dtaManager;
+        private readonly MzMLManager _mzMLManager;
+        private readonly DtaManager _dtaManager;
         private ISpectraManager _lastOpened = null;
         private string _lastDatasetOpened;
 
-        public SpectraManagerCache()
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public SpectraManagerCache(PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
         {
-            _mzMLManager = new MzMLManager();
-            _dtaManager = new DtaManager();
+            _mzMLManager = new MzMLManager(peptideMassCalculator);
+            _dtaManager = new DtaManager(peptideMassCalculator);
             AttachEvents(_dtaManager);
             AttachEvents(_mzMLManager);
         }

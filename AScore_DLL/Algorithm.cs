@@ -182,7 +182,9 @@ namespace AScore_DLL
             var modSummaryManager = new ModSummaryFileManager();
             modSummaryManager.MessageEvent += modSummaryManager_MessageEvent;
 
-            ISpectraManager spectraFile = new DtaManager();
+            var peptideMassCalculator = new PHRPReader.clsPeptideMassCalculator();
+
+            ISpectraManager spectraFile = new DtaManager(peptideMassCalculator);
 
             if (this.FilterOnMSGFScore)
             {
@@ -305,7 +307,7 @@ namespace AScore_DLL
                 MolecularWeights.MassType = MassType.Monoisotopic;
 
                 // Compute precursor m/z value
-                double precursorMZ = PHRPReader.clsPeptideMassCalculator.ConvoluteMass(expSpec.PrecursorMass, 1, chargeState);
+                double precursorMZ = peptideMassCalculator.ConvoluteMass(expSpec.PrecursorMass, 1, chargeState);
 
                 // Set the m/z range
                 // Remove magic numbers parameterize

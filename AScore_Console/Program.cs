@@ -4,6 +4,7 @@ using AScore_DLL.Managers.DatasetManagers;
 using AScore_DLL.Managers.SpectraManagers;
 using FileProcessor;
 using System.IO;
+using PHRPReader;
 
 namespace AScore_Console
 {
@@ -53,7 +54,7 @@ namespace AScore_Console
         const string SupportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
 
         /// <summary>
-        /// Main entry point. I know, it's a pointless comment, but the comment block helps code reading
+        /// Main entry point
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -68,7 +69,7 @@ namespace AScore_Console
                 mAScoreOptions.Initialize();
                 mLogFilePath = string.Empty;
 
-                string syntaxError = string.Empty;
+                var syntaxError = string.Empty;
 
                 if (clu.ParseCommandLine(clsParseCommandLine.ALTERNATE_SWITCH_CHAR))
                 {
@@ -91,7 +92,7 @@ namespace AScore_Console
                     return 0;
                 }
 
-                int returnCode = CheckParameters();
+                var returnCode = CheckParameters();
                 // If we encountered an error in the input - a necessary file does not exist - then exit.
                 if (returnCode != 0)
                 {
@@ -346,7 +347,7 @@ namespace AScore_Console
                 }
             }
 
-            string ascoreResultsFilePath = Path.Combine(diOutputFolder.FullName, Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile) + "_ascore.txt");
+            var ascoreResultsFilePath = Path.Combine(diOutputFolder.FullName, Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile) + "_ascore.txt");
 
             if (ascoreOptions.SkipExistingResults && File.Exists(ascoreResultsFilePath))
             {
@@ -385,8 +386,10 @@ namespace AScore_Console
                         Console.WriteLine();
                         return -13;
                 }
+                var peptideMassCalculator = new clsPeptideMassCalculator();
 
-                var spectraManager = new SpectraManagerCache();
+                var spectraManager = new SpectraManagerCache(peptideMassCalculator);
+
                 AttachEvents(spectraManager);
 
                 ShowMessage("Output folder: " + diOutputFolder.FullName);

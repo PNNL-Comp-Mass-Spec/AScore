@@ -39,11 +39,13 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         #region Variables
 
-        protected string m_datasetName;
-        protected StreamReader m_masterDta = null;
-        protected Dictionary<string, long> dtaEntries = new Dictionary<string, long>();
+        private string m_datasetName;
+        private StreamReader m_masterDta;
+        private readonly Dictionary<string, long> dtaEntries = new Dictionary<string, long>();
 
-        protected bool m_initialized;
+        private readonly PHRPReader.clsPeptideMassCalculator m_PeptideMassCalculator;
+
+        private bool m_initialized;
 
         #endregion // Variables
 
@@ -76,8 +78,9 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// Initializes a DtaManager for which we don't yet know the path of the CDTA file to read
         /// </summary>
         /// <remarks>You must call UpdateDtaFilePath() prior to using GetDtaFileName() or GetExperimentalSpectra()</remarks>
-        public DtaManager()
+        public DtaManager(PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
         {
+            m_PeptideMassCalculator = peptideMassCalculator;
             m_initialized = false;
         }
 
@@ -140,7 +143,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             }
             catch (FileNotFoundException)
             {
-                string fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
+                var fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
                 throw new FileNotFoundException("The specified Master DTA file \"" +
                                                 fileName + "\" could not be found!");
             }
@@ -168,8 +171,8 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (string.IsNullOrWhiteSpace(scanPrefixPad))
                 scanPrefixPad = string.Empty;
 
-            string scanStart = scanPrefixPad + scanNumber;
-            string scanEnd = scanPrefixPad + (scanNumber + scanCount - 1);
+            var scanStart = scanPrefixPad + scanNumber;
+            var scanEnd = scanPrefixPad + (scanNumber + scanCount - 1);
 
             return string.Format("{0}.{1}.{2}.{3}.dta",
                 m_datasetName, scanStart,
@@ -189,7 +192,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (!m_initialized)
                 throw new Exception("Class has not yet been initialized; call OpenCDTAFile() before calling this function");
 
-            int dtaChargeState = psmChargeState;
+            var dtaChargeState = psmChargeState;
 
             // Find the desired spectrum
             // Dictionary keys are the header text for each DTA in the _DTA.txt file, for example:
@@ -204,16 +207,16 @@ namespace AScore_DLL.Managers.SpectraManagers
                     dtaChargeState
                 };
 
-                for (int alternateCharge = 1; alternateCharge < 10; alternateCharge++)
+                for (var alternateCharge = 1; alternateCharge < 10; alternateCharge++)
                 {
                     if (alternateCharge != dtaChargeState)
                         lstCharges.Add(alternateCharge);
                 }
 
-                foreach (int chargeState in lstCharges)
+                foreach (var chargeState in lstCharges)
                 {
-                    bool matchFound = false;
-                    for (int padLength = 0; padLength <= 6; padLength++)
+                    var matchFound = false;
+                    for (var padLength = 0; padLength <= 6; padLength++)
                     {
                         var scanPrefixPad = new string('0', padLength);
                         spectraName = GetDtaFileName(scanNumber, scanCount, chargeState, scanPrefixPad);
@@ -235,8 +238,8 @@ namespace AScore_DLL.Managers.SpectraManagers
             var reScan = new Regex(@"scan=(\d+)");
             var reCS = new Regex(@"cs=(\d+)");
 
-            double precursorMass = 0.0;
-            int precursorChargeState = 0;
+            var precursorMass = 0.0;
+            var precursorChargeState = 0;
             var entries = new List<ExperimentalSpectraEntry>();
 
             // Set the Master DTAs file position to the specified spectra
@@ -245,7 +248,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
             // Read the first line of the entry and extract the precursor
             // entries as well as the scan number and charge state
-            string line = m_masterDta.ReadLine();
+            var line = m_masterDta.ReadLine();
 
             if (string.IsNullOrWhiteSpace(line))
             {
@@ -312,7 +315,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                     double.TryParse(massAndIntensity[0], out ionMz);
 
                     // Get the second number
-                    double ionIntensity = 0.0;
+                    var ionIntensity = 0.0;
                     double.TryParse(massAndIntensity[1], out ionIntensity);
 
                     // Add this entry to the entries list
@@ -326,16 +329,16 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (precursorChargeState != psmChargeState)
             {
                 // Convert precursor mass from M+H to m/z
-                double precursorMZ = PHRPReader.clsPeptideMassCalculator.ConvoluteMass(precursorMass, 1, precursorChargeState);
+                var precursorMZ = m_PeptideMassCalculator.ConvoluteMass(precursorMass, 1, precursorChargeState);
 
                 // Convert precursor m/z to the correct M+H value
-                precursorMass = PHRPReader.clsPeptideMassCalculator.ConvoluteMass(precursorMZ, psmChargeState, 1);
+                precursorMass = m_PeptideMassCalculator.ConvoluteMass(precursorMZ, psmChargeState, 1);
                 precursorChargeState = psmChargeState;
             }
 
             // Finally, create the new ExperimentalSpectra
             var expSpec = new ExperimentalSpectra(scanNumber, psmChargeState,
-                precursorMass, precursorChargeState, entries);
+                precursorMass, precursorChargeState, entries, m_PeptideMassCalculator);
 
             return expSpec;
         }
@@ -344,7 +347,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         #region Private Methods
 
-        protected void ClearCachedData()
+        private void ClearCachedData()
         {
             if (dtaEntries != null)
             {
@@ -362,10 +365,10 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// Initializes the internal dictionary with the offsets of the files located
         /// in the master dta.
         /// </summary>
-        protected void Initialize(string masterDtaPath)
+        private void Initialize(string masterDtaPath)
         {
             long bytesRead = 0;
-            string line = string.Empty;
+            var line = string.Empty;
 
             try
             {
@@ -386,9 +389,9 @@ namespace AScore_DLL.Managers.SpectraManagers
                     if (!m_masterDta.EndOfStream)
                     {
                         // First extract the name of this dta entry
-                        int entryNameIndex = line.IndexOf('\"') + 1;
-                        int entryNameLength = line.LastIndexOf('\"') - entryNameIndex;
-                        string entryName = line.Substring(entryNameIndex, entryNameLength);
+                        var entryNameIndex = line.IndexOf('\"') + 1;
+                        var entryNameLength = line.LastIndexOf('\"') - entryNameIndex;
+                        var entryName = line.Substring(entryNameIndex, entryNameLength);
 
                         // Add it to the dictionary
                         dtaEntries.Add(entryName, bytesRead);

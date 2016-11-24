@@ -46,6 +46,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         protected string m_datasetName;
         protected bool m_initialized;
 
+        private readonly PHRPReader.clsPeptideMassCalculator m_PeptideMassCalculator;
         #endregion // Variables
 
         #endregion // Class Members
@@ -56,8 +57,9 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// Initializes a DtaManager for which we don't yet know the path of the CDTA file to read
         /// </summary>
         /// <remarks>You must call UpdateDtaFilePath() prior to using GetDtaFileName() or GetExperimentalSpectra()</remarks>
-        public MzMLManager()
+        public MzMLManager(PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
         {
+            m_PeptideMassCalculator = peptideMassCalculator;
             m_initialized = false;
         }
 
@@ -196,10 +198,10 @@ namespace AScore_DLL.Managers.SpectraManagers
             {
                 //int tempCharge = precursorChargeState;
                 // Convert precursor mass from M+H to m/z
-                double precursorMZ = PHRPReader.clsPeptideMassCalculator.ConvoluteMass(precursorMass, 1, precursorChargeState);
+                double precursorMZ = m_PeptideMassCalculator.ConvoluteMass(precursorMass, 1, precursorChargeState);
 
                 // Convert precursor m/z to the correct M+H value
-                precursorMass = PHRPReader.clsPeptideMassCalculator.ConvoluteMass(precursorMZ, psmChargeState, 1);
+                precursorMass = m_PeptideMassCalculator.ConvoluteMass(precursorMZ, psmChargeState, 1);
                 precursorChargeState = psmChargeState;
                 //ReportWarning("Charge state for spectra \"" + scanNumber + "\" changed from \"" + tempCharge +
                 //              "\" to \"" + precursorChargeState + "\"");
@@ -207,7 +209,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
             // Finally, create the new ExperimentalSpectra
             var expSpec = new ExperimentalSpectra(scanNumber, psmChargeState,
-                precursorMass, precursorChargeState, entries);
+                precursorMass, precursorChargeState, entries, m_PeptideMassCalculator);
 
             return expSpec;
         }

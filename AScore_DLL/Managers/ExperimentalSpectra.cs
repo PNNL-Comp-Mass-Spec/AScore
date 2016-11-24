@@ -16,12 +16,13 @@ namespace AScore_DLL.Managers
 
         public double m_maxMZ = -1;
         public double m_minMZ = -1;
-        private int scanNumber;
-        private int chargeState;
+        private readonly int scanNumber;
+        private readonly int chargeState;
         private double precursorMass;
-        private int precursorChargeState;
-        private List<List<ExperimentalSpectraEntry>> topTenSpectra =
-            new List<List<ExperimentalSpectraEntry>>();
+        private readonly int precursorChargeState;
+        private readonly List<List<ExperimentalSpectraEntry>> topTenSpectra = new List<List<ExperimentalSpectraEntry>>();
+
+        private readonly PHRPReader.clsPeptideMassCalculator mPeptideMassCalculator;
 
         #endregion // Variables
 
@@ -48,12 +49,12 @@ namespace AScore_DLL.Managers
         /// </summary>
         public double PrecursorMass
         {
-            get { return precursorMass; }
+            get { return PrecursorMass1; }
         }
 
         public double PrecursorNeutralMass
         {
-            get { return PHRPReader.clsPeptideMassCalculator.ConvoluteMass(precursorMass, 1, 0); }
+            get { return mPeptideMassCalculator.ConvoluteMass(PrecursorMass1, 1, 0); }
         }
 
         /// <summary>
@@ -62,6 +63,19 @@ namespace AScore_DLL.Managers
         public int PrecursorChargeState
         {
             get { return precursorChargeState; }
+        }
+
+        public double PrecursorMass1
+        {
+            get
+            {
+                return precursorMass;
+            }
+
+            set
+            {
+                precursorMass = value;
+            }
         }
 
         #endregion // Properties
@@ -75,19 +89,21 @@ namespace AScore_DLL.Managers
         /// </summary>
         /// <param name="scanNum">Scan number of this experimental spectra.</param>
         /// <param name="chargeState">Charge state of the peptide in this experimental spectrum</param>
-        /// <param name="name">Name of the dta file this spectra was extracted from.</param>
         /// <param name="precursorMass">Precursor mass (first number in dta file); this is an M+H value</param>
         /// <param name="precursorChargeState">Precursor charge state (second number in dta file).</param>
-        /// <param name="spectra">List of the experimental spectra from the
-        /// Master DTA file.</param>
+        /// <param name="spectra">List of the experimental spectra from the Master DTA file.</param>
+        /// <param name="peptideMassCalculator">Mass calculator class</param>
         public ExperimentalSpectra(int scanNum, int chargeState, double precursorMass,
-            int precursorChargeState, List<ExperimentalSpectraEntry> spectra)
+            int precursorChargeState, List<ExperimentalSpectraEntry> spectra,
+            PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
         {
             this.scanNumber = scanNum;
             this.chargeState = chargeState;
-            this.precursorMass = precursorMass;
+            this.PrecursorMass1 = precursorMass;
             this.precursorChargeState = precursorChargeState;
             GenerateSpectraForPeptideScore(spectra);
+
+            mPeptideMassCalculator = peptideMassCalculator;
         }
 
         #endregion // Constructor
