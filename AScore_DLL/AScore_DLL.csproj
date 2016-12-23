@@ -63,6 +63,9 @@
     <Reference Include="ProteinFileReader">
       <HintPath>lib\ProteinFileReader.dll</HintPath>
     </Reference>
+    <Reference Include="PSI_Interface">
+      <HintPath>lib\PSI_Interface.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -83,10 +86,6 @@
     <Compile Include="Managers\DatasetManagers\MsgfdbFHT.cs" />
     <Compile Include="Managers\ModSummaryFileManager.cs" />
     <Compile Include="Managers\SpectraManagers\MzMLManager.cs" />
-    <Compile Include="Managers\SpectraManagers\MZML\IsolationWindow.cs" />
-    <Compile Include="Managers\SpectraManagers\MZML\MzMLReader.cs" />
-    <Compile Include="Managers\SpectraManagers\MZML\Peak.cs" />
-    <Compile Include="Managers\SpectraManagers\MZML\MS2_Spectrum.cs" />
     <Compile Include="Managers\SpectraManagers\MzxmlManager.cs" />
     <Compile Include="Managers\DatasetManagers\SequestFHT.cs" />
     <Compile Include="Managers\DatasetManagers\XTandemFHT.cs" />

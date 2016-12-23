@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using AScore_DLL.Managers.SpectraManagers.MZML;
+using PSI_Interface.MSData;
 
 namespace AScore_DLL.Managers.SpectraManagers
 {
     class MzMLManager : AScore_DLL.MessageEventBase, ISpectraManager
     {
+        public const double Proton = 1.00727649;
+
         public static string GetFilePath(string datasetFilePath, string datasetName)
         {
             var datasetFile = new FileInfo(datasetFilePath);
@@ -40,9 +42,9 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         #region Variables
 
-        private MzMLReader m_MzMLReader = null;
+        private SimpleMzMLReader m_MzMLReader = null;
         //private List<MS2_Spectrum> m_ms2_spectra = null;
-        private readonly Dictionary<string, MzMLReader> m_readers = new Dictionary<string, MzMLReader>();
+        private readonly Dictionary<string, SimpleMzMLReader> m_readers = new Dictionary<string, SimpleMzMLReader>();
         protected string m_datasetName;
         protected bool m_initialized;
 
@@ -166,7 +168,11 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (!m_initialized)
                 throw new Exception("Class has not yet been initialized; call OpenFile() before calling this function");
 
-            var spectrum = m_MzMLReader.ReadMassSpectrum(scanNumber);
+            var spectrum = m_MzMLReader.ReadMassSpectrum(scanNumber) as SimpleMzMLReader.SimpleProductSpectrum;
+            if (spectrum == null)
+            {
+                return null;
+            }
 
             // Find the desired spectrum
             // Dictionary keys are the header text for each DTA in the _DTA.txt file, for example:
@@ -183,15 +189,15 @@ namespace AScore_DLL.Managers.SpectraManagers
             // precursorMass precursorCharge ScanNumber dtaChargeState
             // 1196.03544724 3   scan=99 cs=3
 
-            precursorMass = spectrum.IsolationWindow.MPlusHMass;
-            precursorChargeState = (spectrum.IsolationWindow.Charge != 0 ? spectrum.IsolationWindow.Charge : 1);
+            precursorMass = CalculateMPlusHMass(spectrum.MonoisotopicMz, spectrum.Charge);
+            precursorChargeState = (spectrum.Charge != 0 ? spectrum.Charge : 1);
             //scanNumber = spectrum.ScanNum;
 
             // Process the spectra binary data
-            foreach (var peak in spectrum.Peaks)
+            for (var i = 0; i < spectrum.Mzs.Length; i++)
             {
                 // Add this entry to the entries list
-                entries.Add(new ExperimentalSpectraEntry(peak.Mz, peak.Intensity));
+                entries.Add(new ExperimentalSpectraEntry(spectrum.Mzs[i], spectrum.Intensities[i]));
             }
 
             if (precursorChargeState != psmChargeState)
@@ -214,6 +220,22 @@ namespace AScore_DLL.Managers.SpectraManagers
             return expSpec;
         }
 
+        /// <summary>
+        /// Computes M+H mass using m/z and charge.
+        /// </summary>
+        /// <param name="mz"></param>
+        /// <param name="charge"></param>
+        /// <returns></returns>
+        public static double CalculateMPlusHMass(double mz, double charge)
+        {
+            if (!charge.Equals(0))
+            {
+                return ((mz - Proton) * charge) + Proton;
+                //return (double)((mz * charge) - (charge * Proton) + Proton);
+            }
+            return mz;
+        }
+
         #endregion // Public Methods
 
         #region Private Methods
@@ -234,7 +256,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         {
             if (!m_readers.ContainsKey(mzMLPath))
             {
-                m_readers.Add(mzMLPath, new MzMLReader(mzMLPath, true));
+                m_readers.Add(mzMLPath, new SimpleMzMLReader(mzMLPath, true));
             }
 
             m_MzMLReader = m_readers[mzMLPath];
