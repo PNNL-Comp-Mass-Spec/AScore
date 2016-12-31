@@ -128,6 +128,10 @@ namespace AScore_DLL.Managers.SpectraManagers
             try
             {
                 m_datasetName = Path.GetFileNameWithoutExtension(mzMLPath);
+                if (m_datasetName.ToLowerInvariant().EndsWith(".mzml"))
+                {
+                    m_datasetName = Path.GetFileNameWithoutExtension(m_datasetName);
+                }
                 if (string.IsNullOrEmpty(m_datasetName))
                     throw new FileNotFoundException("MzML filename is empty");
 

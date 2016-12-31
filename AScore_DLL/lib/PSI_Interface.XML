@@ -31501,6 +31501,11 @@
             Array of intensity values
             </summary>
         </member>
+        <member name="P:PSI_Interface.MSData.SimpleMzMLReader.SimpleSpectrum.Peaks">
+            <summary>
+            Array of peak data
+            </summary>
+        </member>
         <member name="P:PSI_Interface.MSData.SimpleMzMLReader.SimpleSpectrum.TotalIonCurrent">
             <summary>
             Total Ion Current
@@ -31518,6 +31523,28 @@
             <param name="mzs">array of mzs</param>
             <param name="intensities">array of intensities</param>
             <param name="scanNum">spectrum scan number</param>
+        </member>
+        <member name="M:PSI_Interface.MSData.SimpleMzMLReader.SimpleSpectrum.#ctor(PSI_Interface.MSData.SimpleMzMLReader.Peak[],System.Int32)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="peaks">array of peaks</param>
+            <param name="scanNum">spectrum scan number</param>
+        </member>
+        <member name="T:PSI_Interface.MSData.SimpleMzMLReader.Peak">
+            <summary>
+            Peak data
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.MSData.SimpleMzMLReader.Peak.Mz">
+            <summary>
+            Peak m/z
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.MSData.SimpleMzMLReader.Peak.Intensity">
+            <summary>
+            Peak intensity
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.SimpleMzMLReader.SimpleProductSpectrum">
             <summary>
@@ -31560,6 +31587,13 @@
             </summary>
             <param name="mzs">array of mzs</param>
             <param name="intensities">array of intensities</param>
+            <param name="scanNum">spectrum scan number</param>
+        </member>
+        <member name="M:PSI_Interface.MSData.SimpleMzMLReader.SimpleProductSpectrum.#ctor(PSI_Interface.MSData.SimpleMzMLReader.Peak[],System.Int32)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="peaks">array of peaks</param>
             <param name="scanNum">spectrum scan number</param>
         </member>
         <member name="M:PSI_Interface.MSData.SimpleMzMLReader.#ctor(System.String,System.Boolean,System.Boolean)">
