@@ -227,6 +227,6 @@ namespace AScore_DLL.Managers.DatasetManagers
                 AtEnd = true;
             }
         }
-	
+
     }
 }
