@@ -6,423 +6,157 @@ ProteinCoverageSummarizer
 </name>
 </assembly>
 <members>
+<member name="T:ProteinCoverageSummarizer.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
 <member name="P:ProteinCoverageSummarizer.My.Resources.Resources.ResourceManager">
-	<summary>
+<summary>
   Returns the cached ResourceManager instance used by this class.
 </summary>
-</member><member name="P:ProteinCoverageSummarizer.My.Resources.Resources.Culture">
-	<summary>
+</member>
+<member name="P:ProteinCoverageSummarizer.My.Resources.Resources.Culture">
+<summary>
   Overrides the current thread's CurrentUICulture property for all
   resource lookups using this strongly typed resource class.
 </summary>
-</member><member name="T:ProteinCoverageSummarizer.My.Resources.Resources">
-	<summary>
-  A strongly-typed resource class, for looking up localized strings, etc.
-</summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.LoadSettings">
-	<summary>
- Loads the settings for the defined Xml Settings File.  Assumes names are not case sensitive
+</member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.ProteinName">
+ <summary>
+ Protein name (optional)
  </summary>
-	<return>The function returns a boolean that shows if the file was successfully loaded.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.LoadSettings(System.String)">
-	<summary>
- Loads the settings for the defined Xml Settings File.   Assumes names are not case sensitive
+</member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.PeptideSequence">
+ <summary>
+ Peptide amino acids (stored as uppercase letters)
  </summary>
-	<param name="XmlSettingsFilePath">The path to the XML settings file.</param>
-	<return>The function returns a boolean that shows if the file was successfully loaded.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.LoadSettings(System.String,System.Boolean)">
-	<summary>
- Loads the settings for the defined Xml Settings File
+</member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.Prefix">
+ <summary>
+ Prefix residue
  </summary>
-	<param name="XmlSettingsFilePath">The path to the XML settings file.</param>
-	<param name="IsCaseSensitive">Case sensitive names if True.  Non-case sensitive if false.</param>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SaveSettings">
-	<summary>
- Saves the settings for the defined Xml Settings File.  Note that you must call LoadSettings to initialize the class prior to setting any values.
+</member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.Suffix">
+ <summary>
+ Suffix residue
  </summary>
-	<return>The function returns a boolean that shows if the file was successfully saved.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SectionPresent(System.String)">
-	<summary>Checks if a section is present in the settings file.</summary>
-	<param name="sectionName">The name of the section to look for.</param>
-	<return>The function returns a boolean that shows if the section is present.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.GetParam(System.String,System.String,System.String,System.Boolean@)">
-	<summary>
- The function gets the name of the "value" attribute in section "sectionName".
+</member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.PeptideSequenceLtoI">
+ <summary>
+ Peptide sequence where leucines have been changed to isoleucine
  </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
-	<param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
-	<return>The function returns the name of the "value" attribute as a String.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.GetParam(System.String,System.String,System.Boolean,System.Boolean@)">
-	<summary>
- The function gets the name of the "value" attribute in section "sectionName".
+ <remarks>Only used if mIgnoreILDifferences is True</remarks>
+</member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.PrefixLtoI">
+ <summary>
+ Prefix residue; if leucine, changed to isoleucine
  </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
-	<param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
-	<return>The function returns boolean True if the "value" attribute is "true".  Otherwise, returns boolean False.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.GetParam(System.String,System.String,System.Int16,System.Boolean@)">
-	<summary>
- The function gets the name of the "value" attribute in section "sectionName".
+ <remarks>Only used if mIgnoreILDifferences is True</remarks>
+</member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.SuffixLtoI">
+ <summary>
+ Suffix residue; if leucine, changed to isoleucine
  </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
-	<param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
-	<return>The function returns the name of the "value" attribute as a Short.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.GetParam(System.String,System.String,System.Int32,System.Boolean@)">
-	<summary>
- The function gets the name of the "value" attribute in section "sectionName".
+ <remarks>Only used if mIgnoreILDifferences is True</remarks>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.ToString">
+ <summary>
+ Show the peptide sequence, including prefix and suffix
  </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
-	<param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
-	<return>The function returns the name of the "value" attribute as an Integer.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.GetParam(System.String,System.String,System.Int64,System.Boolean@)">
-	<summary>
- The function gets the name of the "value" attribute in section "sectionName".
+ <returns></returns>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.CachePeptide(System.String,System.String,System.Char,System.Char)">
+ <summary>
+ Caches the peptide and updates mLeaderSequences
  </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
-	<param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
-	<return>The function returns the name of the "value" attribute as a Long.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.GetParam(System.String,System.String,System.Single,System.Boolean@)">
-	<summary>
- The function gets the name of the "value" attribute in section "sectionName".
+ <param name="strPeptideSequence"></param>
+ <param name="strProteinName"></param>
+ <param name="chPrefixResidue"></param>
+ <param name="chSuffixResidue"></param>
+ <returns></returns>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ConstructOutputFilePath(System.String,System.String,System.String,System.String)">
+ <summary>
+ Construct the output file path
+ The output file is based on outputFileBaseName if defined, otherwise is based on inputFilePath with the suffix removed
+ In either case, suffixToAppend is appended
+ The Output fodler is based on outputFolderPath if defined, otherwise it is the folder where inputFilePath resides
  </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
-	<param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
-	<return>The function returns the name of the "value" attribute as a Single.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.GetParam(System.String,System.String,System.Double,System.Boolean@)">
-	<summary>
- The function gets the name of the "value" attribute in section "sectionName".
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
-	<param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
-	<return>The function returns the name of the "value" attribute as a Double.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetIniFilePath(System.String)">
-	<summary>
- Legacy function name; calls SetXMLFilePath
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetXMLFilePath(System.String)">
-	<summary>
- The function sets the path to the Xml Settings File.
- </summary>
-	<param name="XmlSettingsFilePath">The path to the XML settings file.</param>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetParam(System.String,System.String,System.String)">
-	<summary>
- The function sets a new String value for the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "value".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetParam(System.String,System.String,System.Boolean)">
-	<summary>
- The function sets a new Boolean value for the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "value".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetParam(System.String,System.String,System.Int16)">
-	<summary>
- The function sets a new Short value for the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "value".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetParam(System.String,System.String,System.Int32)">
-	<summary>
- The function sets a new Integer value for the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "value".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetParam(System.String,System.String,System.Int64)">
-	<summary>
- The function sets a new Long value for the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "value".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetParam(System.String,System.String,System.Single)">
-	<summary>
- The function sets a new Single value for the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "value".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.SetParam(System.String,System.String,System.Double)">
-	<summary>
- The function sets a new Double value for the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "value".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.RenameSection(System.String,System.String)">
-	<summary>
- The function renames a section.
- </summary>
-	<param name="sectionNameOld">The name of the old XML section name.</param>
-	<param name="sectionNameNew">The new name for the XML section.</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.#ctor(System.String)">
-	<summary>Initializes a new instance of the XMLFileReader (non case-sensitive)</summary>
-	<param name="XmlFilename">The name of the XML file.</param>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.#ctor(System.String,System.Boolean)">
-	<summary>Initializes a new instance of the XMLFileReader.</summary>
-	<param name="XmlFilename">The name of the XML file.</param>
-	<param name="IsCaseSensitive">Case sensitive as boolean.</param>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.InitXMLFileReader(System.String,System.Boolean)">
-	<summary>
- This routine is called by each of the constructors to make the actual assignments.
- </summary>
-</member><member name="P:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.IniFilename">
-	<summary>
- Legacy property; calls XmlFilename
- </summary>
-</member><member name="P:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.XmlFilename">
-	<summary>
- This routine returns the name of the ini file.
- </summary>
-	<return>The function returns the name of ini file.</return>
-</member><member name="P:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.Initialized">
-	<summary>
- This routine returns a boolean showing if the file was initialized or not.
- </summary>
-	<return>The function returns a Boolean.</return>
-</member><member name="P:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.CaseSensitive">
-	<summary>
- This routine returns a boolean showing if the name is case sensitive or not.
- </summary>
-	<return>The function returns a Boolean.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetNameCase(System.String)">
-	<summary>
- This routine sets a name.
- </summary>
-	<param name="aName">The name to be set.</param>
-	<return>The function returns a string.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetRoot">
-	<summary>
- Returns the root element of the XML document
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetLastSection">
-	<summary>
- The function gets the last section.
- </summary>
-	<return>The function returns the last section as System.Xml.XmlElement.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetSection(System.String)">
-	<summary>
- The function gets a section as System.Xml.XmlElement.
- </summary>
-	<param name="sectionName">The name of a section.</param>
-	<return>The function returns a section as System.Xml.XmlElement.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetItem(System.String,System.String)">
-	<summary>
- The function gets an item.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<return>The function returns a XML element.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetIniSection(System.String,System.String)">
-	<summary>
- Legacy function name; calls SetXMLSection
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetXMLSection(System.String,System.String)">
-	<summary>
- The function sets the ini section name.
- </summary>
-	<param name="oldSection">The name of the old ini section name.</param>
-	<param name="newSection">The new name for the ini section.</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetIniValue(System.String,System.String,System.String)">
-	<summary>
- Legacy function name; calls SetXMLValue
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetXMLValue(System.String,System.String,System.String)">
-	<summary>
- The function sets a new value for the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "value".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.DeleteSection(System.String)">
-	<summary>
- The function deletes a section in the file.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<return>The function returns a boolean that shows if the delete was completed.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.DeleteItem(System.String,System.String)">
-	<summary>
- The function deletes a item in a specific section.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<return>The function returns a boolean that shows if the delete was completed.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetIniKey(System.String,System.String,System.String)">
-	<summary>
- Legacy function name; calls SetXmlKey
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetXmlKey(System.String,System.String,System.String)">
-	<summary>
- The function sets a new value for the "key" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value for the "key".</param>
-	<return>The function returns a boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetIniValue(System.String,System.String)">
-	<summary>
- Legacy function name; calls GetXMLValue
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetXMLValue(System.String,System.String)">
-	<summary>
- The function gets the name of the "value" attribute.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<return>The function returns the name of the "value" attribute.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetIniComments(System.String)">
-	<summary>
- Legacy function name; calls GetXmlSectionComments
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetXmlSectionComments(System.String)">
-	<summary>
- The function gets the comments for a section name.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<return>The function returns a string collection with comments</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetIniComments(System.String,System.Collections.Specialized.StringCollection)">
-	<summary>
- Legacy function name; calls SetXMLComments
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetXMLComments(System.String,System.Collections.Specialized.StringCollection)">
-	<summary>
- The function sets a the comments for a section name.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="comments">A string collection.</param>
-	<return>The function returns a Boolean that shows if the change was done.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.UpdateSections">
-	<summary>
- The subroutine updades the sections.
- </summary>
-</member><member name="P:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.AllSections">
-	<summary>
- The subroutine gets the sections.
- </summary>
-	<return>The subroutine returns a strin collection of sections.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetItemsInSection(System.String,ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.XMLItemTypeEnum)">
-	<summary>
- The function gets a collection of items for a section name.
- </summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="itemType">Item type.</param>
-	<return>The function returns a string colection of items in a section.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.AllKeysInSection(System.String)">
-	<summary>The funtions gets a collection of keys in a section.</summary>
-	<param name="sectionName">The name of the section.</param>
-	<return>The function returns a string colection of all the keys in a section.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.AllValuesInSection(System.String)">
-	<summary>The funtions gets a collection of values in a section.</summary>
-	<param name="sectionName">The name of the section.</param>
-	<return>The function returns a string colection of all the values in a section.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.AllItemsInSection(System.String)">
-	<summary>The funtions gets a collection of items in a section.</summary>
-	<param name="sectionName">The name of the section.</param>
-	<return>The function returns a string colection of all the items in a section.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.GetCustomIniAttribute(System.String,System.String,System.String)">
-	<summary>The funtions gets a custom attribute name.</summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="attributeName">The name of the attribute.</param>
-	<return>The function returns a string.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.SetCustomIniAttribute(System.String,System.String,System.String,System.String)">
-	<summary>The funtions sets a custom attribute name.</summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="attributeName">The name of the attribute.</param>
-	<param name="attributeValue">The value of the attribute.</param>
-	<return>The function returns a Boolean.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.CreateSection(System.String)">
-	<summary>The funtions creates a section name.</summary>
-	<param name="sectionName">The name of the section to be created.</param>
-	<return>The function returns a Boolean.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.CreateItem(System.String,System.String,System.String)">
-	<summary>The funtions creates a section name.</summary>
-	<param name="sectionName">The name of the section.</param>
-	<param name="keyName">The name of the key.</param>
-	<param name="newValue">The new value to be created.</param>
-	<return>The function returns a Boolean.</return>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.ManualParseXmlOrIniFile(System.String)">
-	<summary>
- Manually read a XML or .INI settings file line-by-line, extracting out any settings in the expected format
- </summary>
-	<param name="strFilePath"></param>
-	<returns></returns>
-	<remarks></remarks>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.ParseLineManual(System.String,System.Xml.XmlDocument@)">
-	<summary>Manually parses a line to extract the settings information
- Supports the traditional .Ini file format
- Also supports the 'key="KeyName" value="Value"' method used in XML settings files
- If success, then adds attributes to the doc object</summary>
-	<param name="strLine">The name of the string to be parse.</param>
-	<param name="doc">The name of the System.Xml.XmlDocument.</param>
-	<returns>True if success, false if not a recognized line format</returns>
-	<remarks>Returns True for blank lines</remarks>
-</member><member name="P:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.OutputFilename">
-	<summary>It Sets or Gets the output file name.</summary>
-</member><member name="M:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.Save">
-	<summary>It saves the data to the Xml output file.</summary>
-</member><member name="P:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.XmlDoc">
-	<summary>It gets the System.Xml.XmlDocument.</summary>
-</member><member name="P:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader.XML">
-	<summary>Converts an XML document to a string.</summary>
-	<return>It returns the XML document formatted as a string.</return>
-</member><member name="T:ProteinCoverageSummarizer.XmlSettingsFileAccessor.XMLFileReader">
-	<summary>
- Tools to manipulates XML Settings files.
- </summary>
-</member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptide(System.String,System.Char,System.Char,System.String)">
-	<summary>
- Searches for proteins that contain peptide strPeptideSequence.  
- If strProteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
- </summary>
-	<param name="strPeptideSequence">The peptide sequence to find</param>
-	<param name="chPrefixResidue">The prefix for the peptide</param>
-	<param name="chSuffixResidue">The suffix for the peptide</param>
-	<param name="strProteinNameForPeptide">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
-	<remarks></remarks>
-</member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptideList(System.Collections.Hashtable@,System.String)">
-	<summary>
- Searches for proteins that contain the peptides in htPeptideList  
+ <param name="inputFilePath"></param>
+ <param name="suffixToAppend"></param>
+ <param name="outputFolderPath"></param>
+ <param name="outputFileBaseName"></param>
+ <returns></returns>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptideList(System.Collections.Generic.IDictionary{System.String,System.Int32},System.String)">
+ <summary>
+ Searches for proteins that contain the peptides in peptideList
  If strProteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
  Otherwise, only searches protein strProteinNameForPeptide
  </summary>
-	<param name="htPeptideList">Hash table containing the peptides to search; peptides must be in the format Prefix.Peptide.Suffix where Prefix and Suffix are single characters; peptides are assumed to only contain letters (no symbols)</param>
-	<param name="strProteinNameForPeptides">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
-	<remarks></remarks>
-</member><member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ReadProteinInfoChunk(System.Int32,System.Int32,System.Boolean[]@,System.Boolean)">
-	<summary>
+ <param name="peptideList">Dictionary containing the peptides to search; peptides must be in the format Prefix.Peptide.Suffix where Prefix and Suffix are single characters; peptides are assumed to only contain letters (no symbols)</param>
+ <param name="strProteinNameForPeptides">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
+ <remarks></remarks>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetOutputFolderPath(System.String,System.String)">
+ <summary>
+ Determine the output folder path
+ Uses strOutputFolderPath if defined
+ Otherwise uses the folder where strOutputFilePath resides
+ </summary>
+ <param name="strOutputFolderPath"></param>
+ <param name="strOutputFilePath"></param>
+ <returns></returns>
+ <remarks>If an error, or unable to determine a folder, returns the folder with the application files</remarks>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.IncrementCountByKey(System.Collections.Generic.IDictionary{System.String,System.Int32},System.String)">
+ <summary>
+ Increment the observation count for the given key in the given dictionary
+ If the key is not defined, add it
+ </summary>
+ <param name="oDictionary"></param>
+ <param name="key"></param>
+ <returns>True if the protein is new and was added tomProteinPeptideStats </returns>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ReadProteinInfoChunk(System.Int32,System.Boolean[],System.Boolean)">
+ <summary>
  Read the next chunk of proteins from the database (SequenceID, ProteinName, ProteinSequence)
  </summary>
-	<returns>The number of records read</returns>
-	<remarks></remarks>
+ <returns>The number of records read</returns>
+ <remarks></remarks>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ValidateColumnCountInInputFile(System.String,ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ePeptideFileColumnOrderingCode@,System.Boolean,System.Char)">
+ <summary>
+ Read the first two lines to check whether the data file actually has only one column when the user has
+ specified mPeptideFileColumnOrdering = ePeptideFileColumnOrderingCode.ProteinName_PeptideSequence
+ If mPeptideFileColumnOrdering = ePeptideFileColumnOrderingCode.SequenceOnly, the file isn't even opened
+ </summary>
+ <param name="strPeptideInputFilePath"></param>
+ <param name="ePeptideFileColumnOrdering">Input / Output parameter</param>
+ <param name="blnSkipFirstLine"></param>
+ <param name="chColumnDelimiter"></param>
+ <returns>True if no problems; False if the user chooses to abort</returns>
+</member>
+<member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.AssumeDelimitedFile">
+ <summary>
+ When True, assume the input file is a tab-delimited text file
+ </summary>
+ <returns></returns>
+ <remarks>Ignored if AssumeFastaFile is True</remarks>
+</member>
+<member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.AssumeFastaFile">
+ <summary>
+ When True, assume the input file is a FASTA text file
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.IsFastaFile(System.String)">
+ <summary>
+ Examines the file's extension and true if it ends in .fasta or .fsa or .faa
+ </summary>
+ <param name="strFilePath"></param>
+ <returns></returns>
 </member>
 </members>
 </doc>
