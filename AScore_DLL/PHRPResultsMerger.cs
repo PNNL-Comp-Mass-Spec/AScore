@@ -321,7 +321,7 @@ namespace AScore_DLL
                         outLine.Clear();
                         outLine.Append(dataLineUpdated);
 
-                        outLine.Append("\t" + MathUtilities.ValueToString(ascoreResult.PeptideScore));
+                        outLine.Append("\t" + PRISM.StringUtilities.ValueToString(ascoreResult.PeptideScore));
 
                         // Count the number of modInfo entries that are not "-"
                         var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != Algorithm.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
@@ -334,7 +334,7 @@ namespace AScore_DLL
                             {
                                 if (modInfoName == modInfoEntry.Key)
                                 {
-                                    outLine.Append("\t" + MathUtilities.ValueToString(modInfoEntry.Value));
+                                    outLine.Append("\t" + PRISM.StringUtilities.ValueToString(modInfoEntry.Value));
                                     modInfoMatch = true;
                                     break;
                                 }

@@ -132,9 +132,9 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow[RESULTS_COL_SCAN] = scanNum;
             drow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
             drow[RESULTS_COL_BESTSEQUENCE] = bestSeq;
-            drow[RESULTS_COL_PEPTIDESCORE] = MathUtilities.ValueToString(topPeptideScore);
+            drow[RESULTS_COL_PEPTIDESCORE] = PRISM.StringUtilities.ValueToString(topPeptideScore);
 
-            drow[RESULTS_COL_ASCORE] = MathUtilities.ValueToString(ascoreResult.AScore);
+            drow[RESULTS_COL_ASCORE] = PRISM.StringUtilities.ValueToString(ascoreResult.AScore);
             drow[RESULTS_COL_NUMSITEIONSPOSS] = ascoreResult.NumSiteIons;
             drow[RESULTS_COL_NUMSITEIONSMATCHED] = ascoreResult.SiteDetermineMatched;
             drow[RESULTS_COL_SECONDSEQUENCE] = ascoreResult.SecondSequence;
@@ -166,7 +166,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow[RESULTS_COL_SCAN] = scanNum;
             drow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
             drow[RESULTS_COL_BESTSEQUENCE] = peptideSeq;
-            drow[RESULTS_COL_PEPTIDESCORE] = MathUtilities.ValueToString(pScore);
+            drow[RESULTS_COL_PEPTIDESCORE] = PRISM.StringUtilities.ValueToString(pScore);
 
             var intNonZeroCount = (from item in positionList where item > 0 select item).Count();
 
