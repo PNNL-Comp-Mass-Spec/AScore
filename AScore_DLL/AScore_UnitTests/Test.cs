@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
+using System.IO;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
 using AScore_DLL.Managers.SpectraManagers;
-using System.IO;
+using NUnit.Framework;
 
-
-namespace AScore_DLL
+namespace AScore_UnitTests
 {
     [TestFixture]
     class Test
     {
         [Test]
+        [Ignore("Local testing")]
         public void NewTest()
         {
             var ascore = new string[] { "SOSM_May_P1_R2_13Jun11_Hawk_11-04-02p_fht.txt"};
@@ -46,6 +46,7 @@ namespace AScore_DLL
         }
 
         [Test]
+        [Ignore("Local testing")]
         public void ForJohnJacobs()
         {
             var myfht = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt.txt";
@@ -66,6 +67,7 @@ namespace AScore_DLL
         }
 
         [Test]
+        [Ignore("Local testing")]
         public void SisiConfirm()
         {
             var dtaname = new string[]{
@@ -119,6 +121,7 @@ namespace AScore_DLL
 
 
         [Test]
+        [Ignore("Local testing")]
         public void FengTest()
         {
             var datasetname = new string[]{
@@ -164,6 +167,7 @@ namespace AScore_DLL
         }
 
         [Test]
+        [Ignore("Local testing")]
         public void FengTest2()
         {
             var datasetname = new string[]{
@@ -194,6 +198,7 @@ namespace AScore_DLL
         }
 
         [Test]
+        [Ignore("Local testing")]
         public void EcoliTest2()
         {
             var datasetname = new string[]{
@@ -226,13 +231,20 @@ namespace AScore_DLL
         [Test]
         public void Testneut()
         {
-            Console.WriteLine(PeptideScoresManager.GetPeptideScore(0.09,12,6));
-            
+            const double prob = 0.09;
+            const int numPossMatch = 12;
+            const int matches = 6;
+
+            var score = PeptideScoresManager.GetPeptideScore(prob, numPossMatch, matches);
+            Console.WriteLine("Match with probability {0}, {1} possible matches, and {2} matches results in score {3:F4}", prob, numPossMatch, matches, score);
+
+            Assert.AreEqual(35.17035, score, 0.00001);
         }
 
-    
+
 
         [Test]
+        [Ignore("Local testing")]
         public void QuYi()
         {
             var direct = @"C:\Documents and Settings\aldr699\My Documents2011\EColiPhos";
@@ -324,6 +336,7 @@ namespace AScore_DLL
 
 
         [Test]
+        [Ignore("Local testing")]
         public void Sisi()
         {
             var ascoreP = "parameterFile.xml";
@@ -339,7 +352,7 @@ namespace AScore_DLL
                 "NMR_LaR80a_01_20Jul11_Andromeda_11-02-54_fhtf.txt",
                 "NMR_LaR80a_02_20Jul11_Andromeda_11-02-56_fhtf.txt",
                 "NMR_LaR80a_03_20Jul11_Andromeda_11-02-54_fhtf.txt"
-                
+
             };
 
             var dtaFiles = new List<string>{
@@ -379,37 +392,71 @@ namespace AScore_DLL
         [Test]
         public void TestMSGFFilter()
         {
-            var direct = @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase";
-            var fht = Path.Combine(direct, "689706_GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_fht.txt");
-            var param = Path.Combine(direct, "parameterFileForGmax.xml");
-            var dta = Path.Combine(direct, "GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_dta.txt");
+            var workDir = @"F:\My Documents\Projects\JoshAldrich\AScore\AScore_DLL\TestCase";
+            var fht = Path.Combine(workDir, "GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_fht.txt");
+            var param = Path.Combine(workDir, "AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da_MSGF1E-12.xml");
+            var dta = Path.Combine(workDir, "GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_dta.txt");
+            var resultsFile = Path.Combine(workDir, "GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_fht_ascore.txt");
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
 
             DatasetManager dfht = new SequestFHT(fht);
             var pfile = new ParameterFileManager(param);
-            //DtaManager dtaman = new DtaManager(dta);
+
             var spectraCache = new SpectraManagerCache(peptideMassCalculator);
             spectraCache.OpenFile(dta);
 
             var sw = System.Diagnostics.Stopwatch.StartNew();
 
             var ascoreEngine = new AScore_DLL.Algorithm();
-            //ascoreEngine.AlgorithmRun(dtaman, dfht, pfile, @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase\TestMSGFFilter.txt");
-            ascoreEngine.AlgorithmRun(spectraCache, dfht, pfile, @"C:\AldrichBackup\aldr699\My Documents\Visual Studio 2010\Projects\RevisedFinalAScore\AScore_DLL\TestCase\TestMSGFFilter.txt");
+            ascoreEngine.AlgorithmRun(spectraCache, dfht, pfile, resultsFile);
 
             sw.Stop();
             Console.WriteLine("Time used (float): {0} ms", sw.Elapsed.TotalMilliseconds);
+            Console.WriteLine("Results in " + resultsFile);
+
+        }
+
+        [Test]
+        public void TestMSGFPlusResults()
+        {
+            var workDir = @"F:\My Documents\Projects\JoshAldrich\AScore\AScore_DLL\TestCase";
+            var fht = Path.Combine(workDir, "CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_msgfdb_fht.txt");
+            var param = Path.Combine(workDir, "AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da_MSGF1E-12.xml");
+            var dta = Path.Combine(workDir, "CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_dta.txt");
+            var resultsFile = Path.Combine(workDir, "CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_msgfdb_fht_ascore.txt");
+
+            var peptideMassCalculator = GetDefaultPeptideMassCalculator();
+
+            DatasetManager dfht = new MsgfdbFHT(fht);
+            var pfile = new ParameterFileManager(param);
+
+            var spectraCache = new SpectraManagerCache(peptideMassCalculator);
+            spectraCache.OpenFile(dta);
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            var ascoreEngine = new AScore_DLL.Algorithm();
+            ascoreEngine.AlgorithmRun(spectraCache, dfht, pfile, resultsFile);
+
+            sw.Stop();
+            Console.WriteLine("Time used (float): {0} ms", sw.Elapsed.TotalMilliseconds);
+            Console.WriteLine("Results in " + resultsFile);
+
         }
 
         [Test]
         public void QuickTest()
         {
-            var s = "";
+            var s = "3.432";
             var d = double.Parse(s);
+
+            Console.WriteLine("{0} converts to {1}", s, d);
+            Assert.AreEqual(3.432, d, 0.0001);
         }
 
         [Test]
+        [Ignore("Local testing")]
         public void OsmaniRedux()
         {
             var ascorePETD = "ETDPhos.xml";
@@ -424,7 +471,7 @@ namespace AScore_DLL
                 "SOSM_May_G2_RR2_27Jan12_Hawk_11-11-03p_fhtf.txt",
                 "SOSM_May_M_RR2_29Jan12_Hawk_11-11-03p_fhtf.txt",
                 "SOSM_May_G_RR1_31Jan12_Hawk_11-11-03p_fhtf.txt",
-                "SOSM_May_P1_RR1_31Jan12_Hawk_11-11-03p_fhtf.txt"       
+                "SOSM_May_P1_RR1_31Jan12_Hawk_11-11-03p_fhtf.txt"
             };
 
             var direct2 = @"C:\Users\aldr699\Documents\2012\Osmani";
@@ -435,7 +482,7 @@ namespace AScore_DLL
                 "SOSM_May_G2_RR2_27Jan12_Hawk_11-11-03p_dta.txt",
                 "SOSM_May_M_RR2_29Jan12_Hawk_11-11-03p_dta.txt",
                 "SOSM_May_G_RR1_31Jan12_Hawk_11-11-03p_dta.txt",
-                "SOSM_May_P1_RR1_31Jan12_Hawk_11-11-03p_dta.txt"   
+                "SOSM_May_P1_RR1_31Jan12_Hawk_11-11-03p_dta.txt"
             };
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
@@ -479,6 +526,7 @@ namespace AScore_DLL
 
 
         [Test]
+        [Ignore("Local testing")]
         public void Sisi_Kidneys()
         {
             var ascoreP = "HCDPhos.xml";
@@ -507,7 +555,7 @@ namespace AScore_DLL
                 "Kidney_ACHN_Das_1_pTyr_HCD_8May12_Lynx_12-02-29_dta.txt",
                 "Kidney_ACHN_Veh_1_pTyr_HCD_10May12_Lynx_12-02-29_dta.txt",
                 "Kidney_ACHN_Veh_2_IMAC_HCD_10May12_Lynx_12-02-31_dta.txt",
-                "Kidney_ACHN_Das_2_IMAC_HCD_11May12_Lynx_12-02-31_dta.txt" 
+                "Kidney_ACHN_Das_2_IMAC_HCD_11May12_Lynx_12-02-31_dta.txt"
             };
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
@@ -568,4 +616,3 @@ namespace AScore_DLL
 
     }
 }
- 

@@ -1,0 +1,5 @@
+Modification_Symbol	Modification_Mass	Target_Residues	Modification_Type	Mass_Correction_Tag	Occurrence_Count
+*	79.9663	STY	D	Phosph	111738
+-	144.102063	K	S	itrac	111345
+-	144.102063	<	T	itrac	69724
+-	57.0215	C	S	IodoAcet	21006

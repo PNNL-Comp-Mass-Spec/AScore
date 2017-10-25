@@ -1,0 +1,5 @@
+Modification_Symbol	Modification_Mass	Target_Residues	Modification_Type	Mass_Correction_Tag	Occurence_Count
+*	79.9663	STY	D	Phosph	61827
+-	57.0215	C	S	IodoAcet	8814
+-	304.2022	K	S	iTRAQ8	34351
+-	304.2022	<	T	iTRAQ8	37467
