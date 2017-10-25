@@ -79,7 +79,11 @@ namespace AScore_DLL
                     mergedPhrpDataFileName = Path.GetFileNameWithoutExtension(fiInputFile.Name) + "_WithAScore" + fiInputFile.Extension;
                 }
 
-                m_MergedFilePath = Path.Combine(fiAScoreResultsFile.Directory.FullName, mergedPhrpDataFileName);
+                if (fiAScoreResultsFile.DirectoryName == null)
+                    m_MergedFilePath = mergedPhrpDataFileName;
+                else
+                    m_MergedFilePath = Path.Combine(fiAScoreResultsFile.DirectoryName, mergedPhrpDataFileName);
+
                 var fiOutputFilePath = new FileInfo(m_MergedFilePath);
 
 
@@ -268,13 +272,13 @@ namespace AScore_DLL
             return true;
 
         }
-        private bool MakeUpdatedPHRPFile(
+
+        private void MakeUpdatedPHRPFile(
             FileSystemInfo fiInputFile,
             FileSystemInfo fiOutputFilePath,
             clsPHRPReader oPHRPReader,
             Dictionary<string, AScoreResultsType> cachedAscoreResults)
         {
-
             try
             {
                 // Read the header line from the PHRP file
@@ -321,7 +325,7 @@ namespace AScore_DLL
                         outLine.Clear();
                         outLine.Append(dataLineUpdated);
 
-                        outLine.Append("\t" + PRISM.StringUtilities.ValueToString(ascoreResult.PeptideScore));
+                        outLine.Append("\t" + StringUtilities.ValueToString(ascoreResult.PeptideScore));
 
                         // Count the number of modInfo entries that are not "-"
                         var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != Algorithm.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
@@ -334,7 +338,7 @@ namespace AScore_DLL
                             {
                                 if (modInfoName == modInfoEntry.Key)
                                 {
-                                    outLine.Append("\t" + PRISM.StringUtilities.ValueToString(modInfoEntry.Value));
+                                    outLine.Append("\t" + StringUtilities.ValueToString(modInfoEntry.Value));
                                     modInfoMatch = true;
                                     break;
                                 }
@@ -356,10 +360,8 @@ namespace AScore_DLL
             catch (Exception ex)
             {
                 OnErrorEvent("Error in CacheAScoreResults: " + ex.Message);
-                return false;
             }
 
-            return true;
         }
 
         protected bool FilePathsMatch(FileInfo fiFile1, FileInfo fiFile2)
