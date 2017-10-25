@@ -3,13 +3,14 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using AScore_DLL.Mod;
+using PRISM;
 
 namespace AScore_DLL.Managers
 {
     /// <summary>
     /// Override the parameter file modifications with modifications listed in the ModSummary file.
     /// </summary>
-    public class ModSummaryFileManager : MessageEventBase
+    public class ModSummaryFileManager : clsEventNotifier
     {
 
         private const string COL_SYMBOL = "Modification_Symbol";
@@ -44,16 +45,18 @@ namespace AScore_DLL.Managers
 
             ReadModSummary(modSummaryFile, ascoreParams);
 
-            ReportMessage("Loaded modifications from: " + modSummaryFile.Name);
+            OnStatusEvent("Loaded modifications from: " + modSummaryFile.Name);
 
             foreach (var mod in ascoreParams.StaticMods)
             {
                 WriteMod("Static,   ", mod);
             }
+
             foreach (var mod in ascoreParams.DynamicMods)
             {
                 WriteMod("Dynamic,  ", mod);
             }
+
             foreach (var mod in ascoreParams.TerminiMods)
             {
                 WriteMod("Terminus, ", mod);
@@ -77,7 +80,7 @@ namespace AScore_DLL.Managers
             {
                 residues += "<";
             }
-            ReportMessage("    " + type + mod.MassMonoisotopic + " on " + residues);
+            OnStatusEvent("    " + type + mod.MassMonoisotopic + " on " + residues);
         }
 
         public void ReadModSummary(FileInfo modSummaryFile, ParameterFileManager ascoreParams)

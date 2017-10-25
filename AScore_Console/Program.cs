@@ -436,12 +436,12 @@ namespace AScore_Console
         /// <summary>
         /// Attaches the Error, Warning, and Message events to the local event handler
         /// </summary>
-        /// <param name="paramManager"></param>
-        private static void AttachEvents(AScore_DLL.MessageEventBase paramManager)
+        /// <param name="oClass"></param>
+        private static void AttachEvents(clsEventNotifier oClass)
         {
-            paramManager.ErrorEvent += AScoreEngineErrorEventHandler;
-            paramManager.WarningEvent += AScoreEngineWarningEventHandler;
-            paramManager.MessageEvent += AScoreEngineMessageEventHandler;
+            oClass.ErrorEvent += AScoreEngineErrorEventHandler;
+            oClass.WarningEvent += AScoreEngineWarningEventHandler;
+            oClass.StatusEvent += AScoreEngineMessageEventHandler;
         }
 
         private static void ShowMessage(string message)
@@ -453,22 +453,44 @@ namespace AScore_Console
                 mLogFile.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + message);
         }
 
+        private static void ShowError(string message, Exception ex = null)
+        {
+            Console.WriteLine();
+            var msg = "Error: " + message;
+
+            ConsoleMsgUtils.ShowError(msg, ex);
+            mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + msg);
+
+            if (ex != null)
+            {
+                mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + Utilities.GetExceptionStackTrace(ex));
+            }
+
+        }
+
+        private static void ShowWarning(string message)
+        {
+            Console.WriteLine();
+            var msg = "Warning: " + message;
+
+            ConsoleMsgUtils.ShowWarning(msg);
+            mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + msg);
+        }
+
         #region "Event handlers for AutoUIMFCalibration"
-        private static void AScoreEngineErrorEventHandler(object sender, AScore_DLL.MessageEventArgs e)
+        private static void AScoreEngineErrorEventHandler(string message, Exception ex)
         {
-            Console.WriteLine();
-            ShowMessage("Error: " + e.Message);
+            ShowError(message, ex);
         }
 
-        private static void AScoreEngineMessageEventHandler(object sender, AScore_DLL.MessageEventArgs e)
+        private static void AScoreEngineMessageEventHandler(string message)
         {
-            ShowMessage(e.Message);
+            ShowMessage(message);
         }
 
-        private static void AScoreEngineWarningEventHandler(object sender, AScore_DLL.MessageEventArgs e)
+        private static void AScoreEngineWarningEventHandler(string message)
         {
-            Console.WriteLine();
-            ShowMessage("Warning: " + e.Message);
+            ShowWarning(message);
         }
         #endregion
     }

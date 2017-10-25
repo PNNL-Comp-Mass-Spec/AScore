@@ -4,14 +4,14 @@ using System.IO;
 using System.Linq;
 using AScore_DLL.Managers.DatasetManagers;
 using PHRPReader;
-using PNNLOmics.Utilities;
+using PRISM;
 
 namespace AScore_DLL
 {
     /// <summary>
     /// Merges AScore results with an existing PHRP-compatible tab-delimited text file
     /// </summary>
-    public class PHRPResultsMerger : MessageEventBase
+    public class PHRPResultsMerger : clsEventNotifier
     {
         protected string m_MergedFilePath = string.Empty;
         protected clsPHRPReader mPHRPReader;
@@ -57,14 +57,14 @@ namespace AScore_DLL
                 var fiInputFile = new FileInfo(phrpDataFilePath);
                 if (!fiInputFile.Exists)
                 {
-                    ReportError("PHRP Data File not found: " + fiInputFile.FullName);
+                    OnErrorEvent("PHRP Data File not found: " + fiInputFile.FullName);
                     return false;
                 }
 
                 var fiAScoreResultsFile = new FileInfo(ascoreResultsFilePath);
                 if (!fiAScoreResultsFile.Exists)
                 {
-                    ReportError("AScore results file not found: " + fiAScoreResultsFile.FullName);
+                    OnErrorEvent("AScore results file not found: " + fiAScoreResultsFile.FullName);
                     return false;
                 }
 
@@ -85,13 +85,13 @@ namespace AScore_DLL
 
                 if (FilePathsMatch(fiInputFile, fiOutputFilePath))
                 {
-                    ReportError("Input PHRP file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
+                    OnErrorEvent("Input PHRP file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
                     return false;
                 }
 
                 if (FilePathsMatch(fiAScoreResultsFile, fiOutputFilePath))
                 {
-                    ReportError("AScore results file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
+                    OnErrorEvent("AScore results file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
                     return false;
                 }
 
@@ -108,7 +108,7 @@ namespace AScore_DLL
             }
             catch (Exception ex)
             {
-                ReportError("Error in MergeResults: " + ex.Message);
+                OnErrorEvent("Error in MergeResults: " + ex.Message);
                 return false;
             }
 
@@ -127,7 +127,7 @@ namespace AScore_DLL
 
                 if (!File.Exists(ascoreResultsFilePath))
                 {
-                    ReportError("File not found: " + ascoreResultsFilePath);
+                    OnErrorEvent("File not found: " + ascoreResultsFilePath);
                     return false;
                 }
 
@@ -197,7 +197,7 @@ namespace AScore_DLL
             }
             catch (Exception ex)
             {
-                ReportError("Error in CacheAScoreResults: " + ex.Message);
+                OnErrorEvent("Error in CacheAScoreResults: " + ex.Message);
                 return false;
             }
 
@@ -239,7 +239,7 @@ namespace AScore_DLL
 
                 if (ePeptideHitResultType == clsPHRPReader.ePeptideHitResultType.Unknown)
                 {
-                    ReportError("Error: Could not determine the format of the PHRP data file: " + fiInputFile.FullName);
+                    OnErrorEvent("Error: Could not determine the format of the PHRP data file: " + fiInputFile.FullName);
                     return false;
                 }
 
@@ -252,19 +252,17 @@ namespace AScore_DLL
 
                 if (!mPHRPReader.CanRead)
                 {
-                    ReportError("Aborting since PHRPReader is not ready: " + mPHRPReader.ErrorMessage);
+                    OnErrorEvent("Aborting since PHRPReader is not ready: " + mPHRPReader.ErrorMessage);
                     return false;
                 }
 
                 // Attach the events
-                mPHRPReader.ErrorEvent += mPHRPReader_ErrorEvent;
-                mPHRPReader.WarningEvent += mPHRPReader_WarningEvent;
-                mPHRPReader.MessageEvent += mPHRPReader_MessageEvent;
+                RegisterEvents(mPHRPReader);
 
             }
             catch (Exception ex)
             {
-                ReportError("Error in InitializeReader: " + ex.Message);
+                OnErrorEvent("Error in InitializeReader: " + ex.Message);
                 return false;
             }
 
@@ -353,13 +351,13 @@ namespace AScore_DLL
 
 
                     if (skipCount > 0)
-                        ReportMessage("  Skipped " + skipCount + " PHRP results without an AScore result");
+                        OnStatusEvent("  Skipped " + skipCount + " PHRP results without an AScore result");
 
                 }
             }
             catch (Exception ex)
             {
-                ReportError("Error in CacheAScoreResults: " + ex.Message);
+                OnErrorEvent("Error in CacheAScoreResults: " + ex.Message);
                 return false;
             }
 
@@ -410,22 +408,5 @@ namespace AScore_DLL
 
         #endregion
 
-        #region "PHRP Reader Event Handlers"
-        void mPHRPReader_MessageEvent(string strMessage)
-        {
-            ReportMessage(strMessage);
-        }
-
-        void mPHRPReader_WarningEvent(string strWarningMessage)
-        {
-            ReportWarning(strWarningMessage);
-        }
-
-        void mPHRPReader_ErrorEvent(string strErrorMessage)
-        {
-            ReportError(strErrorMessage);
-        }
-
-        #endregion
     }
 }

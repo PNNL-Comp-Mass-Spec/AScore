@@ -1,6 +1,5 @@
 ﻿//Joshua Aldrich
-
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,11 +7,13 @@ using System.Linq;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
 using AScore_DLL.Managers.SpectraManagers;
+using AScore_DLL.Mod;
+using PRISM;
 
 
 namespace AScore_DLL
 {
-    public class Algorithm : MessageEventBase
+    public class Algorithm : clsEventNotifier
     {
         public const string MODINFO_NO_MODIFIED_RESIDUES = "-";
         private const double MASS_C13 = 1.00335483;
@@ -89,8 +90,8 @@ namespace AScore_DLL
                             int colIndex = dataColumns.IndexOf(columnName);
                             if (colIndex < 0)
                             {
-                                string errorMessage = "JobToDatasetMapFile is missing column " + columnName;
-                                ReportError(errorMessage);
+                                var errorMessage = "JobToDatasetMapFile is missing column " + columnName;
+                                OnErrorEvent(errorMessage);
                                 throw new Exception(errorMessage);
                             }
                             lstColumnMapping.Add(columnName, colIndex);
@@ -100,7 +101,7 @@ namespace AScore_DLL
 
                     if (dataColumns.Count < lstColumnMapping.Count)
                     {
-                        ReportWarning("Row " + rowNumber + " has fewer than " + lstColumnMapping.Count + " columns; skipping this row");
+                        OnWarningEvent("Row " + rowNumber + " has fewer than " + lstColumnMapping.Count + " columns; skipping this row");
                         continue;
                     }
 
@@ -173,22 +174,23 @@ namespace AScore_DLL
             if (jobToDatasetNameMap == null || jobToDatasetNameMap.Count == 0)
             {
                 const string errorMessage = "Error in AlgorithmRun: jobToDatasetNameMap cannot be null or empty";
-                ReportError(errorMessage);
+                OnErrorEvent(errorMessage);
                 throw new ArgumentException(errorMessage);
             }
 
             string spectraManagerCurrentJob = null; // Force open after first read from fht
 
             var modSummaryManager = new ModSummaryFileManager();
-            modSummaryManager.MessageEvent += modSummaryManager_MessageEvent;
+            RegisterEvents(modSummaryManager);
 
             var peptideMassCalculator = new PHRPReader.clsPeptideMassCalculator();
 
             ISpectraManager spectraFile = new DtaManager(peptideMassCalculator);
 
             if (this.FilterOnMSGFScore)
+            if (FilterOnMSGFScore)
             {
-                ReportMessage("Filtering using MSGF_SpecProb <= " + ascoreParameters.MSGFPreFilter.ToString("0.0E+00"));
+                OnStatusEvent("Filtering using MSGF_SpecProb <= " + ascoreParameters.MSGFPreFilter.ToString("0.0E+00"));
             }
             Console.WriteLine();
 
@@ -242,7 +244,7 @@ namespace AScore_DLL
                     {
                         string errorMessage = "Input file refers to job " + datasetManager.JobNum +
                                               " but jobToDatasetNameMap does not contain that job; unable to continue";
-                        ReportError(errorMessage);
+                        OnErrorEvent(errorMessage);
                         throw new Exception(errorMessage);
                     }
 
@@ -298,7 +300,7 @@ namespace AScore_DLL
 
                 if (expSpec == null)
                 {
-                    ReportWarning("Scan " + scanNumber + " not found in spectra file for peptide " + peptideSeq);
+                    OnWarningEvent("Scan " + scanNumber + " not found in spectra file for peptide " + peptideSeq);
                     datasetManager.IncrementRow();
                     continue;
                 }
@@ -349,18 +351,18 @@ namespace AScore_DLL
 
             Console.WriteLine();
 
-            ReportMessage("Writing " + datasetManager.ResultsCount + " rows to " + Path.GetFileName(outputFilePath));
+            OnStatusEvent("Writing " + datasetManager.ResultsCount + " rows to " + Path.GetFileName(outputFilePath));
             datasetManager.WriteToFile(outputFilePath);
 
             Console.WriteLine();
 
             if (statsByType.Sum() == 0)
             {
-                ReportWarning("Input file appeared empty");
+                OnWarningEvent("Input file appeared empty");
             }
             else
             {
-                ReportMessage("Stats by fragmentation ion type:");
+                OnStatusEvent("Stats by fragmentation ion type:");
                 ReportStatsForFragType("  CID", statsByType, FragmentType.CID);
                 ReportStatsForFragType("  ETD", statsByType, FragmentType.ETD);
                 ReportStatsForFragType("  HCD", statsByType, FragmentType.HCD);
@@ -410,7 +412,7 @@ namespace AScore_DLL
 
                 if (Math.Abs(peptideMassTheoretical - expSpec.PrecursorNeutralMass) > 20)
                 {
-                    ReportWarning("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is more than 20 Da away from the computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da");
+                    OnWarningEvent("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is more than 20 Da away from the computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da");
                 }
                 else
                 {
@@ -434,7 +436,7 @@ namespace AScore_DLL
                     }
 
                     if (!bValidMatch)
-                        ReportError("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
+                        OnErrorEvent("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
 
                 }
 
@@ -604,7 +606,7 @@ namespace AScore_DLL
             }
             catch (Exception ex)
             {
-                ReportError("Exception in ComputeAScore: " + ex.Message);
+                OnErrorEvent("Exception in ComputeAScore: " + ex.Message);
                 throw;
             }
         }
@@ -883,7 +885,7 @@ namespace AScore_DLL
 
         private void ReportStatsForFragType(string fragTypeText, int[] statsByType, FragmentType fragmentType)
         {
-            ReportMessage(fragTypeText + " peptides: " + statsByType[(int)fragmentType]);
+            OnStatusEvent(fragTypeText + " peptides: " + statsByType[(int)fragmentType]);
         }
 
         private string GetDatasetName(string dataFilepath)
@@ -914,13 +916,5 @@ namespace AScore_DLL
 
         #endregion
 
-        #region "Event Handlers"
-
-        void modSummaryManager_MessageEvent(object sender, MessageEventArgs e)
-        {
-            ReportMessage(e.Message);
-        }
-
-        #endregion
     }
 }

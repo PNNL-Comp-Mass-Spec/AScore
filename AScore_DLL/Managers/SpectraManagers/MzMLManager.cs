@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
+using PRISM;
 using PSI_Interface.MSData;
 
 namespace AScore_DLL.Managers.SpectraManagers
 {
-    class MzMLManager : AScore_DLL.MessageEventBase, ISpectraManager
+    class MzMLManager : clsEventNotifier, ISpectraManager
     {
         public const double Proton = 1.00727649;
 

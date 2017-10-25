@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using PRISM;
 
 namespace AScore_DLL.Managers.SpectraManagers
 {
-    public class SpectraManagerCache : AScore_DLL.MessageEventBase
+    public class SpectraManagerCache : clsEventNotifier
     {
         private readonly MzMLManager _mzMLManager;
         private readonly DtaManager _dtaManager;
@@ -18,8 +19,8 @@ namespace AScore_DLL.Managers.SpectraManagers
         {
             _mzMLManager = new MzMLManager(peptideMassCalculator);
             _dtaManager = new DtaManager(peptideMassCalculator);
-            AttachEvents(_dtaManager);
-            AttachEvents(_mzMLManager);
+            RegisterEvents(_dtaManager);
+            RegisterEvents(_mzMLManager);
         }
 
         public bool Initialized
@@ -65,7 +66,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
             // _dta.txt or .mzML file not found (checked both the folder with the dataset file and the parent folder)
 
-            ReportError(string.Format("Could not find the spectra file for dataset \"{0}\" in {1} or one folder up", datasetName, fiDatasetFile.Directory.FullName));
+            OnErrorEvent(string.Format("Could not find the spectra file for dataset \"{0}\" in {1} or one folder up", datasetName, fiDatasetFile.Directory.FullName));
 
             return null;
         }
@@ -81,8 +82,8 @@ namespace AScore_DLL.Managers.SpectraManagers
             var filePath = GetFilePath(datasetFilePath, datasetName);
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                string errorMessage = "Could not find spectra file for dataset \"" + datasetName + "\" in path \"" + Path.GetDirectoryName(datasetFilePath) + "\"";
-                ReportError(errorMessage);
+                var errorMessage = "Could not find spectra file for dataset \"" + datasetName + "\" in path \"" + Path.GetDirectoryName(datasetFilePath) + "\"";
+                OnErrorEvent(errorMessage);
                 throw new Exception(errorMessage);
             }
             OpenFile(filePath);

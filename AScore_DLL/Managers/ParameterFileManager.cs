@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Xml;
 using AScore_DLL.Mod;
 using System.Text.RegularExpressions;
+using PRISM;
 
 namespace AScore_DLL.Managers
 {
     /// <summary>
     /// A class for managing xml input to ascore parameters
     /// </summary>
-    public class ParameterFileManager : MessageEventBase
+    public class ParameterFileManager : clsEventNotifier
     {
 
         #region Member Variables
@@ -70,14 +71,14 @@ namespace AScore_DLL.Managers
 
             if (MultiDissociationParamFile)
             {
-                ReportMessage("CID Mass Tolerance: " + FragmentMassToleranceCID + " Da");
-                ReportMessage("ETD Mass Tolerance: " + FragmentMassToleranceETD + " Da");
-                ReportMessage("HCD Mass Tolerance: " + FragmentMassToleranceHCD + " Da");
+                OnStatusEvent("CID Mass Tolerance: " + FragmentMassToleranceCID + " Da");
+                OnStatusEvent("ETD Mass Tolerance: " + FragmentMassToleranceETD + " Da");
+                OnStatusEvent("HCD Mass Tolerance: " + FragmentMassToleranceHCD + " Da");
             }
             else
             {
-                ReportMessage("Fragment Type:  " + FragmentType);
-                ReportMessage("Mass Tolerance: " + FragmentMassTolerance + " Da");
+                OnStatusEvent("Fragment Type:  " + FragmentType);
+                OnStatusEvent("Mass Tolerance: " + FragmentMassTolerance + " Da");
             }
         }
 
@@ -277,19 +278,19 @@ namespace AScore_DLL.Managers
 
                         if (Math.Abs(massMonoIsotopic) < 1e-6)
                         {
-                            ReportError("Invalid modification definition in section " + sectionName + ", MassMonoIsotopic is zero for mod #" + modNumberInSection);
+                            OnErrorEvent("Invalid modification definition in section " + sectionName + ", MassMonoIsotopic is zero for mod #" + modNumberInSection);
                             continue;
                         }
 
                         if (requireModSymbol && modSymbol == ' ')
                         {
-                            ReportError("Invalid modification definition in section " + sectionName + ", ModSymbol is empty is for mod #" + modNumberInSection);
+                            OnErrorEvent("Invalid modification definition in section " + sectionName + ", ModSymbol is empty is for mod #" + modNumberInSection);
                             continue;
                         }
 
                         if (requireModSites && possibleModSites.Count == 0)
                         {
-                            ReportError("Invalid modification definition in section " + sectionName + ", PossibleModSites is missing and/or does not have any <Pos> sub-elements for mod #" + modNumberInSection);
+                            OnErrorEvent("Invalid modification definition in section " + sectionName + ", PossibleModSites is missing and/or does not have any <Pos> sub-elements for mod #" + modNumberInSection);
                             continue;
                         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using PRISM;
 
 //TODO: leverage mzxmlfilereader and random access indexing to insert experimental spectra as needed.  may want to use an abstract class that DTAmanager can inherit from.  Make all the same calls.
 //Need to add some intelligence fro grabbing msxml instead of dta when requesting the msgfdb results.
@@ -11,7 +12,7 @@ namespace AScore_DLL.Managers.SpectraManagers
     /// <summary>
     /// Provides an interface to extract individual dta files from the master dta file
     /// </summary>
-    public class DtaManager : AScore_DLL.MessageEventBase, ISpectraManager
+    public class DtaManager : clsEventNotifier, ISpectraManager
     {
         public static string GetFilePath(string datasetFilePath, string datasetName)
         {
@@ -252,7 +253,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
             if (string.IsNullOrWhiteSpace(line))
             {
-                ReportWarning("Data not found for DTA " + spectraName);
+                OnWarningEvent("Data not found for DTA " + spectraName);
                 return null;
             }
 
@@ -266,7 +267,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             var precursorInfo = line.Split(splitChars, 3);
             if (precursorInfo.Length < 1)
             {
-                ReportWarning("Precursor line is empty for DTA " + spectraName);
+                OnWarningEvent("Precursor line is empty for DTA " + spectraName);
                 return null;
             }
 
@@ -298,7 +299,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
             if (precursorChargeState != dtaChargeState)
             {
-                ReportWarning("Charge state mismatch: dtaChargeState=" + dtaChargeState + " vs. precursorChargeState=" + precursorChargeState);
+                OnWarningEvent("Charge state mismatch: dtaChargeState=" + dtaChargeState + " vs. precursorChargeState=" + precursorChargeState);
                 dtaChargeState = precursorChargeState;
             }
 
