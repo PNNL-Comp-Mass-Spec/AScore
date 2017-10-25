@@ -412,7 +412,7 @@ namespace AScore_UnitTests
             ascoreEngine.AlgorithmRun(spectraCache, dfht, pfile, resultsFile);
 
             sw.Stop();
-            Console.WriteLine("Time used (float): {0} ms", sw.Elapsed.TotalMilliseconds);
+            Console.WriteLine("Time elapsed: {0:F1} seconds", sw.Elapsed.TotalSeconds);
             Console.WriteLine("Results in " + resultsFile);
 
         }
@@ -440,7 +440,7 @@ namespace AScore_UnitTests
             ascoreEngine.AlgorithmRun(spectraCache, dfht, pfile, resultsFile);
 
             sw.Stop();
-            Console.WriteLine("Time used (float): {0} ms", sw.Elapsed.TotalMilliseconds);
+            Console.WriteLine("Time elapsed: {0:F1} seconds", sw.Elapsed.TotalSeconds);
             Console.WriteLine("Results in " + resultsFile);
 
         }
