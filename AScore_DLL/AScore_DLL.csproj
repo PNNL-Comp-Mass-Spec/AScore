@@ -98,7 +98,6 @@
     <Compile Include="Managers\ParameterFileManager.cs" />
     <Compile Include="Managers\PeptideScoresManager.cs" />
     <Compile Include="PHRPResultsMerger.cs" />
-    <Compile Include="Test.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Mod\Modification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

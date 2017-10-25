@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AScore_DLL", "..\AScore_DLL\AScore_DLL.csproj", "{B319DBEA-1C29-407F-857F-6BBEF2949EEB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AScore_Console_with_DLL", "AScore_Console_with_DLL.csproj", "{5AD45D9D-9E50-4A4F-B074-6DB797410382}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AScore_UnitTests", "..\AScore_DLL\AScore_UnitTests\AScore_UnitTests.csproj", "{21995887-7968-4CD7-A6F3-A07F56A5AF8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,15 @@ Global
 		{5AD45D9D-9E50-4A4F-B074-6DB797410382}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AD45D9D-9E50-4A4F-B074-6DB797410382}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AD45D9D-9E50-4A4F-B074-6DB797410382}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21995887-7968-4CD7-A6F3-A07F56A5AF8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21995887-7968-4CD7-A6F3-A07F56A5AF8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21995887-7968-4CD7-A6F3-A07F56A5AF8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21995887-7968-4CD7-A6F3-A07F56A5AF8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4277B5D3-9B69-4E92-BC76-DA323558E96E}
 	EndGlobalSection
 EndGlobal
