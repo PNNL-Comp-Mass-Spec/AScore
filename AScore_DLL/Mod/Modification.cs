@@ -34,19 +34,19 @@ namespace AScore_DLL.Mod
 		/// </summary>
 		public Modification(Modification itemToCopy)
 		{
-			this.CopyFrom(itemToCopy);
+			CopyFrom(itemToCopy);
 		}
 
 		protected void CopyFrom(Modification itemToCopy)
 		{
-			this.MassMonoisotopic = itemToCopy.MassMonoisotopic;
-			this.MassAverage = itemToCopy.MassAverage;
-			this.ModSymbol = itemToCopy.ModSymbol;
-			this.PossibleModSites = itemToCopy.PossibleModSites;
-			this.UniqueID = itemToCopy.UniqueID;
-			this.ModMassType = itemToCopy.ModMassType;
-			this.nTerminus = itemToCopy.nTerminus;
-			this.cTerminus = itemToCopy.cTerminus;
+			MassMonoisotopic = itemToCopy.MassMonoisotopic;
+			MassAverage = itemToCopy.MassAverage;
+			ModSymbol = itemToCopy.ModSymbol;
+			PossibleModSites = itemToCopy.PossibleModSites;
+			UniqueID = itemToCopy.UniqueID;
+			ModMassType = itemToCopy.ModMassType;
+			nTerminus = itemToCopy.nTerminus;
+			cTerminus = itemToCopy.cTerminus;
 		}
 
 		public double Mass
@@ -73,7 +73,7 @@ namespace AScore_DLL.Mod
 			{
 				return true;
 			}
-			foreach (char p in PossibleModSites)
+			foreach (var p in PossibleModSites)
 			{
 				if ( p == ' ' || c == p)
 				{
@@ -83,6 +83,6 @@ namespace AScore_DLL.Mod
 			return false;
 		}
 
-		
+
 	}
 }

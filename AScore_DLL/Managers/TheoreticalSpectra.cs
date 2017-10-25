@@ -13,27 +13,19 @@ namespace AScore_DLL.Managers
     {
 
         private int chargeState;
-        private double minRange = 0.0;
-        private double maxRange = 2000.0;
         private int count;
-        private double peptideMassWithStaticMods = 0;
+        private double peptideMassWithStaticMods;
 
-        List<double> bIonsMass= new List<double>();
-        List<double> yIonsMass = new List<double>();
-        string peptideSequence;                         // Peptide sequence, without any mods
+        readonly List<double> bIonsMass= new List<double>();
+        readonly List<double> yIonsMass = new List<double>();
+        readonly string peptideSequence;                         // Peptide sequence, without any mods
 
-        public int Count
-        {
-            get { return count; }
-        }
+        public int Count => count;
 
         /// <summary>
         /// Computed, theoretical mass of the peptide, including static mods but not including dynamic mods
         /// </summary>
-        public double PeptideNeutralMassWithStaticMods
-        {
-            get { return peptideMassWithStaticMods; }
-        }
+        public double PeptideNeutralMassWithStaticMods => peptideMassWithStaticMods;
 
         /// <summary>
         /// Creates the theoretical mass spectrum for the given peptide
@@ -58,17 +50,17 @@ namespace AScore_DLL.Managers
         /// <param name="staticMods"></param>
         /// <param name="terminiMods"></param>
         /// <returns>The peptide mass, including static modifications</returns>
-        private double GenerateIonMasses(List<Modification> staticMods,
+        private double GenerateIonMasses(IReadOnlyCollection<Modification> staticMods,
             List<Modification> terminiMods)
         {
 
             // Need to iterate through each amino acid in the peptide to
             // generate the ion masses
-            for (int i = 0; i < peptideSequence.Length; ++i)
+            for (var i = 0; i < peptideSequence.Length; ++i)
             {
                 // Current amino acid
-                char bAcid = peptideSequence[i];
-                char yAcid = peptideSequence[peptideSequence.Length - i - 1];
+                var bAcid = peptideSequence[i];
+                var yAcid = peptideSequence[peptideSequence.Length - i - 1];
 
 
                 // Get the monoisotopic mass for the current amino acid
@@ -76,7 +68,7 @@ namespace AScore_DLL.Managers
                 bIonsMass.Add(AminoAcidMass.GetMassByLetter(bAcid));
                 yIonsMass.Add(AminoAcidMass.GetMassByLetter(yAcid));
 
-                foreach (Modification m in staticMods)
+                foreach (var m in staticMods)
                 {
                     if (m.Match(bAcid))
                     {
@@ -107,7 +99,7 @@ namespace AScore_DLL.Managers
 
             }
 
-            double peptideMass = bIonsMass[bIonsMass.Count - 1] - MolecularWeights.Hydrogen + MolecularWeights.Water;
+            var peptideMass = bIonsMass[bIonsMass.Count - 1] - MolecularWeights.Hydrogen + MolecularWeights.Water;
 
             bIonsMass.RemoveAt(bIonsMass.Count - 1);
             //yIonsMonoisotopicMass[yIonsMonoisotopicMass.Count - 1] = EdgeCase(
@@ -132,7 +124,7 @@ namespace AScore_DLL.Managers
         {
 
 
-            foreach (Modification t in terminiMods)
+            foreach (var t in terminiMods)
             {
                 if (t.nTerminus && leftSide && t.Match(aAcid))
                 {
@@ -149,7 +141,7 @@ namespace AScore_DLL.Managers
             {
                 mass += MolecularWeights.Hydrogen;
             }
-            else if (!leftSide)
+            else
             {
                 mass += MolecularWeights.Hydrogen + MolecularWeights.Water;
             }
@@ -162,17 +154,18 @@ namespace AScore_DLL.Managers
         /// </summary>
         /// <param name="charge">charge, do i need this?</param>
         /// <param name="ascoreParameters">ascore parameters</param>
+        /// <param name="massType"></param>
         private void Calculate(int charge, ParameterFileManager ascoreParameters, MassType massType)
         {
             chargeState = charge;
 
             AminoAcidMass.MassType = massType;
             MolecularWeights.MassType = massType;
-            foreach (Modification sm in ascoreParameters.StaticMods)
+            foreach (var sm in ascoreParameters.StaticMods)
             {
                 sm.ModMassType = massType;
             }
-            foreach (Modification tm in ascoreParameters.TerminiMods)
+            foreach (var tm in ascoreParameters.TerminiMods)
             {
                 tm.ModMassType = massType;
             }
@@ -184,7 +177,7 @@ namespace AScore_DLL.Managers
             // into C and Z ions
             if (ascoreParameters.FragmentType == FragmentType.ETD)
             {
-                for (int i = 0; i < yIonsMass.Count; ++i)
+                for (var i = 0; i < yIonsMass.Count; ++i)
                 {
                     if (i < bIonsMass.Count)
                     {
@@ -201,11 +194,12 @@ namespace AScore_DLL.Managers
         /// </summary>
         /// <param name="positions">int array has modifications at indice in which they occur in the sequence</param>
         /// <param name="myMods">dynamic modification list</param>
+        /// <param name="massType"></param>
         /// <returns>Dictionary of theoretical ions organized by charge</returns>
         public Dictionary<int,ChargeStateIons> GetTempSpectra(int[] positions, List<DynamicModification> myMods,MassType massType)
         {
-            Dictionary<int, ChargeStateIons> tempFragIons = new Dictionary<int, ChargeStateIons>();
-            for (int i = 1; i < chargeState; ++i)
+            var tempFragIons = new Dictionary<int, ChargeStateIons>();
+            for (var i = 1; i < chargeState; ++i)
             {
                 tempFragIons[i] = ChargeStateIons.GenerateFragmentIon(i, massType,
                     myMods, positions,
@@ -220,11 +214,11 @@ namespace AScore_DLL.Managers
         /// <returns>enumeration of b and y ion monoisotopic masses</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for (int i = 0; i < bIonsMass.Count; i++)
-                yield return bIonsMass[i];
+            foreach (var bIon in bIonsMass)
+                yield return bIon;
 
-            for (int i = 0; i < yIonsMass.Count; i++)
-                yield return yIonsMass[i];
+            foreach (var yIon in yIonsMass)
+                yield return yIon;
         }
 
         /// <summary>
@@ -235,12 +229,10 @@ namespace AScore_DLL.Managers
         public void SetSpectraRange(double min, double max)
         {
             // Set the range variables
-            minRange = min;
-            maxRange = max;
 
             // Update the count to reflect the new range
             count = 0;
-            foreach (double temp in this)
+            foreach (double unused in this)
             {
                 ++count;
             }

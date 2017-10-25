@@ -35,14 +35,14 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         string ISpectraManager.GetFilePath(string datasetFilePath, string datasetName)
         {
-            return MzMLManager.GetFilePath(datasetFilePath, datasetName);
+            return GetFilePath(datasetFilePath, datasetName);
         }
 
         #region Class Members
 
         #region Variables
 
-        private SimpleMzMLReader m_MzMLReader = null;
+        private SimpleMzMLReader m_MzMLReader;
         //private List<MS2_Spectrum> m_ms2_spectra = null;
         private readonly Dictionary<string, SimpleMzMLReader> m_readers = new Dictionary<string, SimpleMzMLReader>();
         protected string m_datasetName;
@@ -100,15 +100,9 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         #region Public Methods
 
-        public string DatasetName
-        {
-            get { return m_datasetName; }
-        }
+        public string DatasetName => m_datasetName;
 
-        public bool Initialized
-        {
-            get { return m_initialized; }
-        }
+        public bool Initialized => m_initialized;
 
         public void OpenFile(string filePath)
         {
@@ -128,10 +122,11 @@ namespace AScore_DLL.Managers.SpectraManagers
             try
             {
                 m_datasetName = Path.GetFileNameWithoutExtension(mzMLPath);
-                if (m_datasetName.ToLowerInvariant().EndsWith(".mzml"))
+                if (m_datasetName != null && m_datasetName.ToLowerInvariant().EndsWith(".mzml"))
                 {
                     m_datasetName = Path.GetFileNameWithoutExtension(m_datasetName);
                 }
+
                 if (string.IsNullOrEmpty(m_datasetName))
                     throw new FileNotFoundException("MzML filename is empty");
 
@@ -147,7 +142,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             }
             catch (FileNotFoundException)
             {
-                string fileName = mzMLPath.Substring(
+                var fileName = mzMLPath.Substring(
                     mzMLPath.LastIndexOf('\\') + 1);
                 throw new FileNotFoundException("The specified mzML file \"" +
                                                 fileName + "\" could not be found!");
@@ -172,8 +167,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (!m_initialized)
                 throw new Exception("Class has not yet been initialized; call OpenFile() before calling this function");
 
-            var spectrum = m_MzMLReader.ReadMassSpectrum(scanNumber) as SimpleMzMLReader.SimpleProductSpectrum;
-            if (spectrum == null)
+            if (!(m_MzMLReader.ReadMassSpectrum(scanNumber) is SimpleMzMLReader.SimpleProductSpectrum spectrum))
             {
                 return null;
             }
@@ -183,8 +177,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             // MyDataset.0538.0538.3.dta
             // Note that scans could have one or more leading zeroes, so we may need to check for that
 
-            double precursorMass = 0.0;
-            int precursorChargeState = 0;
             var entries = new List<ExperimentalSpectraEntry>();
 
             // Determine the precursor mass
@@ -193,8 +185,8 @@ namespace AScore_DLL.Managers.SpectraManagers
             // precursorMass precursorCharge ScanNumber dtaChargeState
             // 1196.03544724 3   scan=99 cs=3
 
-            precursorMass = CalculateMPlusHMass(spectrum.MonoisotopicMz, spectrum.Charge);
-            precursorChargeState = (spectrum.Charge != 0 ? spectrum.Charge : 1);
+            var precursorMass = CalculateMPlusHMass(spectrum.MonoisotopicMz, spectrum.Charge);
+            var precursorChargeState = (spectrum.Charge != 0 ? spectrum.Charge : 1);
             //scanNumber = spectrum.ScanNum;
 
             // Process the spectra binary data
@@ -208,10 +200,10 @@ namespace AScore_DLL.Managers.SpectraManagers
             {
                 //int tempCharge = precursorChargeState;
                 // Convert precursor mass from M+H to m/z
-                double precursorMZ = m_PeptideMassCalculator.ConvoluteMass(precursorMass, 1, precursorChargeState);
+                var precursorMZ = m_PeptideMassCalculator.ConvoluteMass(precursorMass, 1, precursorChargeState);
 
                 // Convert precursor m/z to the correct M+H value
-                precursorMass = m_PeptideMassCalculator.ConvoluteMass(precursorMZ, psmChargeState, 1);
+                precursorMass = m_PeptideMassCalculator.ConvoluteMass(precursorMZ, psmChargeState);
                 precursorChargeState = psmChargeState;
                 //ReportWarning("Charge state for spectra \"" + scanNumber + "\" changed from \"" + tempCharge +
                 //              "\" to \"" + precursorChargeState + "\"");

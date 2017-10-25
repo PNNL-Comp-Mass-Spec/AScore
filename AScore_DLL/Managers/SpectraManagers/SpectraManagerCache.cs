@@ -9,7 +9,7 @@ namespace AScore_DLL.Managers.SpectraManagers
     {
         private readonly MzMLManager _mzMLManager;
         private readonly DtaManager _dtaManager;
-        private ISpectraManager _lastOpened = null;
+        private ISpectraManager _lastOpened;
         private string _lastDatasetOpened;
 
         /// <summary>
@@ -23,14 +23,10 @@ namespace AScore_DLL.Managers.SpectraManagers
             RegisterEvents(_mzMLManager);
         }
 
-        public bool Initialized
-        {
-            //get { return _mzMLManager.Initialized || _dtaManager.Initialized; }
-            get { return _lastOpened != null && _lastOpened.Initialized; }
-        }
+        public bool Initialized => _lastOpened != null && _lastOpened.Initialized;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="datasetFilePath">_fht.txt or _syn.txt file</param>
         /// <param name="datasetName">_dta.txt or .mzML file</param>
@@ -72,7 +68,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="datasetFilePath">_fht.txt or _syn.txt file</param>
         /// <param name="datasetName">dataset name</param>
@@ -104,20 +100,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             _lastOpened.OpenFile(filePath);
         }
 
-        public string DatasetName
-        {
-            get { return _lastDatasetOpened; }
-        }
-
-        /// <summary>
-        /// Attaches the Error, Warning, and Message events to the local event handler (which passes them to the parent event handler)
-        /// </summary>
-        /// <param name="paramManager"></param>
-        private void AttachEvents(AScore_DLL.MessageEventBase paramManager)
-        {
-            paramManager.ErrorEvent += OnErrorMessage;
-            paramManager.WarningEvent += OnMessage;
-            paramManager.MessageEvent += OnWarningMessage;
-        }
+        public string DatasetName => _lastDatasetOpened;
     }
 }

@@ -33,7 +33,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         string ISpectraManager.GetFilePath(string datasetFilePath, string datasetName)
         {
-            return DtaManager.GetFilePath(datasetFilePath, datasetName);
+            return GetFilePath(datasetFilePath, datasetName);
         }
 
         #region Class Members
@@ -52,23 +52,11 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         #region Properties
 
-        public string DatasetName
-        {
-            get
-            {
-                return m_datasetName;
-            }
-        }
+        public string DatasetName => m_datasetName;
 
 
-        public bool Initialized
-        {
-            get
-            {
-                return m_initialized;
-            }
+        public bool Initialized => m_initialized;
 
-        }
         #endregion // Properties
 
         #endregion // Class Members
@@ -152,10 +140,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         public void Abort()
         {
-            if (m_masterDta != null)
-            {
-                m_masterDta.Close();
-            }
+            m_masterDta?.Close();
         }
 
         //Gets a spectra entry from the dta file
@@ -239,7 +224,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             var reScan = new Regex(@"scan=(\d+)");
             var reCS = new Regex(@"cs=(\d+)");
 
-            var precursorMass = 0.0;
             var precursorChargeState = 0;
             var entries = new List<ExperimentalSpectraEntry>();
 
@@ -257,7 +241,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 return null;
             }
 
-            var splitChars = new char[] { ' ' };
+            var splitChars = new[] { ' ' };
 
             // Determine the precursor mass
             // The mass listed in the DTA file is the M+H mass
@@ -271,7 +255,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 return null;
             }
 
-            double.TryParse(precursorInfo[0], out precursorMass);
+            double.TryParse(precursorInfo[0], out var precursorMass);
 
             // Parse out charge state
             if (precursorInfo.Length > 1)
@@ -312,12 +296,10 @@ namespace AScore_DLL.Managers.SpectraManagers
                 if (massAndIntensity.Length > 1)
                 {
                     // Get the first number
-                    double ionMz;
-                    double.TryParse(massAndIntensity[0], out ionMz);
+                    double.TryParse(massAndIntensity[0], out var ionMz);
 
                     // Get the second number
-                    var ionIntensity = 0.0;
-                    double.TryParse(massAndIntensity[1], out ionIntensity);
+                    double.TryParse(massAndIntensity[1], out var ionIntensity);
 
                     // Add this entry to the entries list
                     entries.Add(new ExperimentalSpectraEntry(ionMz, ionIntensity));
@@ -350,10 +332,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         private void ClearCachedData()
         {
-            if (dtaEntries != null)
-            {
-                dtaEntries.Clear();
-            }
+            dtaEntries?.Clear();
 
             if (m_masterDta != null)
             {
@@ -377,7 +356,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 while (!m_masterDta.EndOfStream)
                 {
                     // Find the next individual dta file entry
-                    while ((!line.Contains("\"")) && (!m_masterDta.EndOfStream))
+                    while (!m_masterDta.EndOfStream && (string.IsNullOrEmpty(line) || !line.Contains("\"")))
                     {
                         line = m_masterDta.ReadLine();
                         if (line != null)
@@ -387,22 +366,22 @@ namespace AScore_DLL.Managers.SpectraManagers
                     }
 
                     // If we're not at the end of the file get the next entry
-                    if (!m_masterDta.EndOfStream)
+                    if (m_masterDta.EndOfStream || string.IsNullOrEmpty(line))
+                        continue;
+
+                    // First extract the name of this dta entry
+                    var entryNameIndex = line.IndexOf('\"') + 1;
+                    var entryNameLength = line.LastIndexOf('\"') - entryNameIndex;
+                    var entryName = line.Substring(entryNameIndex, entryNameLength);
+
+                    // Add it to the dictionary
+                    dtaEntries.Add(entryName, bytesRead);
+
+                    // Read the next line from the file
+                    line = m_masterDta.ReadLine();
+                    if (line != null)
                     {
-                        // First extract the name of this dta entry
-                        var entryNameIndex = line.IndexOf('\"') + 1;
-                        var entryNameLength = line.LastIndexOf('\"') - entryNameIndex;
-                        var entryName = line.Substring(entryNameIndex, entryNameLength);
-
-                        // Add it to the dictionary
-                        dtaEntries.Add(entryName, bytesRead);
-
-                        // Read the next line from the file
-                        line = m_masterDta.ReadLine();
-                        if (line != null)
-                        {
-                            bytesRead += line.Length + Environment.NewLine.Length;
-                        }
+                        bytesRead += line.Length + Environment.NewLine.Length;
                     }
                 }
 

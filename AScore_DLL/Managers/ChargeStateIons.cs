@@ -26,8 +26,8 @@ namespace AScore_DLL.Managers
         private int chargeState = -1;
 
         // No phosphorylation ions
-        private List<double> bIonsOut = new List<double>();
-        private List<double> yIonsOut = new List<double>();
+        private readonly List<double> bIonsOut = new List<double>();
+        private readonly List<double> yIonsOut = new List<double>();
 
 
 
@@ -38,26 +38,17 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Gets the charge state this fragment ion represents
         /// </summary>
-        public int ChargeState
-        {
-            get { return chargeState; }
-        }
+        public int ChargeState => chargeState;
 
         /// <summary>
         /// Gets the bIons with no phosphorylation
         /// </summary>
-        public List<double> BIons
-        {
-            get { return bIonsOut; }
-        }
+        public List<double> BIons => bIonsOut;
 
         /// <summary>
         /// Gets the yIons with no phosphorylation
         /// </summary>
-        public List<double> YIons
-        {
-            get { return yIonsOut; }
-        }
+        public List<double> YIons => yIonsOut;
 
         #endregion // Properties
 
@@ -84,10 +75,8 @@ namespace AScore_DLL.Managers
         /// <param name="chargeState">Desired charge state for the fragment ion.
         /// Must be greater than 0.</param>
         /// <param name="massType">Mass type.</param>
-        /// <param name="minPhosphoSite">The smallest from the list of available
-        /// phophoSites for this peptide.</param>
-        /// <param name="maxPhosphoSite">The biggest from the list of available
-        /// phophoSites for this peptide.</param>
+        /// <param name="dynamMods">Dynamic mods</param>
+        /// <param name="positions">Mod positions</param>
         /// <param name="bIons">The bIons to use corresponding to the mass type.</param>
         /// <param name="yIons">The yIons to use corresponding to the mass type.</param>
         /// <param name="peptideLength">The length of the trimmed peptide without
@@ -100,25 +89,26 @@ namespace AScore_DLL.Managers
         {
             ChargeStateIons fragIon = null;
             MolecularWeights.MassType = massType;
-            double sumofModsB = 0.0;
-            double sumofModsY = 0.0;
+            var sumofModsB = 0.0;
+            var sumofModsY = 0.0;
 
 
             // If the charge state is one, create the
             if (chargeState == 1)
             {
-                fragIon = new ChargeStateIons();
+                fragIon = new ChargeStateIons {
+                    chargeState = chargeState
+                };
 
                 // Set the charge state of the frag ion
-                fragIon.chargeState = chargeState;
 
                 // There is a phosphorylation site
                 if (dynamMods.Count > 0)
                 {
                     // bIons
-                    for (int i = 0; i < bIons.Count; ++i)
+                    for (var i = 0; i < bIons.Count; ++i)
                     {
-                        foreach (Mod.DynamicModification mod in dynamMods)
+                        foreach (var mod in dynamMods)
                         {
                             if (mod.UniqueID == positions[i])
                             {
@@ -136,12 +126,13 @@ namespace AScore_DLL.Managers
             }
             else if (chargeState > 1)
             {
-                sumofModsB = (chargeState - 1) * MolecularWeights.Hydrogen; ;
+                sumofModsB = (chargeState - 1) * MolecularWeights.Hydrogen;
                 sumofModsY = sumofModsB;
-                fragIon = new ChargeStateIons();
+                fragIon = new ChargeStateIons {
+                    chargeState = chargeState
+                };
 
                 // Set the charge state of the frag ion
-                fragIon.chargeState = chargeState;
 
                 // The value to add to each ion
                 //  double temp = (chargeState - 1) * MolecularWeights.Hydrogen;
@@ -149,9 +140,9 @@ namespace AScore_DLL.Managers
                 // There is a phosphorylation site
                 if(dynamMods.Count > 0)
                 {
-                    for (int i = 0; i < bIons.Count; ++i)
+                    for (var i = 0; i < bIons.Count; ++i)
                     {
-                        foreach (Mod.DynamicModification mod in dynamMods)
+                        foreach (var mod in dynamMods)
                         {
                             if (mod.UniqueID == positions[i])
                             {

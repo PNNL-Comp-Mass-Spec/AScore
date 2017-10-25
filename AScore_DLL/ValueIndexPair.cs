@@ -23,8 +23,8 @@ namespace AScore_DLL
 
 		#region Variables
 
-		private T value;
-		private int index;
+		private readonly T value;
+		private readonly int index;
 
 		#endregion // Variables
 
@@ -33,20 +33,14 @@ namespace AScore_DLL
 		/// <summary>
 		/// Gets the value associated with this ValueIndexPair
 		/// </summary>
-		public T Value
-		{
-			get { return value; }
-		}
+		public T Value => value;
 
-		/// <summary>
+	    /// <summary>
 		/// Gets the index associated with this ValueIndexPair
 		/// </summary>
-		public int Index
-		{
-			get { return index; }
-		}
+		public int Index => index;
 
-		#endregion // Properties
+	    #endregion // Properties
 
 		#endregion // Class Members
 
@@ -75,7 +69,7 @@ namespace AScore_DLL
 		{
 			public int Compare(ValueIndexPair<T> x, ValueIndexPair<T> y)
 			{
-				int valueCompare = x.value.CompareTo(y.value);
+				var valueCompare = x.value.CompareTo(y.value);
 				if (valueCompare != 0)
 				{
 					return -1 * valueCompare;

@@ -69,7 +69,7 @@ namespace AScore_DLL
                 }
 
                 // Initialize the PHRPReader
-                bool success = InitializeReader(fiInputFile);
+                var success = InitializeReader(fiInputFile);
                 if (!success)
                     return false;
 
@@ -117,9 +117,9 @@ namespace AScore_DLL
 
         #region "Class functions"
 
-        private bool CacheAScoreResults(string ascoreResultsFilePath, Dictionary<string, AScoreResultsType> cachedAscoreResults)
+        private bool CacheAScoreResults(string ascoreResultsFilePath, IDictionary<string, AScoreResultsType> cachedAscoreResults)
         {
-            bool headersParsed = false;
+            var headersParsed = false;
             var columnHeaders = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
 
             try
@@ -147,11 +147,11 @@ namespace AScore_DLL
                 {
                     while (srInFile.Peek() > -1)
                     {
-                        string lineIn = srInFile.ReadLine();
+                        var lineIn = srInFile.ReadLine();
                         if (string.IsNullOrEmpty(lineIn))
                             continue;
 
-                        string[] splitLine = lineIn.Split('\t');
+                        var splitLine = lineIn.Split('\t');
 
                         if (!headersParsed)
                         {
@@ -160,20 +160,19 @@ namespace AScore_DLL
                             continue;
                         }
 
-                        int scanNumber = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_SCAN, columnHeaders, -1);
-                        string originalPeptide = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ORIGINALSEQUENCE, columnHeaders, string.Empty);
-                        string bestSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_BESTSEQUENCE, columnHeaders, string.Empty);
-                        double peptideScore = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_PEPTIDESCORE, columnHeaders, 0.0);
-                        double ascoreValue = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
+                        var scanNumber = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_SCAN, columnHeaders, -1);
+                        var originalPeptide = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ORIGINALSEQUENCE, columnHeaders, string.Empty);
+                        var bestSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_BESTSEQUENCE, columnHeaders, string.Empty);
+                        var peptideScore = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_PEPTIDESCORE, columnHeaders, 0.0);
+                        var ascoreValue = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
                         //int numSiteIonsPossible = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_NUMSITEIONSPOSS, columnHeaders, 0);
                         //int numSitIonsMatched = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_NUMSITEIONSMATCHED, columnHeaders, 0);
                         //string secondSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_SECONDSEQUENCE, columnHeaders, string.Empty);
-                        string modInfo = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_MODINFO, columnHeaders, string.Empty);
+                        var modInfo = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_MODINFO, columnHeaders, string.Empty);
 
-                        string scanPeptideKey = ConstructScanPeptideKey(scanNumber, originalPeptide);
-                        AScoreResultsType ascoreResult;
+                        var scanPeptideKey = ConstructScanPeptideKey(scanNumber, originalPeptide);
 
-                        if (cachedAscoreResults.TryGetValue(scanPeptideKey, out ascoreResult))
+                        if (cachedAscoreResults.TryGetValue(scanPeptideKey, out var ascoreResult))
                         {
                             if (!ascoreResult.AScoreByMod.ContainsKey(modInfo))
                             {
@@ -213,9 +212,9 @@ namespace AScore_DLL
         {
             var modInfoNames = new SortedSet<string>();
 
-            foreach (KeyValuePair<string, AScoreResultsType> ascoreResult in cachedAscoreResults)
+            foreach (var ascoreResult in cachedAscoreResults)
             {
-                foreach (KeyValuePair<string, double> modInfoEntry in ascoreResult.Value.AScoreByMod)
+                foreach (var modInfoEntry in ascoreResult.Value.AScoreByMod)
                 {
                     // Unmodified peptides will have a ModInfo key of "-"
                     // Skip these entries
@@ -235,7 +234,7 @@ namespace AScore_DLL
         {
             try
             {
-                clsPHRPReader.ePeptideHitResultType ePeptideHitResultType = clsPHRPReader.AutoDetermineResultType(fiInputFile.FullName);
+                var ePeptideHitResultType = clsPHRPReader.AutoDetermineResultType(fiInputFile.FullName);
 
                 if (ePeptideHitResultType == clsPHRPReader.ePeptideHitResultType.Unknown)
                 {
@@ -270,8 +269,8 @@ namespace AScore_DLL
 
         }
         private bool MakeUpdatedPHRPFile(
-            FileInfo fiInputFile,
-            FileInfo fiOutputFilePath,
+            FileSystemInfo fiInputFile,
+            FileSystemInfo fiOutputFilePath,
             clsPHRPReader oPHRPReader,
             Dictionary<string, AScoreResultsType> cachedAscoreResults)
         {
@@ -279,9 +278,9 @@ namespace AScore_DLL
             try
             {
                 // Read the header line from the PHRP file
-                string outputHeaderLine = ReadHeaderLine(fiInputFile.FullName);
+                var outputHeaderLine = ReadHeaderLine(fiInputFile.FullName);
 
-                SortedSet<string> modInfoNames = DetermineModInfoNames(cachedAscoreResults);
+                var modInfoNames = DetermineModInfoNames(cachedAscoreResults);
 
                 // Create the output file
                 using (var swOutFile = new StreamWriter(new FileStream(fiOutputFilePath.FullName, FileMode.Create, FileAccess.Write, FileShare.Read)))
@@ -293,22 +292,21 @@ namespace AScore_DLL
                     outLine.Append("\t" + DatasetManager.RESULTS_COL_PEPTIDESCORE);
                     outLine.Append("\t" + "Modified_Residues");
 
-                    foreach (string modInfoName in modInfoNames)
+                    foreach (var modInfoName in modInfoNames)
                     {
                         outLine.Append("\t" + modInfoName);
                     }
                     swOutFile.WriteLine(outLine);
 
-                    int skipCount = 0;
+                    var skipCount = 0;
 
                     while (oPHRPReader.MoveNext())
                     {
-                        clsPSM oPSM = oPHRPReader.CurrentPSM;
+                        var oPSM = oPHRPReader.CurrentPSM;
 
-                        string scanPeptideKey = ConstructScanPeptideKey(oPSM.ScanNumber, oPSM.Peptide);
-                        AScoreResultsType ascoreResult;
+                        var scanPeptideKey = ConstructScanPeptideKey(oPSM.ScanNumber, oPSM.Peptide);
 
-                        if (!cachedAscoreResults.TryGetValue(scanPeptideKey, out ascoreResult))
+                        if (!cachedAscoreResults.TryGetValue(scanPeptideKey, out var ascoreResult))
                         {
                             skipCount++;
                             if (skipCount < 10)
@@ -318,7 +316,7 @@ namespace AScore_DLL
                         }
 
                         // Replace the original peptide with the "best" peptide
-                        string dataLineUpdated = ReplaceFirst(oPSM.DataLineText, oPSM.Peptide, ascoreResult.BestSequence);
+                        var dataLineUpdated = ReplaceFirst(oPSM.DataLineText, oPSM.Peptide, ascoreResult.BestSequence);
 
                         outLine.Clear();
                         outLine.Append(dataLineUpdated);
@@ -326,13 +324,13 @@ namespace AScore_DLL
                         outLine.Append("\t" + MathUtilities.ValueToString(ascoreResult.PeptideScore));
 
                         // Count the number of modInfo entries that are not "-"
-                        int modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != Algorithm.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
+                        var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != Algorithm.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
                         outLine.Append("\t" + modTypeCount);
 
-                        foreach (string modInfoName in modInfoNames)
+                        foreach (var modInfoName in modInfoNames)
                         {
-                            bool modInfoMatch = false;
-                            foreach (KeyValuePair<string, double> modInfoEntry in ascoreResult.AScoreByMod)
+                            var modInfoMatch = false;
+                            foreach (var modInfoEntry in ascoreResult.AScoreByMod)
                             {
                                 if (modInfoName == modInfoEntry.Key)
                                 {
@@ -366,10 +364,10 @@ namespace AScore_DLL
 
         protected bool FilePathsMatch(FileInfo fiFile1, FileInfo fiFile2)
         {
-            string filePath1 = Path.GetFullPath(fiFile1.FullName);
-            string filePath2 = Path.GetFullPath(fiFile2.FullName);
+            var filePath1 = Path.GetFullPath(fiFile1.FullName);
+            var filePath2 = Path.GetFullPath(fiFile2.FullName);
 
-            if (filePath1.ToLower() == filePath2.ToLower())
+            if (string.Equals(filePath1, filePath2, StringComparison.CurrentCultureIgnoreCase))
                 return true;
 
             return false;
@@ -377,7 +375,7 @@ namespace AScore_DLL
 
         protected string ReadHeaderLine(string filePath)
         {
-            string headerLine = string.Empty;
+            var headerLine = string.Empty;
 
             using (var srInFile = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
@@ -398,7 +396,7 @@ namespace AScore_DLL
             if (string.IsNullOrEmpty(searchText))
                 return textToSearch;
 
-            int charIndex = textToSearch.IndexOf(searchText);
+            var charIndex = textToSearch.IndexOf(searchText, StringComparison.Ordinal);
             if (charIndex < 0)
             {
                 return textToSearch;

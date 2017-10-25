@@ -1,28 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using AScore_DLL.Managers.SpectraManagers;
 using MSDataFileReader;
 
-namespace AScore_DLL.Managers.DatasetManagers
+namespace AScore_DLL.Managers.SpectraManagers
 {
+    [Obsolete("Unused")]
     public class MzxmlManager : ISpectraManager
     {
-        private bool initialized = false;
-        private string datasetName;
-        private clsMzXMLFileAccessor mzAccessor;
+        private readonly clsMzXMLFileAccessor mzAccessor;
 
-        private PHRPReader.clsPeptideMassCalculator mPeptideMassCalculator;
+        private readonly PHRPReader.clsPeptideMassCalculator mPeptideMassCalculator;
 
-        public bool Initialized
-        {
-            get { return initialized; }
-        }
+        public bool Initialized { get; } = false;
 
-        public string DatasetName
-        {
-            get { return datasetName; }
-        }
+        public string DatasetName { get; }
 
         /// <summary>
         /// Constructor
@@ -35,19 +27,23 @@ namespace AScore_DLL.Managers.DatasetManagers
 
             try
             {
-                datasetName = Path.GetFileNameWithoutExtension(mzxmlPath);
-                datasetName = datasetName.Substring(0, datasetName.Length - 4);
+                var datasetName  = Path.GetFileNameWithoutExtension(mzxmlPath);
+
+                // Note: prior to October 2017 the dataset name was determined by removing the last 4 characters from datasetName
+                // That logic seemed flawed and has thus been removed
+                DatasetName = datasetName;
+
                 mzAccessor = new clsMzXMLFileAccessor();
                 mzAccessor.OpenFile(mzxmlPath);
             }
             catch (DirectoryNotFoundException)
             {
-                throw new DirectoryNotFoundException("The specificied directory for " +
+                throw new DirectoryNotFoundException("The specified directory for " +
                     "the mzxml could not be found!");
             }
             catch (FileNotFoundException)
             {
-                string filename = Path.GetFileName(mzxmlPath);
+                var filename = Path.GetFileName(mzxmlPath);
                 throw new FileNotFoundException("The specified mzxml file \"" +
                     filename + "\" could not be found!");
             }
@@ -67,37 +63,29 @@ namespace AScore_DLL.Managers.DatasetManagers
 
         public ExperimentalSpectra GetExperimentalSpectra(int scanNumber, int scanCount, int chargeState)
         {
-            ExperimentalSpectra expSpec = null;
-            clsSpectrumInfo specInfo = null;
-            if (mzAccessor.GetSpectrumByScanNumber(scanNumber, out specInfo))
+            if (!mzAccessor.GetSpectrumByScanNumber(scanNumber, out var specInfo))
+                return null;
+
+            var entries = new List<ExperimentalSpectraEntry>();
+
+            var precursorMass = specInfo.ParentIonMZ;
+            var precursorChargeState = chargeState;
+
+            var mzlist = specInfo.MZList;
+            var intlist = specInfo.IntensityList;
+
+
+
+            for (var i = 0; i < mzlist.Length; i++)
             {
-                double precursorMass = 0.0;
-                int precursorChargeState = 0;
-                List<ExperimentalSpectraEntry> entries =
-                    new List<ExperimentalSpectraEntry>();
+                var val1 = mzlist[i];
+                double val2 = intlist[i];
 
-
-                precursorMass = specInfo.ParentIonMZ;
-                precursorChargeState = chargeState;
-
-                double[] mzlist = specInfo.MZList;
-                float[] intlist = specInfo.IntensityList;
-
-
-
-                for (int i = 0; i < mzlist.Length; i++)
-                {
-                    double val1 = mzlist[i];
-                    double val2 = intlist[i];
-
-                    entries.Add(new ExperimentalSpectraEntry(val1, val2));
-                }
-
-                expSpec = new ExperimentalSpectra(scanNumber, chargeState,
-                    precursorMass, precursorChargeState, entries, mPeptideMassCalculator);
-
-
+                entries.Add(new ExperimentalSpectraEntry(val1, val2));
             }
+
+            var expSpec = new ExperimentalSpectra(scanNumber, chargeState,
+                                                                  precursorMass, precursorChargeState, entries, mPeptideMassCalculator);
             return expSpec;
 
 

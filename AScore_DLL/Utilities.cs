@@ -17,19 +17,19 @@ namespace AScore_DLL
 		/// <returns></returns>
 		public static DataTable TextFileToDataTableAssignTypeString(string fileName, bool addDataSetName)
 		{
-			string line = "";
-			string[] fields = null;
-			DataTable dt = new DataTable();
+		    var dt = new DataTable();
 
 
 
-			using (StreamReader sr = new StreamReader(fileName))
+			using (var sr = new StreamReader(fileName))
 			{
-				// first line has headers   
-				if ((line = sr.ReadLine()) != null)
+				// first line has headers
+			    string line;
+			    string[] fields;
+			    if ((line = sr.ReadLine()) != null)
 				{
-					fields = line.Split(new char[] { '\t', ',' });
-					foreach (string s in fields)
+					fields = line.Split('\t', ',');
+					foreach (var s in fields)
 					{
 						dt.Columns.Add(s);
 						dt.Columns[s].DefaultValue = "";
@@ -38,18 +38,18 @@ namespace AScore_DLL
 				}
 				else
 				{
-					// it's empty, that's an error   
+					// it's empty, that's an error
 					throw new ApplicationException("The data provided is not in a valid format.");
 				}
 
-				// fill the rest of the table; positional   
+				// fill the rest of the table; positional
 				while ((line = sr.ReadLine()) != null)
 				{
-					DataRow row = dt.NewRow();
+					var row = dt.NewRow();
 
-					fields = line.Split(new char[] { '\t', ',' });
-					int i = 0;
-					foreach (string s in fields)
+					fields = line.Split('\t', ',');
+					var i = 0;
+					foreach (var s in fields)
 					{
 						row[i] = s;
 						i++;
@@ -81,10 +81,10 @@ namespace AScore_DLL
 		/// <param name="filePath"></param>
 		public static void WriteDataTableToText(DataTable dt, string filePath)
 		{
-			using (StreamWriter sw = new StreamWriter(filePath))
+			using (var sw = new StreamWriter(filePath))
 			{
-				string s = dt.Columns[0].ColumnName;
-				for (int i = 1; i < dt.Columns.Count; i++)
+				var s = dt.Columns[0].ColumnName;
+				for (var i = 1; i < dt.Columns.Count; i++)
 				{
 					s += "\t" + dt.Columns[i].ColumnName;
 				}
@@ -94,7 +94,7 @@ namespace AScore_DLL
 				foreach (DataRow row in dt.Rows)
 				{
 					s = "" + row[0];
-					for (int i = 1; i < dt.Columns.Count; i++)
+					for (var i = 1; i < dt.Columns.Count; i++)
 					{
 						s += "\t" + row[i];
 					}

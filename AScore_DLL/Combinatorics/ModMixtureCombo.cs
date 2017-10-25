@@ -7,16 +7,16 @@ namespace AScore_DLL.Combinatorics
 {
     public class ModMixtureCombo
     {
-        List<List<int>> finalCombos = new List<List<int>>();
-        List<List<int>> sitePositions;
-        List<List<List<int>>> combinationSets;
-        List<int> allSites = new List<int>(); //List of all modifiable sites for all modifications
+        readonly List<List<int>> finalCombos = new List<List<int>>();
+        readonly List<List<int>> sitePositions;
+        readonly List<List<List<int>>> combinationSets;
+        readonly List<int> allSites = new List<int>(); //List of all modifiable sites for all modifications
 
         /// <summary>
         /// Generates all combination mixtures
         /// </summary>
-        /// <param name="inCombinationSets">All sets of combinations</param>
-        /// <param name="inSitePositions">Possible site positions for each combination group</param>
+        /// <param name="dynMods">Dynamic mods</param>
+        /// <param name="sequence">Peptide sequence</param>
         public ModMixtureCombo(List<Mod.DynamicModification> dynMods, string sequence)
         {
 
@@ -24,9 +24,9 @@ namespace AScore_DLL.Combinatorics
             combinationSets = GenerateCombosToCheck(sitePositions, dynMods);
 
             //Generates a list of all modifiable sites for all modifications
-            foreach (List<int> sites in sitePositions)
+            foreach (var sites in sitePositions)
             {
-                foreach (int s in sites)
+                foreach (var s in sites)
                 {
                     if (!allSites.Contains(s))
                     {
@@ -43,18 +43,12 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// Final Combination sets
         /// </summary>
-        public List<List<int>> FinalCombos
-        {
-            get { return finalCombos; }
-        }
+        public List<List<int>> FinalCombos => finalCombos;
 
         /// <summary>
         /// List of all modifiable sites for all modifications
         /// </summary>
-        public List<int> AllSite
-        {
-            get { return allSites; }
-        }
+        public List<int> AllSite => allSites;
 
         #endregion
 
@@ -69,18 +63,18 @@ namespace AScore_DLL.Combinatorics
         /// <returns>list of lists of possible modification sites</returns>
         public List<List<int>> GetSiteLocation(List<Mod.DynamicModification> dynMods, string sequence)
         {
-            List<List<int>> possiblePositions = new List<List<int>>();
+            var possiblePositions = new List<List<int>>();
 
-            foreach (Mod.DynamicModification dMod in dynMods)
+            foreach (var unused in dynMods)
             {
                 possiblePositions.Add(new List<int>());
             }
 
 
-            for (int i = 0; i < sequence.Length; i++)
+            for (var i = 0; i < sequence.Length; i++)
             {
-                int theCount = 0;
-                foreach (Mod.DynamicModification dMod in dynMods)
+                var theCount = 0;
+                foreach (var dMod in dynMods)
                 {
                     if (dMod.nTerminus && i == 0)
                     {
@@ -114,16 +108,16 @@ namespace AScore_DLL.Combinatorics
             if (i >= combinationSets.Count)
             {
 
-                List<int> aFinalCombo = new List<int>();
+                var aFinalCombo = new List<int>();
                 //Ensure no overlap between modification combination site positions
-                foreach (int s in allSites)
+                foreach (var s in allSites)
                 {
-                    int count = 0;
+                    var count = 0;
                     //int countAtSameSite = 0;
-                    List<int> siteList = new List<int>();
+                    var siteList = new List<int>();
 
                     //Add all uniqueids or zeros associated with this sequence positions
-                    foreach (List<int> site in sitePositions)
+                    foreach (var site in sitePositions)
                     {
                         if (site.Contains(s))
                         {
@@ -132,7 +126,7 @@ namespace AScore_DLL.Combinatorics
                         count++;
                     }
 
-                    int greaterThanZero = siteList.Count(k => k > 0);
+                    var greaterThanZero = siteList.Count(k => k > 0);
 
                     //if site has 1 nonzero modification or only zeros continue
                     //if more than 1 nonzero modification, overlap at site, remove
@@ -158,7 +152,7 @@ namespace AScore_DLL.Combinatorics
             else
             {
 
-                for (int k = 0; k < combinationSets[i].Count; k++)
+                for (var k = 0; k < combinationSets[i].Count; k++)
                 {
                     currentList.Add(combinationSets[i][k]);
                     CalculateCombos(i + 1, currentList);
@@ -181,17 +175,17 @@ namespace AScore_DLL.Combinatorics
             //example: say 2 mods if mod1 has three sites in the sequence and mod2 has 2 mods at 4 sites
             //we have template = {{mod1, 0, 0}, {mod2, mod2, 0, 0}}
 
-            List<List<int>> comboTemplate = new List<List<int>>();
-            int siteCount = 0;
-            foreach (Mod.DynamicModification m in myMods)
+            var comboTemplate = new List<List<int>>();
+            var siteCount = 0;
+            foreach (var m in myMods)
             {
-                List<int> templateToAdd = new List<int>();
-                for (int i = 0; i < m.Count; i++)
+                var templateToAdd = new List<int>();
+                for (var i = 0; i < m.Count; i++)
                 {
                     templateToAdd.Add(m.UniqueID);
                 }
-                int remainingZeros = sitePositions[siteCount].Count - templateToAdd.Count;
-                for (int i = 0; i < remainingZeros; i++)
+                var remainingZeros = sitePositions[siteCount].Count - templateToAdd.Count;
+                for (var i = 0; i < remainingZeros; i++)
                 {
                     templateToAdd.Add(0);
                 }
@@ -200,11 +194,11 @@ namespace AScore_DLL.Combinatorics
             }
 
             //list of mod types with lists of combinations for each type
-            List<List<List<int>>> combinationSets = new List<List<List<int>>>();
-            foreach (List<int> comb in comboTemplate)
+            var combinationSets = new List<List<List<int>>>();
+            foreach (var comb in comboTemplate)
             {
-                List<List<int>> allCombos = new List<List<int>>();
-                Combinatorics.Permutations<int> modcombos = new Combinatorics.Permutations<int>(comb);
+                var allCombos = new List<List<int>>();
+                var modcombos = new Combinatorics.Permutations<int>(comb);
                 foreach (IList<int> combination in modcombos)
                 {
                     allCombos.Add(new List<int>(combination));

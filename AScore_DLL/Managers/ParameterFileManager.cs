@@ -28,12 +28,12 @@ namespace AScore_DLL.Managers
         #endregion
 
 
-
         #region Public Properties
-        public List<Modification> StaticMods { get {return staticMods;} }
-        public List<Modification> TerminiMods { get { return terminiMods; } }
-        public List<DynamicModification> DynamicMods { get { return dynamMods; }  }
-        public FragmentType FragmentType { get { return fragmentType; }
+        public List<Modification> StaticMods => staticMods;
+        public List<Modification> TerminiMods => terminiMods;
+        public List<DynamicModification> DynamicMods => dynamMods;
+
+        public FragmentType FragmentType { get => fragmentType;
             set
             {
                 fragmentType = value;
@@ -52,13 +52,14 @@ namespace AScore_DLL.Managers
                 }
             }
         }
-        public double FragmentMassTolerance { get { return fragmentMassTolerance; } }
-        public double MSGFPreFilter { get { return msgfPreFilter; } }
+        public double FragmentMassTolerance => fragmentMassTolerance;
+        public double MSGFPreFilter => msgfPreFilter;
 
         public bool MultiDissociationParamFile { get; private set; }
-        public double FragmentMassToleranceCID { get { return fragmentMassToleranceCID; } }
-        public double FragmentMassToleranceETD { get { return fragmentMassToleranceETD; } }
-        public double FragmentMassToleranceHCD { get { return fragmentMassToleranceHCD; } }
+        public double FragmentMassToleranceCID => fragmentMassToleranceCID;
+        public double FragmentMassToleranceETD => fragmentMassToleranceETD;
+        public double FragmentMassToleranceHCD => fragmentMassToleranceHCD;
+
         #endregion
 
 
@@ -157,22 +158,22 @@ namespace AScore_DLL.Managers
             var parameterFile = new XmlDocument();
             parameterFile.Load(new XmlTextReader(inputFile));
 
-            XmlNode massToleranceNode = parameterFile.SelectSingleNode("/Run/MassTolerance");
-            XmlNode fragmentTypeNode = parameterFile.SelectSingleNode("/Run/FragmentType");
-            XmlNode msgfFilterNode = parameterFile.SelectSingleNode("/Run/MSGFPreFilter");
+            var massToleranceNode = parameterFile.SelectSingleNode("/Run/MassTolerance");
+            var fragmentTypeNode = parameterFile.SelectSingleNode("/Run/FragmentType");
+            var msgfFilterNode = parameterFile.SelectSingleNode("/Run/MSGFPreFilter");
             if (msgfFilterNode == null)
                 throw new ArgumentOutOfRangeException("The MSGFPreFilter node was not found in XML file " + inputFile);
 
-            XmlNode massTolCID = parameterFile.SelectSingleNode("/Run/CIDMassTolerance");
-            XmlNode massTolETD = parameterFile.SelectSingleNode("/Run/ETDMassTolerance");
-            XmlNode massTolHCD = parameterFile.SelectSingleNode("/Run/HCDMassTolerance");
+            var massTolCID = parameterFile.SelectSingleNode("/Run/CIDMassTolerance");
+            var massTolETD = parameterFile.SelectSingleNode("/Run/ETDMassTolerance");
+            var massTolHCD = parameterFile.SelectSingleNode("/Run/HCDMassTolerance");
 
             if ((fragmentTypeNode == null || massToleranceNode == null) && (massTolCID == null || massTolETD == null || massTolHCD == null))
                 throw new ArgumentOutOfRangeException("The FragmentType and/or MassTolerance nodes were not found in XML file " + inputFile + ", and alternate parameters were not present");
 
             var f = FragmentType.CID;
             double massTol;
-            bool multiDissociationParams = false;
+            var multiDissociationParams = false;
             if (fragmentTypeNode != null && massToleranceNode != null)
             {
                 f = GetFragmentType(fragmentTypeNode);
@@ -189,31 +190,31 @@ namespace AScore_DLL.Managers
                 massTol = fragmentMassToleranceCID;
             }
 
-            double msgfTol = double.Parse(msgfFilterNode.InnerText);
+            var msgfTol = double.Parse(msgfFilterNode.InnerText);
 
-            int uniqueID = 1;
+            var uniqueID = 1;
 
             // Parse the static mods
-            List<Modification> staticModDefs = ParseXmlModInfo(parameterFile, "StaticSeqModifications", ref uniqueID, requireModSites: true);
+            var staticModDefs = ParseXmlModInfo(parameterFile, "StaticSeqModifications", ref uniqueID, requireModSites: true);
 
             // Parse the N and C terminal mods
-            List<Modification> terminalModDefs = ParseXmlModInfo(parameterFile, "TerminiModifications", ref uniqueID, requireModSites: false);
+            var terminalModDefs = ParseXmlModInfo(parameterFile, "TerminiModifications", ref uniqueID, requireModSites: false);
 
             // Parse the dynamic mods
-            List<DynamicModification> dynamicModDefs = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
+            var dynamicModDefs = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
 
             InitializeAScoreParameters(staticModDefs, terminalModDefs, dynamicModDefs, f, massTol, msgfTol);
             MultiDissociationParamFile = multiDissociationParams;
         }
 
 
-        private List<Modification> ParseXmlModInfo(XmlDocument parameterFile, string sectionName, ref int uniqueID, bool requireModSites)
+        private List<Modification> ParseXmlModInfo(XmlNode parameterFile, string sectionName, ref int uniqueID, bool requireModSites)
         {
             var modList = new List<Modification>();
 
-            List<DynamicModification> modsToStore = ParseXmlDynamicModInfo(parameterFile, sectionName, ref uniqueID, requireModSites: requireModSites, requireModSymbol: false);
+            var modsToStore = ParseXmlDynamicModInfo(parameterFile, sectionName, ref uniqueID, requireModSites: requireModSites, requireModSymbol: false);
 
-            foreach (DynamicModification item in modsToStore)
+            foreach (var item in modsToStore)
             {
                 var modEntry = new Modification(item);
                 modList.Add(modEntry);
@@ -222,23 +223,23 @@ namespace AScore_DLL.Managers
             return modList;
         }
 
-        private List<DynamicModification> ParseXmlDynamicModInfo(XmlDocument parameterFile, string sectionName, ref int uniqueID, bool requireModSites, bool requireModSymbol)
+        private List<DynamicModification> ParseXmlDynamicModInfo(XmlNode parameterFile, string sectionName, ref int uniqueID, bool requireModSites, bool requireModSymbol)
         {
             var modList = new List<DynamicModification>();
-            int modNumberInSection = 0;
+            var modNumberInSection = 0;
 
-            XmlNodeList xmlModInfo = parameterFile.SelectNodes("/Run/Modifications/" + sectionName);
+            var xmlModInfo = parameterFile.SelectNodes("/Run/Modifications/" + sectionName);
 
             foreach (XmlNode mod in xmlModInfo)
             {
                 foreach (XmlNode mod2 in mod.ChildNodes)
                 {
-                    double massMonoIsotopic = 0.0;
-                    double massAverage = 0.0;
-                    char modSymbol = ' ';
+                    var massMonoIsotopic = 0.0;
+                    var massAverage = 0.0;
+                    var modSymbol = ' ';
                     var possibleModSites = new List<char>();
-                    bool nTerminal = false;
-                    bool cTerminal = false;
+                    var nTerminal = false;
+                    var cTerminal = false;
 
                     if (mod2.Name.StartsWith("Mod"))
                     {

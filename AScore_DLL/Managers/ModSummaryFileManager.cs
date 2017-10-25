@@ -67,7 +67,7 @@ namespace AScore_DLL.Managers
 
         private void WriteMod(string type, Modification mod)
         {
-            string residues = string.Empty;
+            var residues = string.Empty;
             foreach (var res in mod.PossibleModSites)
             {
                 residues += res;
@@ -95,8 +95,8 @@ namespace AScore_DLL.Managers
             ascoreParams.StaticMods.Clear();
             ascoreParams.TerminiMods.Clear();
 
-            DataTable mods = Utilities.TextFileToDataTableAssignTypeString(modSummaryFile.FullName, false);
-            for (int i = 0; i < mods.Rows.Count; i++)
+            var mods = Utilities.TextFileToDataTableAssignTypeString(modSummaryFile.FullName, false);
+            for (var i = 0; i < mods.Rows.Count; i++)
             {
                 var residues = (string)mods.Rows[i][COL_RESIDUE];
 
@@ -122,19 +122,19 @@ namespace AScore_DLL.Managers
 
         private DynamicModification ParseDynamicMod(DataTable mods, int row)
         {
-            double massMonoIsotopic = double.Parse((string)mods.Rows[row][COL_MASS]);
-            char symbol = ((string)mods.Rows[row][COL_SYMBOL])[0];
+            var massMonoIsotopic = double.Parse((string)mods.Rows[row][COL_MASS]);
+            var symbol = ((string)mods.Rows[row][COL_SYMBOL])[0];
             var residues = (string)mods.Rows[row][COL_RESIDUE];
             var possibleModSites = new List<char>();
-            bool nTerminal = false;
-            bool cTerminal = false;
+            var nTerminal = false;
+            var cTerminal = false;
 
-            if (residues.IndexOfAny(new char[] { '<', '[' }) != -1)
+            if (residues.IndexOfAny(new[] { '<', '[' }) != -1)
             {
                 // N-term residue, peptide (<) or protein ([)
                 nTerminal = true;
             }
-            else if (residues.IndexOfAny(new char[] { '>', ']' }) != -1)
+            else if (residues.IndexOfAny(new[] { '>', ']' }) != -1)
             {
                 // C-term residue, peptide (>) or protein (])
                 cTerminal = true;

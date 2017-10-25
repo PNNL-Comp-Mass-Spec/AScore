@@ -10,17 +10,11 @@ namespace AScore_DLL.Managers
     /// </summary>
     public class ExperimentalSpectra
     {
-        #region Class Members
-
         #region Variables
 
         public double m_maxMZ = -1;
         public double m_minMZ = -1;
-        private readonly int scanNumber;
-        private readonly int chargeState;
-        private double precursorMass;
-        private readonly int precursorChargeState;
-        private readonly List<List<ExperimentalSpectraEntry>> topTenSpectra = new List<List<ExperimentalSpectraEntry>>();
+        private readonly List<List<ExperimentalSpectraEntry>> TopTenSpectra = new List<List<ExperimentalSpectraEntry>>();
 
         private readonly PHRPReader.clsPeptideMassCalculator mPeptideMassCalculator;
 
@@ -31,56 +25,28 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Gets the scan number of this ExperimentalSpectra
         /// </summary>
-        public int ScanNumber
-        {
-            get { return scanNumber; }
-        }
+        public int ScanNumber { get; }
 
         /// <summary>
         /// Gets the charge state of this ExperimentalSpectra
         /// </summary>
-        public int ChargeState
-        {
-            get { return chargeState; }
-        }
+        public int ChargeState { get; }
 
         /// <summary>
         /// Gets the precursor mass (M+H value)
         /// </summary>
-        public double PrecursorMass
-        {
-            get { return PrecursorMass1; }
-        }
+        public double PrecursorMass => PrecursorMass1;
 
-        public double PrecursorNeutralMass
-        {
-            get { return mPeptideMassCalculator.ConvoluteMass(PrecursorMass1, 1, 0); }
-        }
+        public double PrecursorNeutralMass => mPeptideMassCalculator.ConvoluteMass(PrecursorMass1, 1, 0);
 
         /// <summary>
         /// Gets the precursor charge state
         /// </summary>
-        public int PrecursorChargeState
-        {
-            get { return precursorChargeState; }
-        }
+        public int PrecursorChargeState { get; }
 
-        public double PrecursorMass1
-        {
-            get
-            {
-                return precursorMass;
-            }
-
-            set
-            {
-                precursorMass = value;
-            }
-        }
+        public double PrecursorMass1 { get; set; }
 
         #endregion // Properties
-
-        #endregion // Class Members
 
         #region Constructor
 
@@ -97,10 +63,10 @@ namespace AScore_DLL.Managers
             int precursorChargeState, List<ExperimentalSpectraEntry> spectra,
             PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
         {
-            this.scanNumber = scanNum;
-            this.chargeState = chargeState;
-            this.PrecursorMass1 = precursorMass;
-            this.precursorChargeState = precursorChargeState;
+            ScanNumber = scanNum;
+            ChargeState = chargeState;
+            PrecursorMass1 = precursorMass;
+            PrecursorChargeState = precursorChargeState;
             GenerateSpectraForPeptideScore(spectra);
 
             mPeptideMassCalculator = peptideMassCalculator;
@@ -115,11 +81,11 @@ namespace AScore_DLL.Managers
         /// </summary>
         ~ExperimentalSpectra()
         {
-            for (int i = 0; i < topTenSpectra.Count; ++i)
+            foreach (var spectrum in TopTenSpectra)
             {
-                topTenSpectra[i].Clear();
+                spectrum.Clear();
             }
-            topTenSpectra.Clear();
+            TopTenSpectra.Clear();
         }
 
         #endregion // Destructor
@@ -133,7 +99,7 @@ namespace AScore_DLL.Managers
         public List<ExperimentalSpectraEntry> GetPeakDepthSpectra(int peakDepth)
         {
             var expSpecPeakDepth = new List<ExperimentalSpectraEntry>();
-            foreach (List<ExperimentalSpectraEntry> list in topTenSpectra)
+            foreach (var list in TopTenSpectra)
             {
                 if (list.Count >= peakDepth)
                 {
@@ -159,30 +125,30 @@ namespace AScore_DLL.Managers
         private void GenerateSpectraForPeptideScore(
             List<ExperimentalSpectraEntry> spectra)
         {
-            double tol = 0.6;
-            int index = 0;
+            var tol = 0.6;
+            var index = 0;
 
-            double minMZ = spectra[0].Value1;
-            double maxMZ = spectra[spectra.Count - 1].Value1;
+            var minMZ = spectra[0].Value1;
+            var maxMZ = spectra[spectra.Count - 1].Value1;
             m_minMZ = minMZ;
             m_maxMZ = maxMZ;
-            int numSections = Convert.ToInt32(Math.Ceiling((maxMZ - minMZ) / 100.0));
+            var numSections = Convert.ToInt32(Math.Ceiling((maxMZ - minMZ) / 100.0));
             var descendSort = new ExperimentalSpectraEntry.SortValue2Descend();
 
             // Start getting the top ten hits from each section
-            for (int i = 0; i < numSections; ++i)
+            for (var i = 0; i < numSections; ++i)
             {
                 // Set the lower and upper bounds for this section
-                double lowerBound = minMZ + (i * 100.0);
-                double upperBound = lowerBound + 100.0;
+                var lowerBound = minMZ + (i * 100.0);
+                var upperBound = lowerBound + 100.0;
                 var currentSection = new List<ExperimentalSpectraEntry>();
                 // Now iterate through each mz value in this section looking for
                 // entries that are within 1.0 of the current mz value and picking
                 // the one with the highest Value2 property
-                for (double mz = lowerBound; mz < upperBound; mz += 1.0)
+                for (var mz = lowerBound; mz < upperBound; mz += 1.0)
                 {
                     // Get all of the entries for this mz value
-                    int count = 0;
+                    var count = 0;
                     while ((index < spectra.Count) && (spectra[index].Value1 >= mz) &&
                         (spectra[index].Value1 < (mz + 1.0)))
                     {
@@ -216,10 +182,10 @@ namespace AScore_DLL.Managers
 
                     var currentSectionFiltered = new List<ExperimentalSpectraEntry>();
 
-                    foreach (ExperimentalSpectraEntry s in currentSection)
+                    foreach (var s in currentSection)
                     {
                         // Make sure the current data point is not too close in mass to the filtered data points
-                        bool closeToExistingPoint = currentSectionFiltered.Any(p => Math.Abs(s.Value1 - p.Value1) < tol);
+                        var closeToExistingPoint = currentSectionFiltered.Any(p => Math.Abs(s.Value1 - p.Value1) < tol);
                         if (!closeToExistingPoint)
                         {
                             currentSectionFiltered.Add(s);
@@ -233,7 +199,7 @@ namespace AScore_DLL.Managers
                 }
 
                 // Add the current section to the top ten list
-                topTenSpectra.Add(currentSection);
+                TopTenSpectra.Add(currentSection);
             }
         }
 

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Data;
-using PNNLOmics.Utilities;
 
 namespace AScore_DLL.Managers.DatasetManagers
 {
@@ -23,35 +22,20 @@ namespace AScore_DLL.Managers.DatasetManagers
 
         protected DataTable dt;
         protected DataTable dAscores;
-        protected int t = 0;
+        protected int t;
         protected int maxSteps;
         public bool AtEnd { get; set; }
         protected string m_jobNum;
-        protected string mDatasetFilePath = string.Empty;
+        protected string mDatasetFilePath;
         protected bool m_MSGFSpecProbColumnPresent;
 
         #region "Properties"
 
-        public string DatasetFilePath
-        {
-            get
-            {
-                return mDatasetFilePath;
-            }
-        }
+        public string DatasetFilePath => mDatasetFilePath;
 
-        public string JobNum
-        {
-            get
-            {
-                return m_jobNum;
-            }
-        }
+        public string JobNum => m_jobNum;
 
-        public bool MSGFSpecProbColumnPresent
-        {
-            get { return m_MSGFSpecProbColumnPresent; }
-        }
+        public bool MSGFSpecProbColumnPresent => m_MSGFSpecProbColumnPresent;
 
         #endregion
 
@@ -110,10 +94,10 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// <param name="peptideSeq">peptide sequence</param>
         /// <param name="ascoreParam">Parameter file manager</param>
         public abstract void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
-            out string peptideSeq, ref AScore_DLL.Managers.ParameterFileManager ascoreParam);
+            out string peptideSeq, ref ParameterFileManager ascoreParam);
 
         public abstract void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
-            out string peptideSeq, out double msgfScore, ref AScore_DLL.Managers.ParameterFileManager ascoreParam);
+            out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam);
 
         /// <summary>
         /// Resets the counter to the beginning
@@ -123,20 +107,16 @@ namespace AScore_DLL.Managers.DatasetManagers
             t = 0;
         }
 
-        public int CurrentRowNum
-        {
-            get { return t; }
-        }
+        public int CurrentRowNum => t;
 
-        public int ResultsCount
-        {
-            get { return dAscores.Rows.Count; }
-        }
+        public int ResultsCount => dAscores.Rows.Count;
 
         /// <summary>
         /// Writes ascore information to table
         /// </summary>
+        /// <param name="peptideSeq"></param>
         /// <param name="bestSeq"></param>
+        /// <param name="scanNum"></param>
         /// <param name="topPeptideScore"></param>
         /// <param name="ascoreResult"></param>
         public void WriteToTable(string peptideSeq, string bestSeq, int scanNum, double topPeptideScore, AScoreResult ascoreResult)
@@ -146,7 +126,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             //    Console.WriteLine("Debug: found " + peptideSeq);
             //}
 
-            DataRow drow = dAscores.NewRow();
+            var drow = dAscores.NewRow();
 
             drow[RESULTS_COL_JOB] = m_jobNum;
             drow[RESULTS_COL_SCAN] = scanNum;
@@ -168,9 +148,11 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// Writes ascore information to table
         /// Call this function if a peptide has zero or just one modifiable site
         /// </summary>
-        /// <param name="bestSeq"></param>
+        /// <param name="peptideSeq"></param>
+        /// <param name="scanNum"></param>
         /// <param name="pScore"></param>
         /// <param name="positionList"></param>
+        /// <param name="modInfo"></param>
         public void WriteToTable(string peptideSeq, int scanNum, double pScore, int[] positionList, string modInfo)
         {
             //if (peptideSeq == "R.HGTDLWIDNM@SSAVPNHS*PEKK.D")
@@ -178,7 +160,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             //    Console.WriteLine("Debug: found " + peptideSeq);
             //}
 
-            DataRow drow = dAscores.NewRow();
+            var drow = dAscores.NewRow();
 
             drow[RESULTS_COL_JOB] = m_jobNum;
             drow[RESULTS_COL_SCAN] = scanNum;
@@ -186,7 +168,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow[RESULTS_COL_BESTSEQUENCE] = peptideSeq;
             drow[RESULTS_COL_PEPTIDESCORE] = MathUtilities.ValueToString(pScore);
 
-            int intNonZeroCount = (from item in positionList where item > 0 select item).Count();
+            var intNonZeroCount = (from item in positionList where item > 0 select item).Count();
 
             if (intNonZeroCount == 0)
             {

@@ -18,7 +18,7 @@
 
             if (dt.Columns.Contains("FragMethod"))
             {
-                string fragtype = ((string)dt.Rows[t]["FragMethod"]).ToLower();
+                var fragtype = ((string)dt.Rows[t]["FragMethod"]).ToLower();
 
                 switch (fragtype)
                 {

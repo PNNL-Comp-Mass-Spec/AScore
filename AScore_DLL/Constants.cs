@@ -70,8 +70,8 @@ namespace AScore_DLL
 		/// </summary>
 		public static MassType MassType
 		{
-			get { return massType; }
-			set { massType = value; }
+			get => massType;
+		    set => massType = value;
 		}
 
 		#endregion // Properties
@@ -111,7 +111,7 @@ namespace AScore_DLL
 				case 'W': return Tryptophan;
 				case 'Y': return Tyrosine;
 				case 'V': return Valine;
-				default: 
+				default:
 					// Unrecognized character (or a symbol)
 					return 0;
 			}
@@ -465,8 +465,8 @@ namespace AScore_DLL
 		/// </summary>
 		public static MassType MassType
 		{
-			get { return massType; }
-			set { massType = value; }
+			get => massType;
+		    set => massType = value;
 		}
 
 		#endregion // Properties

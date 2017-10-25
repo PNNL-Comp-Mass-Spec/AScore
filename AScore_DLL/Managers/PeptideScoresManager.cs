@@ -24,14 +24,13 @@ namespace AScore_DLL.Managers
         /// <returns>The peptide score if it exists, -1 if it does not.</returns>
         public static double GetPeptideScore(double prob, int numPossMatch, int matches)
         {
-            double sum = 0.0;
+            var sum = 0.0;
 
-            double success = Math.Log10(prob);
-            double fail = Math.Log10(1 - prob);
-            for (int i = matches; i <= numPossMatch; i++)
+            var success = Math.Log10(prob);
+            var fail = Math.Log10(1 - prob);
+            for (var i = matches; i <= numPossMatch; i++)
             {
-                double logTotal = 0;
-                logTotal = success * (i) + fail * (numPossMatch - i);
+                var logTotal = success * (i) + fail * (numPossMatch - i);
                 logTotal += LogAChooseB(numPossMatch, i);
                 sum += Math.Pow(10, logTotal);
             }
@@ -51,11 +50,11 @@ namespace AScore_DLL.Managers
             if (a == 0) return 0.0f;
             if (b == 0) return 0.0f;
             if (a == b) return 0.0f;
-            double total = 0.0;
+            var total = 0.0;
             total += LogFactorial(a);
             total -= LogFactorial(b);
             total -= LogFactorial(a - b);
-            return (double)total;
+            return total;
         }
 
         /// <summary>
@@ -65,8 +64,7 @@ namespace AScore_DLL.Managers
         /// <returns></returns>
         private static double LogFactorial(int n)
         {
-            double value;
-            if (mCachedFactorial.TryGetValue(n, out value))
+            if (mCachedFactorial.TryGetValue(n, out var value))
                 return value;
 
             //log n! = 0.5log(2.pi) + 0.5logn + nlog(n/e) + log(1 + 1/(12n))

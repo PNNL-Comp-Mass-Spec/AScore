@@ -22,18 +22,12 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Gets the first value in this ExperimentalSpectraEntry
         /// </summary>
-        public double Value1
-        {
-            get { return value1; }
-        }
+        public double Value1 => value1;
 
         /// <summary>
         /// Gets the second value in this ExperimentalSpectraEntry
         /// </summary>
-        public double Value2
-        {
-            get { return value2; }
-        }
+        public double Value2 => value2;
 
         #endregion // Properties
 

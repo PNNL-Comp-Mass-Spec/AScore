@@ -3,10 +3,11 @@
 
 using System.Collections.Generic;
 
-namespace AScore_DLL.Combinatorics {
+namespace AScore_DLL.Combinatorics
+{
     /// <summary>
-    /// Combinations defines a meta-collection, typically a list of lists, of all possible 
-    /// subsets of a particular size from the set of values.  This list is enumerable and 
+    /// Combinations defines a meta-collection, typically a list of lists, of all possible
+    /// subsets of a particular size from the set of values.  This list is enumerable and
     /// allows the scanning of all possible combinations using a simple foreach() loop.
     /// Within the returned set, there is no prescribed order.  This follows the mathematical
     /// concept of choose.  For example, put 10 dominoes in a hat and pick 5.  The number of possible
@@ -14,28 +15,29 @@ namespace AScore_DLL.Combinatorics {
     /// </summary>
     /// <remarks>
     /// The MetaCollectionType parameter of the constructor allows for the creation of
-    /// two types of sets,  those with and without repetition in the output set when 
+    /// two types of sets,  those with and without repetition in the output set when
     /// presented with repetition in the input set.
-    /// 
+    ///
     /// When given a input collect {A B C} and lower index of 2, the following sets are generated:
     /// MetaCollectionType.WithRepetition =>
     /// {A A}, {A B}, {A C}, {B B}, {B C}, {C C}
     /// MetaCollectionType.WithoutRepetition =>
     /// {A B}, {A C}, {B C}
-    /// 
+    ///
     /// Input sets with multiple equal values will generate redundant combinations in proprotion
     /// to the likelyhood of outcome.  For example, {A A B B} and a lower index of 3 will generate:
     /// {A A B} {A A B} {A B B} {A B B}
     /// </remarks>
     /// <typeparam name="T">The type of the values within the list.</typeparam>
-    public class Combinations<T> : IMetaCollection<T> {
+    public class Combinations<T> : IMetaCollection<T>
+    {
         #region Constructors
 
         /// <summary>
         /// No default constructor, must provided a list of values and size.
         /// </summary>
-        protected Combinations() {
-            ;
+        protected Combinations()
+        {
         }
 
         /// <summary>
@@ -45,7 +47,8 @@ namespace AScore_DLL.Combinatorics {
         /// </summary>
         /// <param name="values">List of values to select combinations from.</param>
         /// <param name="lowerIndex">The size of each combination set to return.</param>
-        public Combinations(IList<T> values, int lowerIndex) {
+        public Combinations(ICollection<T> values, int lowerIndex)
+        {
             Initialize(values, lowerIndex, GenerateOption.WithoutRepetition);
         }
 
@@ -56,7 +59,8 @@ namespace AScore_DLL.Combinatorics {
         /// <param name="values">List of values to select combinations from.</param>
         /// <param name="lowerIndex">The size of each combination set to return.</param>
         /// <param name="type">The type of Combinations set to generate.</param>
-        public Combinations(IList<T> values, int lowerIndex, GenerateOption type) {
+        public Combinations(ICollection<T> values, int lowerIndex, GenerateOption type)
+        {
             Initialize(values, lowerIndex, type);
         }
 
@@ -68,15 +72,17 @@ namespace AScore_DLL.Combinatorics {
         /// Gets an enumerator for collecting the list of combinations.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public IEnumerator<IList<T>> GetEnumerator() {
+        public IEnumerator<IList<T>> GetEnumerator()
+        {
             return new Enumerator(this);
         }
 
         /// <summary>
         /// Gets an enumerator for collecting the list of combinations.
         /// </summary>
-        /// <returns>The enumerator.returns>
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+        /// <returns>The enumerator</returns>
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
             return new Enumerator(this);
         }
 
@@ -87,15 +93,17 @@ namespace AScore_DLL.Combinatorics {
         /// <summary>
         /// The enumerator that enumerates each meta-collection of the enclosing Combinations class.
         /// </summary>
-        public class Enumerator : IEnumerator<IList<T>> {
-            
+        public class Enumerator : IEnumerator<IList<T>>
+        {
+
             #region Constructors
 
             /// <summary>
             /// Construct a enumerator with the parent object.
             /// </summary>
             /// <param name="source">The source combinations object.</param>
-            public Enumerator(Combinations<T> source) {
+            public Enumerator(Combinations<T> source)
+            {
                 myParent = source;
                 myPermutationsEnumerator = (Permutations<bool>.Enumerator)myParent.myPermutations.GetEnumerator();
             }
@@ -104,12 +112,13 @@ namespace AScore_DLL.Combinatorics {
 
             #region IEnumerator interface
             /// <summary>
-            /// Resets the combinations enumerator to the first combination.  
+            /// Resets the combinations enumerator to the first combination.
             /// </summary>
-            public void Reset() {
+            public void Reset()
+            {
                 myPermutationsEnumerator.Reset();
             }
-            
+
             /// <summary>
             /// Advances to the next combination of items from the set.
             /// </summary>
@@ -118,8 +127,9 @@ namespace AScore_DLL.Combinatorics {
             /// The heavy lifting is done by the permutations object, the combination is generated
             /// by creating a new list of those items that have a true in the permutation parrellel array.
             /// </remarks>
-            public bool MoveNext() {
-                bool ret = myPermutationsEnumerator.MoveNext();
+            public bool MoveNext()
+            {
+                var ret = myPermutationsEnumerator.MoveNext();
                 myCurrentList = null;
                 return ret;
             }
@@ -127,8 +137,10 @@ namespace AScore_DLL.Combinatorics {
             /// <summary>
             /// The current combination
             /// </summary>
-            public IList<T> Current {
-                get {
+            public IList<T> Current
+            {
+                get
+                {
                     ComputeCurrent();
                     return myCurrentList;
                 }
@@ -137,8 +149,10 @@ namespace AScore_DLL.Combinatorics {
             /// <summary>
             /// The current combination
             /// </summary>
-            object System.Collections.IEnumerator.Current {
-                get {
+            object System.Collections.IEnumerator.Current
+            {
+                get
+                {
                     ComputeCurrent();
                     return myCurrentList;
                 }
@@ -147,8 +161,8 @@ namespace AScore_DLL.Combinatorics {
             /// <summary>
             /// Cleans up non-managed resources, of which there are none used here.
             /// </summary>
-            public void Dispose() {
-                ;
+            public void Dispose()
+            {
             }
 
             #endregion
@@ -157,7 +171,7 @@ namespace AScore_DLL.Combinatorics {
 
             /// <summary>
             /// The only complex function of this entire wrapper, ComputeCurrent() creates
-            /// a list of original values from the bool permutation provided.  
+            /// a list of original values from the bool permutation provided.
             /// The exception for accessing current (InvalidOperationException) is generated
             /// by the call to .Current on the underlying enumeration.
             /// </summary>
@@ -165,15 +179,15 @@ namespace AScore_DLL.Combinatorics {
             /// To compute the current list of values, the underlying permutation object
             /// which moves with this enumerator, is scanned differently based on the type.
             /// The items have only two values, true and false, which have different meanings:
-            /// 
-            /// For type WithoutRepetition, the output is a straightforward subset of the input array.  
+            ///
+            /// For type WithoutRepetition, the output is a straightforward subset of the input array.
             /// E.g. 6 choose 3 without repetition
             /// Input array:   {A B C D E F}
             /// Permutations:  {0 1 0 0 1 1}
             /// Generates set: {A   C D    }
             /// Note: size of permutation is equal to upper index.
-            /// 
-            /// For type WithRepetition, the output is defined by runs of characters and when to 
+            ///
+            /// For type WithRepetition, the output is defined by runs of characters and when to
             /// move to the next element.
             /// E.g. 6 choose 5 with repetition
             /// Input array:   {A B C D E F}
@@ -181,25 +195,35 @@ namespace AScore_DLL.Combinatorics {
             /// Generates set: {A   B B     D D    }
             /// Note: size of permutation is equal to upper index - 1 + lower index.
             /// </remarks>
-            private void ComputeCurrent() {
-                if(myCurrentList == null) {
-                    myCurrentList = new List<T>();
-                    int index = 0;
-                    IList<bool> currentPermutation = (IList<bool>)myPermutationsEnumerator.Current;
-                    for(int i = 0; i < currentPermutation.Count; ++i) {
-                        if(currentPermutation[i] == false) {
-                            myCurrentList.Add(myParent.myValues[index]);
-                            if(myParent.Type == GenerateOption.WithoutRepetition) {
-                                ++index;
-                            }
-                        }
-                        else {
+            private void ComputeCurrent()
+            {
+                if (myCurrentList != null)
+                    return;
+
+                myCurrentList = new List<T>();
+                var currentPermutation = (IList<bool>)myPermutationsEnumerator.Current;
+                if (currentPermutation == null)
+                    return;
+
+                var index = 0;
+
+                foreach (var item in currentPermutation)
+                {
+                    if (item == false)
+                    {
+                        myCurrentList.Add(myParent.myValues[index]);
+                        if (myParent.Type == GenerateOption.WithoutRepetition)
+                        {
                             ++index;
                         }
                     }
+                    else
+                    {
+                        ++index;
+                    }
                 }
             }
-        
+
             #endregion
 
             #region Data
@@ -207,7 +231,7 @@ namespace AScore_DLL.Combinatorics {
             /// <summary>
             /// Parent object this is an enumerator for.
             /// </summary>
-            private Combinations<T> myParent;
+            private readonly Combinations<T> myParent;
 
             /// <summary>
             /// The current list of values, this is lazy evaluated by the Current property.
@@ -217,8 +241,8 @@ namespace AScore_DLL.Combinatorics {
             /// <summary>
             /// An enumertor of the parents list of lexicographic orderings.
             /// </summary>
-            private Permutations<bool>.Enumerator myPermutationsEnumerator;
-            
+            private readonly Permutations<bool>.Enumerator myPermutationsEnumerator;
+
             #endregion
         }
         #endregion
@@ -230,87 +254,79 @@ namespace AScore_DLL.Combinatorics {
         /// This value is mathematically defined as Choose(M, N) where M is the set size
         /// and N is the subset size.  This is M! / (N! * (M-N)!).
         /// </summary>
-        public long Count {
-            get {
-                return myPermutations.Count;
-            }
-        }
+        public long Count => myPermutations.Count;
 
         /// <summary>
         /// The type of Combinations set that is generated.
         /// </summary>
-        public GenerateOption Type {
-            get {
-                return myMetaCollectionType;
-            }
-        }
+        public GenerateOption Type => myMetaCollectionType;
 
         /// <summary>
         /// The upper index of the meta-collection, equal to the number of items in the initial set.
         /// </summary>
-        public int UpperIndex {
-            get {
-                return myValues.Count;
-            }
-        }
+        public int UpperIndex => myValues.Count;
 
         /// <summary>
         /// The lower index of the meta-collection, equal to the number of items returned each iteration.
         /// </summary>
-        public int LowerIndex {
-            get {
-                return myLowerIndex;
-            }
-        }
+        public int LowerIndex => myLowerIndex;
 
         #endregion
 
         #region Heavy Lifting Members
 
         /// <summary>
-        /// Initialize the combinations by settings a copy of the values from the 
+        /// Initialize the combinations by settings a copy of the values from the
         /// </summary>
         /// <param name="values">List of values to select combinations from.</param>
         /// <param name="lowerIndex">The size of each combination set to return.</param>
         /// <param name="type">The type of Combinations set to generate.</param>
         /// <remarks>
-        /// Copies the array and parameters and then creates a map of booleans that will 
+        /// Copies the array and parameters and then creates a map of booleans that will
         /// be used by a permutations object to refence the subset.  This map is slightly
         /// different based on whether the type is with or without repetition.
-        /// 
+        ///
         /// When the type is WithoutRepetition, then a map of upper index elements is
-        /// created with lower index false's.  
+        /// created with lower index false's.
         /// E.g. 8 choose 3 generates:
         /// Map: {1 1 1 1 1 0 0 0}
         /// Note: For sorting reasons, false denotes inclusion in output.
-        /// 
+        ///
         /// When the type is WithRepetition, then a map of upper index - 1 + lower index
         /// elements is created with the falses indicating that the 'current' element should
         /// be included and the trues meaning to advance the 'current' element by one.
         /// E.g. 8 choose 3 generates:
         /// Map: {1 1 1 1 1 1 1 1 0 0 0} (7 trues, 3 falses).
         /// </remarks>
-        private void Initialize(IList<T> values, int lowerIndex, GenerateOption type) {
+        private void Initialize(ICollection<T> values, int lowerIndex, GenerateOption type)
+        {
             myMetaCollectionType = type;
             myLowerIndex = lowerIndex;
             myValues = new List<T>();
             myValues.AddRange(values);
-            List<bool> myMap = new List<bool>();
-            if(type == GenerateOption.WithoutRepetition) {
-                for(int i = 0; i < myValues.Count; ++i) {
-                    if(i >= myValues.Count - myLowerIndex) {
+            var myMap = new List<bool>();
+            if (type == GenerateOption.WithoutRepetition)
+            {
+                for (var i = 0; i < myValues.Count; ++i)
+                {
+                    if (i >= myValues.Count - myLowerIndex)
+                    {
                         myMap.Add(false);
                     }
-                    else {
+                    else
+                    {
                         myMap.Add(true);
                     }
                 }
             }
-            else {
-                for(int i = 0; i < values.Count - 1; ++i) {
+            else
+            {
+                for (var i = 0; i < values.Count - 1; ++i)
+                {
                     myMap.Add(true);
                 }
-                for(int i = 0; i < myLowerIndex; ++i) {
+                for (var i = 0; i < myLowerIndex; ++i)
+                {
                     myMap.Add(false);
                 }
             }
