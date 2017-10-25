@@ -2,9 +2,9 @@
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.DatasetManagers;
 using AScore_DLL.Managers.SpectraManagers;
-using FileProcessor;
 using System.IO;
 using PHRPReader;
+using PRISM;
 
 namespace AScore_Console
 {
@@ -64,47 +64,51 @@ namespace AScore_Console
             try
             {
 #endif
-                var clu = new clsParseCommandLine();
+            var clu = new clsParseCommandLine();
 
-                mAScoreOptions.Initialize();
-                mLogFilePath = string.Empty;
+            mAScoreOptions.Initialize();
+            mLogFilePath = string.Empty;
 
-                var syntaxError = string.Empty;
+            var syntaxError = string.Empty;
 
-                if (clu.ParseCommandLine(clsParseCommandLine.ALTERNATE_SWITCH_CHAR))
+            if (clu.ParseCommandLine(clsParseCommandLine.ALTERNATE_SWITCH_CHAR))
+            {
+                ProcessCommandLine(clu, ref syntaxError);
+            }
+
+            Console.WriteLine();
+
+            if (args.Length == 0 || clu.NeedToShowHelp || syntaxError.Length > 0)
+            {
+                if (syntaxError.Length > 0)
                 {
-                    ProcessCommandLine(clu, ref syntaxError);
+                    ShowError("Error, " + syntaxError);
+                    Console.WriteLine();
                 }
 
-                Console.WriteLine();
+                PrintHelp();
 
-                if ((args.Length == 0) || clu.NeedToShowHelp || syntaxError.Length > 0)
-                {
-                    if (syntaxError.Length > 0)
-                    {
-                        Console.WriteLine("Error, " + syntaxError);
-                        Console.WriteLine();
-                    }
+                clsParseCommandLine.PauseAtConsole(750, 250);
+                return 0;
+            }
 
-                    PrintHelp();
+            var returnCode = CheckParameters();
+            // If we encountered an error in the input - a necessary file does not exist - then exit.
+            if (returnCode != 0)
+            {
+                return returnCode;
+            }
 
-                    clsParseCommandLine.PauseAtConsole(750, 250);
-                    return 0;
-                }
+            returnCode = RunAScore(mAScoreOptions, mLogFilePath, SupportedSearchModes, mMultiJobMode);
 
-                var returnCode = CheckParameters();
-                // If we encountered an error in the input - a necessary file does not exist - then exit.
-                if (returnCode != 0)
-                {
-                    return returnCode;
-                }
-
-                returnCode = RunAScore(mAScoreOptions, mLogFilePath, SupportedSearchModes, mMultiJobMode);
-
-                if (returnCode != 0)
-                {
-                    clsParseCommandLine.PauseAtConsole(2000, 333);
-                }
+            if (returnCode != 0)
+            {
+                clsParseCommandLine.PauseAtConsole(2000, 333);
+            }
+            else
+            {
+                clsParseCommandLine.PauseAtConsole(1000, 250);
+            }
 #if (!DEBUG)
             }
             catch (Exception ex)
