@@ -114,15 +114,13 @@ namespace AScore_Console
             catch (Exception ex)
             {
                 Console.WriteLine();
-                ShowMessage("Program failure, possibly incorrect search engine type; " + ex.Message);
-                ShowMessage("Stack Track: " + ex.StackTrace);
-            
+                ShowError("Program failure, possibly incorrect search engine type; " + ex.Message, ex);
+
                 return ex.Message.GetHashCode();
             }
             finally
             {
-                if (mLogFile != null)
-                    mLogFile.Close();
+                mLogFile?.Close();
             }
 #endif
 
@@ -164,14 +162,12 @@ namespace AScore_Console
                 mAScoreOptions.OutputFolderPath = fiOutputFolderAsFile.Directory.FullName;
             }
 
-            string outValue;
-
             // Deprecating starting February 17, 2015; default is true, and the "noFM" switch is all that is needed.
-            if (clu.RetrieveValueForParameter("FM", out outValue, false))
+            if (clu.RetrieveValueForParameter("FM", out var outValue, false))
             {
                 if (!bool.TryParse(outValue, out mAScoreOptions.FilterOnMSGFScore))
                 {
-                    Console.WriteLine("Warning: '-FM:" + outValue + "' not recognized. Assuming '-FM:true'.");
+                    ShowWarning("Warning: '-FM:" + outValue + "' not recognized. Assuming '-FM:true'.");
                     //syntaxError = "specify true or false for -FM; not -FM:" + outValue;
                     // Reset it to true, bool.TryParse failed and set it to false.
                     mAScoreOptions.FilterOnMSGFScore = true;
@@ -281,35 +277,35 @@ namespace AScore_Console
         {
             if (!File.Exists(mAScoreOptions.AScoreParamFile))
             {
-                Console.WriteLine("Input file not found: " + mAScoreOptions.AScoreParamFile);
+                ShowError("Input file not found: " + mAScoreOptions.AScoreParamFile);
                 clsParseCommandLine.PauseAtConsole(2000, 333);
                 return -10;
             }
 
             if (!string.IsNullOrEmpty(mAScoreOptions.CDtaFile) && !File.Exists(mAScoreOptions.CDtaFile))
             {
-                Console.WriteLine("Input file not found: " + mAScoreOptions.CDtaFile);
+                ShowError("Input file not found: " + mAScoreOptions.CDtaFile);
                 clsParseCommandLine.PauseAtConsole(2000, 333);
                 return -11;
             }
 
             if (!string.IsNullOrEmpty(mAScoreOptions.JobToDatasetMapFile) && !File.Exists(mAScoreOptions.JobToDatasetMapFile))
             {
-                Console.WriteLine("Input file not found: " + mAScoreOptions.JobToDatasetMapFile);
+                ShowError("Input file not found: " + mAScoreOptions.JobToDatasetMapFile);
                 clsParseCommandLine.PauseAtConsole(2000, 333);
                 return -11;
             }
 
             if (!File.Exists(mAScoreOptions.FirstHitsFile))
             {
-                Console.WriteLine("Input file not found: " + mAScoreOptions.FirstHitsFile);
+                ShowError("Input file not found: " + mAScoreOptions.FirstHitsFile);
                 clsParseCommandLine.PauseAtConsole(2000, 333);
                 return -12;
             }
 
             if (!string.IsNullOrEmpty(mAScoreOptions.FastaFilePath) && !File.Exists(mAScoreOptions.FastaFilePath))
             {
-                Console.WriteLine("Fasta file not found: " + mAScoreOptions.FastaFilePath);
+                ShowError("Fasta file not found: " + mAScoreOptions.FastaFilePath);
                 clsParseCommandLine.PauseAtConsole(2000, 333);
                 return -13;
             }
@@ -327,7 +323,7 @@ namespace AScore_Console
         private static int RunAScore(AScoreOptionsType ascoreOptions, string logFilePath, string supportedSearchModes, bool multiJobMode)
         {
 
-            if (!String.IsNullOrWhiteSpace(logFilePath))
+            if (!string.IsNullOrWhiteSpace(logFilePath))
             {
                 mLogFile = new StreamWriter(new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
@@ -386,8 +382,7 @@ namespace AScore_Console
                         datasetManager = new MsgfdbFHT(ascoreOptions.FirstHitsFile);
                         break;
                     default:
-                        ShowMessage("Incorrect search type: " + ascoreOptions.SearchType + " , supported values are " + supportedSearchModes);
-                        Console.WriteLine();
+                        ShowError("Incorrect search type: " + ascoreOptions.SearchType + " , supported values are " + supportedSearchModes);
                         return -13;
                 }
                 var peptideMassCalculator = new clsPeptideMassCalculator();
@@ -449,8 +444,7 @@ namespace AScore_Console
             Console.Write("\r"); // clear out any percent complete status before outputting.
             Console.WriteLine(message);
 
-            if (mLogFile != null)
-                mLogFile.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + message);
+            mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + message);
         }
 
         private static void ShowError(string message, Exception ex = null)
