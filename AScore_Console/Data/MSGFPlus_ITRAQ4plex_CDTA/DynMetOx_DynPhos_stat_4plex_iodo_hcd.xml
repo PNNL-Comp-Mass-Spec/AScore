@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<Run>
+<FragmentType>
+HCD
+</FragmentType>
+<MassTolerance>
+0.05
+</MassTolerance>
+<Threads>
+1
+</Threads>
+<MSGFPreFilter>
+1E-7
+</MSGFPreFilter>
+<Modifications>
+	
+	<StaticSeqModifications>
+		<Mod1>
+			<MassMonoIsotopic>57.0215</MassMonoIsotopic>
+			<PossibleModSites>
+				<Pos1>C</Pos1>
+			</PossibleModSites>
+		</Mod1>
+		<Mod2>
+			<MassMonoIsotopic>144.1021</MassMonoIsotopic>
+			<PossibleModSites>
+				<Pos1>K</Pos1>
+			</PossibleModSites>
+		</Mod2>
+			
+	</StaticSeqModifications>
+	
+	<DynamicModifications>
+		<Mod1>
+			<MassMonoIsotopic>79.9799</MassMonoIsotopic>
+			<ModificationSymbol>*</ModificationSymbol>
+			<PossibleModSites>
+				<Pos1>S</Pos1>
+				<Pos2>T</Pos2>
+				<Pos3>Y</Pos3>
+			</PossibleModSites>
+		</Mod1>
+		<Mod2>
+			<MassMonoIsotopic>15.9949</MassMonoIsotopic>
+			<ModificationSymbol>@</ModificationSymbol>
+			<PossibleModSites>
+				<Pos1>M</Pos1>
+			</PossibleModSites>
+		</Mod2>
+	</DynamicModifications>
+	<TerminiModifications>
+		<Mod1>
+			<MassMonoIsotopic>144.1021</MassMonoIsotopic>
+			<Nterm>true</Nterm>
+		</Mod1>	
+	</TerminiModifications>
+	
+</Modifications>
+</Run>

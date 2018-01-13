@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<Run>
+  <CIDMassTolerance>0.5</CIDMassTolerance>
+  <ETDMassTolerance>0.5</ETDMassTolerance>
+  <HCDMassTolerance>0.05</HCDMassTolerance>
+  <MSGFPreFilter>1E-7</MSGFPreFilter>
+  <Modifications>
+    <!-- Note that modification masses and symbols are read from the _syn_ModSummary.txt created by PHRP -->
+    <StaticSeqModifications></StaticSeqModifications>
+    <DynamicModifications></DynamicModifications>
+  </Modifications>
+</Run>
