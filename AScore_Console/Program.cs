@@ -146,7 +146,7 @@ namespace AScore_Console
             else
             {
                 if (!clu.RetrieveValueForParameter("D", out mAScoreOptions.CDtaFile, false))
-                    syntaxError = "Must use -D:dta_file_path or -JM:job_to_dataset_mapfile_path";
+                    syntaxError = "Must use -D:spectra_file_path or -JM:job_to_dataset_mapfile_path";
             }
 
             if (!clu.RetrieveValueForParameter("P", out mAScoreOptions.AScoreParamFile, false))
@@ -216,8 +216,8 @@ namespace AScore_Console
             Console.WriteLine(" -T:search_engine");
             Console.WriteLine("   (allowed values are " + SupportedSearchModes + ")");
             Console.WriteLine(" -F:fht_file_path");
-            Console.WriteLine(" -D:dta_file_path");
-            //Console.WriteLine(" -MZML:mzML_file_path");
+            Console.WriteLine(" -D:spectra_file_path");
+            Console.WriteLine("   (_dta.txt or .mzML)");
             Console.WriteLine(" -JM:job_to_dataset_mapfile_path");
             Console.WriteLine("   (use -JM instead of -D if the FHT file has results from");
             Console.WriteLine("    multiple jobs; the map file should have job numbers and");
@@ -249,19 +249,28 @@ namespace AScore_Console
             Console.WriteLine("Example command line #2:");
             Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
                               " -T:msgfplus\n" +
-                              " -F:\"C:\\Temp\\Multi_Job_Results_fht.txt\"\n" +
-                              " -JM:\"C:\\Temp\\JobToDatasetNameMap.txt\"\n" +
-                              " -O:\"C:\\Temp\\\"\n" +
-                              " -P:C:\\Temp\\DynPhos_stat_6plex_iodo_hcd.xml\n" +
-                              " -L:LogFile.txt\n" +
-                              " -noFM");
+                              " -F:Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt\n" +
+                              " -D:Dataset_W_S2_Fr_04_2May17.mzML\n" +
+                              " -P:AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml\n" +
+                              " -U:W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt\n" +
+                              " -L:LogFile.txt");
             Console.WriteLine();
             Console.WriteLine("Example command line #3:");
             Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
                               " -T:msgfplus\n" +
-                              " -F:\"C:\\Temp\\Multi_Job_Results_fht.txt\"\n" +
-                              " -JM:\"C:\\Temp\\JobToDatasetNameMap.txt\"\n" +
-                              " -O:\"C:\\Temp\\\"\n" +
+                              " -F:C:\\Temp\\Multi_Job_Results_fht.txt\n" +
+                              " -JM:C:\\Temp\\JobToDatasetNameMap.txt\n" +
+                              " -O:C:\\Temp\\\n" +
+                              " -P:C:\\Temp\\DynPhos_stat_6plex_iodo_hcd.xml\n" +
+                              " -L:LogFile.txt\n" +
+                              " -noFM");
+            Console.WriteLine();
+            Console.WriteLine("Example command line #4:");
+            Console.WriteLine(Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
+                              " -T:msgfplus\n" +
+                              " -F:C:\\Temp\\Multi_Job_Results_fht.txt\n" +
+                              " -JM:C:\\Temp\\JobToDatasetNameMap.txt\n" +
+                              " -O:C:\\Temp\\\n" +
                               " -P:C:\\Temp\\DynPhos_stat_6plex_iodo_hcd.xml\n" +
                               " -L:LogFile.txt\n" +
                               " -Fasta:C:\\Temp\\H_sapiens_Uniprot_SPROT_2013-09-18.fasta\n" +
@@ -457,7 +466,7 @@ namespace AScore_Console
 
             if (ex != null)
             {
-                mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + Utilities.GetExceptionStackTrace(ex));
+                mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + clsStackTraceFormatter.GetExceptionStackTrace(ex));
             }
 
         }
