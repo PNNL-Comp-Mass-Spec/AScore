@@ -1,2 +1,3 @@
 *.sdf
 *.user
+/AScore_Console/Data/*/*.mzML
