@@ -65,7 +65,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             m_initialized = false;
         }
 
-
         /// <summary>
         /// Initializes a new instance of DtaManger.
         /// </summary>
@@ -295,7 +294,6 @@ namespace AScore_DLL.Managers.SpectraManagers
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {

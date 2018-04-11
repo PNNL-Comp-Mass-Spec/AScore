@@ -31,7 +31,6 @@ namespace AScore_DLL.Combinatorics
     /// <typeparam name="T">The type of the values within the list.</typeparam>
     public class Permutations<T> : IMetaCollection<T>
     {
-
         #region Constructors
 
         /// <summary>
@@ -108,7 +107,6 @@ namespace AScore_DLL.Combinatorics
         /// </summary>
         public class Enumerator : IEnumerator<IList<T>>
         {
-
             #region Constructors
 
             /// <summary>
@@ -310,7 +308,6 @@ namespace AScore_DLL.Combinatorics
             }
 
             #endregion
-
         }
 
         #endregion
@@ -477,6 +474,5 @@ namespace AScore_DLL.Combinatorics
         private GenerateOption myMetaCollectionType;
 
         #endregion
-
     }
 }

@@ -152,7 +152,6 @@ namespace AScore_DLL.Combinatorics
                     myPrimes.Add(i);
                 }
             }
-
         }
 
         /// <summary>
@@ -161,6 +160,5 @@ namespace AScore_DLL.Combinatorics
         public static IList<int> PrimeTable => myPrimes;
 
         private static List<int> myPrimes = new List<int>();
-
     }
 }

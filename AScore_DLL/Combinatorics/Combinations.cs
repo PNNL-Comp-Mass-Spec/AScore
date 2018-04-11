@@ -95,7 +95,6 @@ namespace AScore_DLL.Combinatorics
         /// </summary>
         public class Enumerator : IEnumerator<IList<T>>
         {
-
             #region Constructors
 
             /// <summary>

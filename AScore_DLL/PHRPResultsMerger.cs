@@ -18,7 +18,7 @@ namespace AScore_DLL
 
         protected struct AScoreResultsType
         {
-            public string BestSequence;			// New peptide sequence
+            public string BestSequence;  // New peptide sequence
             public double PeptideScore;
 
             // The key in this dictionary is the ModInfo name; the value is the AScore value
@@ -86,7 +86,6 @@ namespace AScore_DLL
 
                 var fiOutputFilePath = new FileInfo(m_MergedFilePath);
 
-
                 if (FilePathsMatch(fiInputFile, fiOutputFilePath))
                 {
                     OnErrorEvent("Input PHRP file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
@@ -99,7 +98,6 @@ namespace AScore_DLL
                     return false;
                 }
 
-
                 // Cache the AScore results in memory
                 var cachedAscoreResults = new Dictionary<string, AScoreResultsType>();
 
@@ -108,7 +106,6 @@ namespace AScore_DLL
                     return false;
 
                 MakeUpdatedPHRPFile(fiInputFile, fiOutputFilePath, mPHRPReader, cachedAscoreResults);
-
             }
             catch (Exception ex)
             {
@@ -128,7 +125,6 @@ namespace AScore_DLL
 
             try
             {
-
                 if (!File.Exists(ascoreResultsFilePath))
                 {
                     OnErrorEvent("File not found: " + ascoreResultsFilePath);
@@ -196,7 +192,6 @@ namespace AScore_DLL
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -228,7 +223,6 @@ namespace AScore_DLL
                             modInfoNames.Add(modInfoEntry.Key);
                     }
                 }
-
             }
 
             return modInfoNames;
@@ -261,7 +255,6 @@ namespace AScore_DLL
 
                 // Attach the events
                 RegisterEvents(mPHRPReader);
-
             }
             catch (Exception ex)
             {
@@ -270,7 +263,6 @@ namespace AScore_DLL
             }
 
             return true;
-
         }
 
         private void MakeUpdatedPHRPFile(
@@ -348,20 +340,16 @@ namespace AScore_DLL
                         }
 
                         swOutFile.WriteLine(outLine);
-
                     }
-
 
                     if (skipCount > 0)
                         OnStatusEvent("  Skipped " + skipCount + " PHRP results without an AScore result");
-
                 }
             }
             catch (Exception ex)
             {
                 OnErrorEvent("Error in CacheAScoreResults: " + ex.Message);
             }
-
         }
 
         protected bool FilePathsMatch(FileInfo fiFile1, FileInfo fiFile2)
@@ -407,6 +395,5 @@ namespace AScore_DLL
         }
 
         #endregion
-
     }
 }

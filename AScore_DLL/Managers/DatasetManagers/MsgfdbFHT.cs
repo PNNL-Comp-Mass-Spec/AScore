@@ -7,7 +7,6 @@
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq,
             ref ParameterFileManager ascoreParam)
         {
-
             if (dt.Columns.Contains(RESULTS_COL_JOB))
                 m_jobNum = (string)dt.Rows[t][RESULTS_COL_JOB];
 
@@ -38,8 +37,6 @@
             }
             else
                 ascoreParam.FragmentType = FragmentType.Unspecified;
-
-
         }
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam)
@@ -59,6 +56,5 @@
                     msgfScore = 0;
             }
         }
-
     }
 }

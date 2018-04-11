@@ -46,7 +46,6 @@ namespace AScore_DLL
         private int mTotalReverseHits;
         private int mTotalPeptidesReallyNotFound;
 
-
         /// <summary>
         /// Configure the AScore Protein Mapper
         /// </summary>
@@ -464,14 +463,10 @@ namespace AScore_DLL
 
                                 WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
                             }
-
                         }
-
                     }
-
                 } // End Using
             } // End Using
-
         }
 
         /// <summary>
@@ -523,8 +518,6 @@ namespace AScore_DLL
 
             // Position of residue
             mappedWriter.WriteLine(residuePosition);
-
         }
-
     }
 }

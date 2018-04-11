@@ -2,9 +2,7 @@
 {
     public class SequestFHT : DatasetManager
     {
-
         public SequestFHT(string fhtFileName) : base(fhtFileName) { }
-
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
             out string peptideSeq, ref AScore_DLL.Managers.ParameterFileManager ascoreParam)
@@ -28,10 +26,7 @@
                 var msgfSpecProb = (string)dt.Rows[t]["MSGF_SpecProb"];
                 if (!double.TryParse(msgfSpecProb, out msgfScore))
                     msgfScore = 1;
-
             }
-
         }
-
     }
 }

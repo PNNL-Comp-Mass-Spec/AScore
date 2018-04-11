@@ -41,7 +41,6 @@ namespace AScore_UnitTests
                 var ascoreEngine = new AScore_DLL.Algorithm();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
-
             }
         }
 
@@ -87,7 +86,6 @@ namespace AScore_UnitTests
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10022010_MG1655_phospho_S11_rerun_101005165350_msgfdb_fht.txt",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10022010_MG1655_phospho_s12_101002094806_msgfdb_fht.txt",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10022010_MG1655_phospho_s7_101002094806_msgfdb_fht.txt"
-
             };
             var ascParam = new string[]{
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\HistPhos.xml",
@@ -115,10 +113,7 @@ namespace AScore_UnitTests
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
             }
-
         }
-
-
 
         [Test]
         [Ignore("Local testing")]
@@ -162,8 +157,6 @@ namespace AScore_UnitTests
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
             }
-
-
         }
 
         [Test]
@@ -193,8 +186,6 @@ namespace AScore_UnitTests
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
             }
-
-
         }
 
         [Test]
@@ -224,8 +215,6 @@ namespace AScore_UnitTests
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
             }
-
-
         }
 
         [Test]
@@ -240,8 +229,6 @@ namespace AScore_UnitTests
 
             Assert.AreEqual(35.17035, score, 0.00001);
         }
-
-
 
         [Test]
         [Ignore("Local testing")]
@@ -330,10 +317,8 @@ namespace AScore_UnitTests
                 var ascoreEngine = new AScore_DLL.Algorithm();
                 //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
                 ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
-
             }
         }
-
 
         [Test]
         [Ignore("Local testing")]
@@ -352,7 +337,6 @@ namespace AScore_UnitTests
                 "NMR_LaR80a_01_20Jul11_Andromeda_11-02-54_fhtf.txt",
                 "NMR_LaR80a_02_20Jul11_Andromeda_11-02-56_fhtf.txt",
                 "NMR_LaR80a_03_20Jul11_Andromeda_11-02-54_fhtf.txt"
-
             };
 
             var dtaFiles = new List<string>{
@@ -385,7 +369,6 @@ namespace AScore_UnitTests
                 var ascoreEngine = new AScore_DLL.Algorithm();
                 //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
                 ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
-
             }
         }
 
@@ -414,7 +397,6 @@ namespace AScore_UnitTests
             sw.Stop();
             Console.WriteLine("Time elapsed: {0:F1} seconds", sw.Elapsed.TotalSeconds);
             Console.WriteLine("Results in " + resultsFile);
-
         }
 
         [Test]
@@ -442,7 +424,6 @@ namespace AScore_UnitTests
             sw.Stop();
             Console.WriteLine("Time elapsed: {0:F1} seconds", sw.Elapsed.TotalSeconds);
             Console.WriteLine("Results in " + resultsFile);
-
         }
 
         [Test]
@@ -463,7 +444,6 @@ namespace AScore_UnitTests
             var ascorePCID = "CIDPhos.xml";
             var directETD = @"C:\Users\aldr699\Documents\2012\Osmani\ETD";
             var directCID = @"C:\Users\aldr699\Documents\2012\Osmani\CID";
-
 
             var fhtFiles = new List<string>{
                 "SOSM_May_G2_RR1_26Jan12_Hawk_11-11-03p_fhtf.txt",
@@ -497,7 +477,6 @@ namespace AScore_UnitTests
                     {
                         direct = directETD;
                         ascoreP = ascorePETD;
-
                     }
                     else
                     {
@@ -519,11 +498,9 @@ namespace AScore_UnitTests
                     var ascoreEngine = new AScore_DLL.Algorithm();
                     //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
                     ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
-
                 }
             }
         }
-
 
         [Test]
         [Ignore("Local testing")]
@@ -532,7 +509,6 @@ namespace AScore_UnitTests
             var ascoreP = "HCDPhos.xml";
             var directSeq = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas\Sequest";
             var directMsg = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas\MSGFDB";
-
 
             var fhtFiles = new List<string>{
                 "Kidney_ACHN_Das_1_pTyr_HCD_8May12_Lynx_12-02-29_fht.txt",
@@ -547,7 +523,6 @@ namespace AScore_UnitTests
                 "Kidney_ACHN_Veh_2_IMAC_HCD_10May12_Lynx_12-02-31_msgfdb_fht.txt",
                 "Kidney_ACHN_Das_2_IMAC_HCD_11May12_Lynx_12-02-31_msgfdb_fht.txt"
             };
-
 
             var direct2 = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas";
 
@@ -570,7 +545,6 @@ namespace AScore_UnitTests
                     {
                         direct = directSeq;
                         fht = fhtFiles[i];
-
                     }
                     else
                     {
@@ -603,7 +577,6 @@ namespace AScore_UnitTests
                     var ascoreEngine = new AScore_DLL.Algorithm();
                     //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
                     ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
-
                 }
             }
         }
@@ -612,7 +585,5 @@ namespace AScore_UnitTests
         {
             return new PHRPReader.clsPeptideMassCalculator();
         }
-
-
     }
 }

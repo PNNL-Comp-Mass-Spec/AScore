@@ -103,6 +103,5 @@ namespace AScore_DLL.Managers
         }
 
         #endregion // Comparison Classes
-
     }
 }

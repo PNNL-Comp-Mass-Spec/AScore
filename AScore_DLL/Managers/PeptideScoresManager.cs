@@ -36,7 +36,6 @@ namespace AScore_DLL.Managers
             }
             sum = -10 * Math.Log(sum, 10);
             return sum;
-
         }
 
         /// <summary>

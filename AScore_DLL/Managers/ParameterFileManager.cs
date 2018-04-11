@@ -14,7 +14,6 @@ namespace AScore_DLL.Managers
     /// </summary>
     public class ParameterFileManager : clsEventNotifier
     {
-
         #region Member Variables
         private List<Modification> staticMods;
         private List<Modification> terminiMods;
@@ -26,7 +25,6 @@ namespace AScore_DLL.Managers
         private double fragmentMassToleranceHCD = 0.05;
         private double msgfPreFilter;
         #endregion
-
 
         #region Public Properties
         public List<Modification> StaticMods => staticMods;
@@ -62,8 +60,6 @@ namespace AScore_DLL.Managers
 
         #endregion
 
-
-
         #region ParameterFileManager Constructors
 
         public ParameterFileManager(string inputFile)
@@ -83,11 +79,9 @@ namespace AScore_DLL.Managers
             }
         }
 
-
         public ParameterFileManager(List<Modification> stat, List<Modification> term,
             List<DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
         {
-
             staticMods = stat;
             terminiMods = term;
             dynamMods = dynam;
@@ -103,7 +97,6 @@ namespace AScore_DLL.Managers
         public void InitializeAScoreParameters(List<Modification> stat, List<Modification> term,
             List<DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
         {
-
             staticMods = stat;
             terminiMods = term;
             dynamMods = dynam;
@@ -145,7 +138,6 @@ namespace AScore_DLL.Managers
         {
             return new ParameterFileManager(new List<Modification>(staticMods), new List<Modification>(terminiMods),
                 new List<DynamicModification>(dynamMods), fragmentType, fragmentMassTolerance, msgfPreFilter);
-
         }
 
         /// <summary>
@@ -206,7 +198,6 @@ namespace AScore_DLL.Managers
             InitializeAScoreParameters(staticModDefs, terminalModDefs, dynamicModDefs, f, massTol, msgfTol);
             MultiDissociationParamFile = multiDissociationParams;
         }
-
 
         private List<Modification> ParseXmlModInfo(XmlNode parameterFile, string sectionName, ref int uniqueID, bool requireModSites)
         {
@@ -340,6 +331,5 @@ namespace AScore_DLL.Managers
             return f;
         }
         #endregion
-
     }
 }

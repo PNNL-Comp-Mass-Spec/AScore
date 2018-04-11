@@ -2,8 +2,6 @@
 {
     public class InspectFHT : DatasetManager
     {
-
-
         public InspectFHT(string fhtFileName) : base(fhtFileName) { }
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq,
@@ -25,8 +23,5 @@
             msgfScore = 0;
             double.TryParse((string)dt.Rows[t]["MSGF_SpecProb"],out msgfScore);
         }
-
     }
-
-
 }

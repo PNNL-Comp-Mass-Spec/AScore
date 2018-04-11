@@ -125,7 +125,6 @@ namespace AScore_Console
 #endif
 
             return 0;
-
         }
 
         /// <summary>
@@ -275,7 +274,6 @@ namespace AScore_Console
                               " -L:LogFile.txt\n" +
                               " -Fasta:C:\\Temp\\H_sapiens_Uniprot_SPROT_2013-09-18.fasta\n" +
                               " -PD");
-
         }
 
         /// <summary>
@@ -331,7 +329,6 @@ namespace AScore_Console
         /// <returns></returns>
         private static int RunAScore(AScoreOptionsType ascoreOptions, string logFilePath, string supportedSearchModes, bool multiJobMode)
         {
-
             if (!string.IsNullOrWhiteSpace(logFilePath))
             {
                 mLogFile = new StreamWriter(new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
@@ -420,7 +417,6 @@ namespace AScore_Console
                     ascoreEngine.AlgorithmRun(spectraManager, datasetManager, paramManager, ascoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
                 }
 
-
                 ShowMessage("AScore Complete");
             }
 
@@ -468,7 +464,6 @@ namespace AScore_Console
             {
                 mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + clsStackTraceFormatter.GetExceptionStackTrace(ex));
             }
-
         }
 
         private static void ShowWarning(string message)

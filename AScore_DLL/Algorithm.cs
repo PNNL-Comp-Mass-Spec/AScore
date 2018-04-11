@@ -9,7 +9,6 @@ using AScore_DLL.Managers.SpectraManagers;
 using AScore_DLL.Mod;
 using PRISM;
 
-
 namespace AScore_DLL
 {
     public class Algorithm : clsEventNotifier
@@ -31,7 +30,6 @@ namespace AScore_DLL
             get => m_filterOnMSGFScore;
             set => m_filterOnMSGFScore = value;
         }
-
 
         #endregion
 
@@ -58,7 +56,6 @@ namespace AScore_DLL
                 "Job",
                 "Dataset"
             };
-
 
             // Read the contents of JobToDatasetMapFile
             using (var srMapFile = new StreamReader(new FileStream(JobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
@@ -160,7 +157,6 @@ namespace AScore_DLL
             ParameterFileManager ascoreParameters,
             string outputFilePath)
         {
-
             var totalRows = datasetManager.GetRowLength();
             var dctPeptidesProcessed = new Dictionary<string, int>();
 
@@ -337,7 +333,6 @@ namespace AScore_DLL
                     datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], MODINFO_NO_MODIFIED_RESIDUES);
                 }
                 datasetManager.IncrementRow();
-
             }
 
             Console.WriteLine();
@@ -360,7 +355,6 @@ namespace AScore_DLL
             }
 
             Console.WriteLine();
-
         }
 
         #endregion
@@ -381,7 +375,6 @@ namespace AScore_DLL
             double mzmin,
             IReadOnlyList<int[]> myPositionsList)
         {
-
             // Initialize AScore results storage
             var lstResults = new List<AScoreResult>();
 
@@ -440,7 +433,6 @@ namespace AScore_DLL
 
                     if (!bValidMatch)
                         OnErrorEvent("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
-
                 }
 
                 var sortByMass = new ExperimentalSpectraEntry.SortValue1();
@@ -448,7 +440,6 @@ namespace AScore_DLL
                 var modNumber = 0;
                 foreach (var myPositions in myPositionsList)
                 {
-
                     //Generate spectra for a modification combination
                     var myIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, myPositions);
                     peptideScores.Add(new List<double>());
@@ -542,12 +533,10 @@ namespace AScore_DLL
                         continue;
                     }
 
-
                     var secondTopPeptidePTMsites = myPositionsList[sortedSumScore[secondPeptide].Index];
                     // Get the second best scoring spectra
 
                     var secondTopTheoIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, secondTopPeptidePTMsites);
-
 
                     // Calculate the diff score between the top and second sites
                     var diffScore = new List<ValueIndexPair<double>>();
@@ -590,7 +579,6 @@ namespace AScore_DLL
                     ascoreResult.AScore = Math.Abs(a1 - a2);
                     ascoreResult.NumSiteIons = siteIons1.Count;                     // numSiteIonsPoss
                     ascoreResult.SiteDetermineMatched = bestDeterminingCount;       // numSiteIonsMatched
-
                 }
 
                 foreach (var ascoreResult in lstResults)
@@ -598,7 +586,6 @@ namespace AScore_DLL
                     ascoreResult.SecondSequence = front + "." +
                         GenerateFinalSequences(sequenceClean, ascoreParameters, ascoreResult.PeptideMods) + "." + back;
                 }
-
 
                 //Put scores into our table
                 var bestSeq = front + "." + GenerateFinalSequences(sequenceClean, ascoreParameters, topPeptidePTMsites) + "." + back;
@@ -630,7 +617,6 @@ namespace AScore_DLL
             }
             return seq;
         }
-
 
         /// <summary>
         /// Generates a sequence based on final best peptide sequence.
@@ -667,7 +653,6 @@ namespace AScore_DLL
             }
 
             return sbFinalSeq.ToString();
-
         }
 
         private double GetModMassTotal(string peptideSeq, IReadOnlyCollection<DynamicModification> dynMods)
@@ -862,7 +847,6 @@ namespace AScore_DLL
             return myIons;
         }
 
-
         private string LookupModInfoByID(int uniqueID, IEnumerable<DynamicModification> dynamicMods)
         {
             var modInfo = string.Empty;
@@ -915,6 +899,5 @@ namespace AScore_DLL
         }
 
         #endregion
-
     }
 }

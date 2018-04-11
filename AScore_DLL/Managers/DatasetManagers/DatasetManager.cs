@@ -58,9 +58,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             maxSteps = dt.Rows.Count;
             AtEnd = false;
             InitializeAscores();
-
         }
-
 
         private void InitializeAscores()
         {
@@ -76,8 +74,6 @@ namespace AScore_DLL.Managers.DatasetManagers
             dAscores.Columns.Add(RESULTS_COL_NUMSITEIONSMATCHED, typeof(string));
             dAscores.Columns.Add(RESULTS_COL_SECONDSEQUENCE, typeof(string));
             dAscores.Columns.Add(RESULTS_COL_MODINFO, typeof(string));
-
-
         }
 
         public int GetRowLength()
@@ -141,7 +137,6 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow[RESULTS_COL_MODINFO] = ascoreResult.ModInfo;
 
             dAscores.Rows.Add(drow);
-
         }
 
         /// <summary>
@@ -173,7 +168,6 @@ namespace AScore_DLL.Managers.DatasetManagers
             if (intNonZeroCount == 0)
             {
                 drow[RESULTS_COL_ASCORE] = "-1";
-
             }
             else
             {
@@ -185,9 +179,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             drow[RESULTS_COL_MODINFO] = modInfo;
 
             dAscores.Rows.Add(drow);
-
         }
-
 
         /// <summary>
         /// Writes the current dataset to file
@@ -209,6 +201,5 @@ namespace AScore_DLL.Managers.DatasetManagers
                 AtEnd = true;
             }
         }
-
     }
 }

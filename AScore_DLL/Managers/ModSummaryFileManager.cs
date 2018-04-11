@@ -12,7 +12,6 @@ namespace AScore_DLL.Managers
     /// </summary>
     public class ModSummaryFileManager : clsEventNotifier
     {
-
         private const string COL_SYMBOL = "Modification_Symbol";
         private const string COL_MASS = "Modification_Mass";
         private const string COL_RESIDUE = "Target_Residues";
@@ -159,6 +158,5 @@ namespace AScore_DLL.Managers
                 UniqueID = row + 1
             };
         }
-
     }
 }

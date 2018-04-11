@@ -19,7 +19,6 @@ namespace AScore_DLL.Combinatorics
         /// <param name="sequence">Peptide sequence</param>
         public ModMixtureCombo(List<Mod.DynamicModification> dynMods, string sequence)
         {
-
             sitePositions = GetSiteLocation(dynMods, sequence);
             combinationSets = GenerateCombosToCheck(sitePositions, dynMods);
 
@@ -70,7 +69,6 @@ namespace AScore_DLL.Combinatorics
                 possiblePositions.Add(new List<int>());
             }
 
-
             for (var i = 0; i < sequence.Length; i++)
             {
                 var theCount = 0;
@@ -95,7 +93,6 @@ namespace AScore_DLL.Combinatorics
             return possiblePositions;
         }
 
-
         /// <summary>
         /// Recursively calculates all possible combination mixtures and stores them
         /// in finalCombos
@@ -107,7 +104,6 @@ namespace AScore_DLL.Combinatorics
             //Reached max depth of recursion
             if (i >= combinationSets.Count)
             {
-
                 var aFinalCombo = new List<int>();
                 //Ensure no overlap between modification combination site positions
                 foreach (var s in allSites)
@@ -151,17 +147,14 @@ namespace AScore_DLL.Combinatorics
             }
             else
             {
-
                 for (var k = 0; k < combinationSets[i].Count; k++)
                 {
                     currentList.Add(combinationSets[i][k]);
                     CalculateCombos(i + 1, currentList);
                     currentList.Remove(combinationSets[i][k]);
                 }
-
             }
         }
-
 
         /// <summary>
         /// Creates a list of modification types each having a list of positional combinations which are themselves int lists
@@ -206,9 +199,6 @@ namespace AScore_DLL.Combinatorics
                 combinationSets.Add(allCombos);
             }
             return combinationSets;
-
         }
-
-
     }
 }

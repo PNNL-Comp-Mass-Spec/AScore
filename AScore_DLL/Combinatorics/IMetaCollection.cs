@@ -34,5 +34,4 @@ namespace AScore_DLL.Combinatorics
         /// </summary>
         int LowerIndex { get; }
     }
-
 }

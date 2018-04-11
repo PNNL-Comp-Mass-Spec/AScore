@@ -54,11 +54,9 @@ namespace AScore_DLL.Managers.SpectraManagers
             mzAccessor.CloseFile();
         }
 
-
         public void Abort()
         {
             mzAccessor.CloseFile();
-
         }
 
         public ExperimentalSpectra GetExperimentalSpectra(int scanNumber, int scanCount, int chargeState)
@@ -74,8 +72,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             var mzlist = specInfo.MZList;
             var intlist = specInfo.IntensityList;
 
-
-
             for (var i = 0; i < mzlist.Length; i++)
             {
                 var val1 = mzlist[i];
@@ -87,8 +83,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             var expSpec = new ExperimentalSpectra(scanNumber, chargeState,
                                                                   precursorMass, precursorChargeState, entries, mPeptideMassCalculator);
             return expSpec;
-
-
         }
 
         public void OpenFile(string filePath)

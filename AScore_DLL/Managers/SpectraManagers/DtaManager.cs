@@ -54,7 +54,6 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         public string DatasetName => m_datasetName;
 
-
         public bool Initialized => m_initialized;
 
         #endregion // Properties
@@ -72,7 +71,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             m_PeptideMassCalculator = peptideMassCalculator;
             m_initialized = false;
         }
-
 
         /// <summary>
         /// Initializes a new instance of DtaManger.
@@ -164,9 +162,6 @@ namespace AScore_DLL.Managers.SpectraManagers
                 m_datasetName, scanStart,
                 scanEnd, chargeState);
         }
-
-
-
 
         /// <summary>
         /// Retrieves an experimental spectra entry from the Master DTA file.
@@ -277,7 +272,6 @@ namespace AScore_DLL.Managers.SpectraManagers
                     {
                         int.TryParse(reMatch.Groups[1].Value, out dtaChargeState);
                     }
-
                 }
             }
 
@@ -384,7 +378,6 @@ namespace AScore_DLL.Managers.SpectraManagers
                         bytesRead += line.Length + Environment.NewLine.Length;
                     }
                 }
-
             }
             catch (Exception ex)
             {

@@ -29,8 +29,6 @@ namespace AScore_DLL.Managers
         private readonly List<double> bIonsOut = new List<double>();
         private readonly List<double> yIonsOut = new List<double>();
 
-
-
         #endregion // Variables
 
         #region Properties
@@ -91,7 +89,6 @@ namespace AScore_DLL.Managers
             MolecularWeights.MassType = massType;
             var sumofModsB = 0.0;
             var sumofModsY = 0.0;
-
 
             // If the charge state is one, create the
             if (chargeState == 1)
@@ -156,13 +153,10 @@ namespace AScore_DLL.Managers
                         fragIon.bIonsOut.Add((bIons[i] + sumofModsB /*+temp*/)/chargeState);
                         fragIon.yIonsOut.Add((yIons[i] + sumofModsY/*+temp*/) / chargeState);
                     }
-
                 }
-
             }
             return fragIon;
         }
-
 
         #endregion // Public Methods
     }

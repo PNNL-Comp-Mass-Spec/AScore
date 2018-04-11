@@ -193,7 +193,6 @@ namespace AScore_DLL.Managers
                             if (currentSectionFiltered.Count >= 10)
                                 break;
                         }
-
                     }
                     currentSection = currentSectionFiltered;
                 }

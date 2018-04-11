@@ -11,7 +11,6 @@ namespace AScore_DLL.Managers
     /// </summary>
     public class TheoreticalSpectra:IEnumerable
     {
-
         private int chargeState;
         private int count;
         private double peptideMassWithStaticMods;
@@ -53,7 +52,6 @@ namespace AScore_DLL.Managers
         private double GenerateIonMasses(IReadOnlyCollection<Modification> staticMods,
             List<Modification> terminiMods)
         {
-
             // Need to iterate through each amino acid in the peptide to
             // generate the ion masses
             for (var i = 0; i < peptideSequence.Length; ++i)
@@ -61,7 +59,6 @@ namespace AScore_DLL.Managers
                 // Current amino acid
                 var bAcid = peptideSequence[i];
                 var yAcid = peptideSequence[peptideSequence.Length - i - 1];
-
 
                 // Get the monoisotopic mass for the current amino acid
 
@@ -80,7 +77,6 @@ namespace AScore_DLL.Managers
                     }
                 }
 
-
                 // Add the previous mass to the current mass for a rolling total
                 if (i > 0)
                 {
@@ -96,7 +92,6 @@ namespace AScore_DLL.Managers
                     bIonsMass[i] = EdgeCase(bIonsMass[i], terminiMods, bAcid, leftSide: true);
                     yIonsMass[i] = EdgeCase(yIonsMass[i], terminiMods, yAcid, leftSide: false);
                 }
-
             }
 
             var peptideMass = bIonsMass[bIonsMass.Count - 1] - MolecularWeights.Hydrogen + MolecularWeights.Water;
@@ -110,8 +105,6 @@ namespace AScore_DLL.Managers
             return peptideMass;
         }
 
-
-
         /// <summary>
         /// N and C terminal static mod cases
         /// </summary>
@@ -122,19 +115,15 @@ namespace AScore_DLL.Managers
         /// <returns>modified mass</returns>
         private static double EdgeCase(double mass, List<Modification> terminiMods, char aAcid, bool leftSide)
         {
-
-
             foreach (var t in terminiMods)
             {
                 if (t.nTerminus && leftSide && t.Match(aAcid))
                 {
                     mass += t.Mass;
-
                 }
                 if (t.cTerminus && !leftSide && t.Match(aAcid))
                 {
                     mass += t.Mass;
-
                 }
             }
             if (leftSide)
@@ -187,7 +176,6 @@ namespace AScore_DLL.Managers
                 }
             }
         }
-
 
         /// <summary>
         /// Generates a theoretical spectra based on a modification list and positions for those modifications

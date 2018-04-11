@@ -9,7 +9,6 @@ namespace AScore_DLL
 {
     class Utilities
     {
-
         /// <summary>
         /// Generates a datatable with all entries being a string
         /// </summary>
@@ -67,7 +66,6 @@ namespace AScore_DLL
             }
 
             return dt;
-
         }
 
         /// <summary>
@@ -95,11 +93,7 @@ namespace AScore_DLL
                     }
                     sw.WriteLine(dataLine);
                 }
-
-
             }
         }
-
-
     }
 }
