@@ -1,9 +1,6 @@
 ﻿using System;
-using AScore_DLL.Managers;
-using AScore_DLL.Managers.DatasetManagers;
-using AScore_DLL.Managers.SpectraManagers;
 using System.IO;
-using PHRPReader;
+using AScore_DLL;
 using PRISM;
 
 namespace AScore_Console
@@ -12,7 +9,6 @@ namespace AScore_Console
     {
         static StreamWriter mLogFile;
         static string mLogFilePath = string.Empty;
-        const string SupportedSearchModes = "sequest, xtandem, inspect, msgfdb, or msgfplus";
 
         /// <summary>
         /// Main entry point
@@ -78,7 +74,15 @@ namespace AScore_Console
                     return returnCode;
                 }
 
-                returnCode = RunAScore(ascoreOptions, mLogFilePath, SupportedSearchModes);
+                if (!string.IsNullOrWhiteSpace(mLogFilePath))
+                {
+                    mLogFile = new StreamWriter(new FileStream(mLogFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                    {
+                        AutoFlush = true
+                    };
+                }
+
+                returnCode = RunAScoreProcessor(ascoreOptions);
 
                 if (returnCode != 0)
                 {
@@ -106,128 +110,28 @@ namespace AScore_Console
             return 0;
         }
 
-        /// <summary>
-        /// Configure and run the AScore DLL
-        /// </summary>
-        /// <param name="ascoreOptions"></param>
-        /// <param name="logFilePath"></param>
-        /// <param name="supportedSearchModes"></param>
-        /// <param name="multiJobMode"></param>
-        /// <returns></returns>
-        private static int RunAScore(AScoreOptions ascoreOptions, string logFilePath, string supportedSearchModes)
+        private static int RunAScoreProcessor(AScoreOptions ascoreOptions)
         {
-            if (!string.IsNullOrWhiteSpace(logFilePath))
-            {
-                mLogFile = new StreamWriter(new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
-                {
-                    AutoFlush = true
-                };
-            }
+            var returnCode = 0;
 
-            var diOutputFolder = new DirectoryInfo(ascoreOptions.OutputFolderPath);
-            if (!diOutputFolder.Exists)
-            {
-                try
-                {
-                    ShowMessage("Output folder not found (will auto-create): " + diOutputFolder.FullName);
-                    diOutputFolder.Create();
-                }
-                catch (Exception ex)
-                {
-                    ShowMessage("Error creating the output folder: " + ex.Message);
-                    diOutputFolder = new DirectoryInfo(".");
-                    ShowMessage("Changed output to " + diOutputFolder.FullName);
-                }
-            }
+            var processor = new AScoreProcessor();
+            AttachEvents(processor);
 
-            var fhtFileBaseName = Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile);
-            if (fhtFileBaseName.ToLower().EndsWith(".mzid"))
+            if (ascoreOptions.ProcessSettings(ShowMessage))
             {
-                fhtFileBaseName = Path.GetFileNameWithoutExtension(fhtFileBaseName);
-            }
-            var ascoreResultsFilePath = Path.Combine(diOutputFolder.FullName, fhtFileBaseName + "_ascore.txt");
-
-            if (ascoreOptions.SkipExistingResults && File.Exists(ascoreResultsFilePath))
-            {
-                ShowMessage("Existing results file found; will not re-create");
+                returnCode = processor.RunAScore(ascoreOptions);
             }
             else
             {
-                var paramManager = new ParameterFileManager(ascoreOptions.AScoreParamFile);
-                AttachEvents(paramManager);
+                ShowMessage("Existing results file found; will not re-create");
 
-                DatasetManager datasetManager;
-
-                switch (ascoreOptions.SearchType)
+                if (ascoreOptions.CreateUpdatedDbSearchResultsFile && ascoreOptions.SearchResultsType == DbSearchResultsType.Fht)
                 {
-                    case SearchMode.XTandem:
-                        ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
-                        datasetManager = new XTandemFHT(ascoreOptions.FirstHitsFile);
-                        break;
-                    case SearchMode.Sequest:
-                        ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
-                        datasetManager = new SequestFHT(ascoreOptions.FirstHitsFile);
-                        break;
-                    case SearchMode.Inspect:
-                        ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
-                        datasetManager = new InspectFHT(ascoreOptions.FirstHitsFile);
-                        break;
-                    case SearchMode.Msgfdb:
-                    case SearchMode.Msgfplus:
-                        ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
-                        if (ascoreOptions.FirstHitsFile.ToLower().Contains(".mzid"))
-                        {
-                            datasetManager = new MsgfMzid(ascoreOptions.FirstHitsFile);
-                        }
-                        else
-                        {
-                            datasetManager = new MsgfdbFHT(ascoreOptions.FirstHitsFile);
-                        }
-                        break;
-                    default:
-                        ShowError("Incorrect search type: " + ascoreOptions.SearchType + " , supported values are " + supportedSearchModes);
-                        return -13;
+                    processor.CreateUpdatedFirstHitsFile(ascoreOptions);
                 }
-                var peptideMassCalculator = new clsPeptideMassCalculator();
-
-                var spectraManager = new SpectraManagerCache(peptideMassCalculator);
-
-                AttachEvents(spectraManager);
-
-                ShowMessage("Output folder: " + diOutputFolder.FullName);
-
-                var ascoreEngine = new AScore_DLL.Algorithm();
-                AttachEvents(ascoreEngine);
-
-                // Initialize the options
-                ascoreEngine.FilterOnMSGFScore = ascoreOptions.FilterOnMSGFScore;
-
-                // Run the algorithm
-                if (ascoreOptions.MultiJobMode)
-                {
-                    ascoreEngine.AlgorithmRun(ascoreOptions.JobToDatasetMapFile, spectraManager, datasetManager, paramManager, ascoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
-                }
-                else
-                {
-                    spectraManager.OpenFile(ascoreOptions.CDtaFile);
-
-                    ascoreEngine.AlgorithmRun(spectraManager, datasetManager, paramManager, ascoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
-                }
-
-                ShowMessage("AScore Complete");
             }
 
-            if (ascoreOptions.CreateUpdatedFirstHitsFile && !ascoreOptions.FirstHitsFile.ToLower().Contains(".mzid"))
-            {
-                var resultsMerger = new AScore_DLL.PHRPResultsMerger();
-                AttachEvents(resultsMerger);
-
-                resultsMerger.MergeResults(ascoreOptions.FirstHitsFile, ascoreResultsFilePath, ascoreOptions.UpdatedFirstHitsFileName);
-
-                ShowMessage("Results merged; new file: " + Path.GetFileName(resultsMerger.MergedFilePath));
-            }
-
-            return 0;
+            return returnCode;
         }
 
         /// <summary>

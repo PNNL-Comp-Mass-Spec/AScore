@@ -1,28 +1,21 @@
 ﻿using System;
 using System.IO;
+using AScore_DLL;
 using PRISM;
 
 namespace AScore_Console
 {
-    public enum SearchMode
-    {
-        Sequest,
-        XTandem,
-        Inspect,
-        Msgfdb,
-        Msgfplus
-    }
 
-    public class AScoreOptions
+    public class AScoreOptions : IAScoreOptions
     {
         [Option("T", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
 
         [Option("F", Required = true, HelpText = "Path to first-hits file (or mzid file, for MSGF+)", HelpShowsDefault = false)]
-        public string FirstHitsFile { get; set; }
+        public string DbSearchResultsFile { get; set; }
 
         [Option("D", HelpText = "Spectra file path (this or -JM is required)", HelpShowsDefault = false)]
-        public string CDtaFile { get; set; }
+        public string MassSpecFile { get; set; }
 
         [Option("JM", HelpText = "Job-to-dataset map file path (this or -D is required). Use this instead of -D if the FHT file has results from multiple jobs; the map file should have job numbers and dataset names, using columns names Job and Dataset.", HelpShowsDefault = false)]
         public string JobToDatasetMapFile { get; set; }
@@ -47,13 +40,12 @@ namespace AScore_Console
         public bool DoNotFilterOnMSGFScore { get; set; }
 
         [Option("U", HelpText = "Output FHT file name; if set, a copy of the FHT file with updated peptide sequences and additional AScore-related columns will be created")]
-        public string UpdatedFirstHitsFileName { get; set; }
+        public string UpdatedDbSearchResultsFileName { get; set; }
 
-        public bool CreateUpdatedFirstHitsFile { get; private set; }
+        public bool CreateUpdatedDbSearchResultsFile { get; private set; }
 
         [Option("Skip", HelpText = "If specified, will not re-run AScore if a results file already exists")]
         public bool SkipExistingResults { get; set; }
-
 
         [Option("Fasta", HelpText = "Fasta file path; if set, Protein Data from the Fasta file will be included in the output")]
         public string FastaFilePath { get; set; }
@@ -63,28 +55,36 @@ namespace AScore_Console
 
         public bool MultiJobMode { get; private set; }
 
+        public DbSearchResultsType SearchResultsType { get; private set; }
+
+        public string AScoreResultsFilePath { get; private set; }
+
+        public DirectoryInfo OutputDirectoryInfo { get; private set; }
+
         public AScoreOptions()
         {
             SearchType = SearchMode.Msgfplus;
-            FirstHitsFile = string.Empty;
-            CDtaFile = string.Empty;
+            SearchResultsType = DbSearchResultsType.Fht;
+            DbSearchResultsFile = string.Empty;
+            MassSpecFile = string.Empty;
             JobToDatasetMapFile = string.Empty;
             AScoreParamFile = string.Empty;
             OutputFolderPath = ".";
             DoNotFilterOnMSGFScore = false;
 
             SkipExistingResults = false;
-            CreateUpdatedFirstHitsFile = false;
-            UpdatedFirstHitsFileName = string.Empty;
+            CreateUpdatedDbSearchResultsFile = false;
+            UpdatedDbSearchResultsFileName = string.Empty;
 
             FastaFilePath = string.Empty;
             OutputProteinDescriptions = false;
             MultiJobMode = false;
+            AScoreResultsFilePath = string.Empty;
         }
 
         public bool Validate()
         {
-            if (string.IsNullOrWhiteSpace(CDtaFile) && string.IsNullOrWhiteSpace(JobToDatasetMapFile))
+            if (string.IsNullOrWhiteSpace(MassSpecFile) && string.IsNullOrWhiteSpace(JobToDatasetMapFile))
             {
                 Console.WriteLine("ERROR: Must specify -D or -JM!");
                 return false;
@@ -100,6 +100,11 @@ namespace AScore_Console
                 OutputFolderPath = ".";
             }
 
+            if (DbSearchResultsFile.ToLower().EndsWith(".mzid") || DbSearchResultsFile.ToLower().EndsWith(".mzid.gz"))
+            {
+                SearchResultsType = DbSearchResultsType.Mzid;
+            }
+
             // If OutputFolderPath points to a file, change it to the parent folder
             var outputFolderPathFile = new FileInfo(OutputFolderPath);
             if (outputFolderPathFile.Extension.Length > 1 && outputFolderPathFile.Directory != null && outputFolderPathFile.Directory.Exists)
@@ -107,9 +112,9 @@ namespace AScore_Console
                 OutputFolderPath = outputFolderPathFile.Directory.FullName;
             }
 
-            if (!string.IsNullOrWhiteSpace(UpdatedFirstHitsFileName))
+            if (!string.IsNullOrWhiteSpace(UpdatedDbSearchResultsFileName))
             {
-                CreateUpdatedFirstHitsFile = true;
+                CreateUpdatedDbSearchResultsFile = true;
             }
 
             if (string.IsNullOrWhiteSpace(FastaFilePath))
@@ -142,9 +147,9 @@ namespace AScore_Console
                 return -10;
             }
 
-            if (!string.IsNullOrEmpty(CDtaFile) && !File.Exists(CDtaFile))
+            if (!string.IsNullOrEmpty(MassSpecFile) && !File.Exists(MassSpecFile))
             {
-                errorReporter("Input file not found: " + CDtaFile);
+                errorReporter("Input file not found: " + MassSpecFile);
                 return -11;
             }
 
@@ -154,9 +159,9 @@ namespace AScore_Console
                 return -11;
             }
 
-            if (!File.Exists(FirstHitsFile))
+            if (!File.Exists(DbSearchResultsFile))
             {
-                errorReporter("Input file not found: " + FirstHitsFile);
+                errorReporter("Input file not found: " + DbSearchResultsFile);
                 return -12;
             }
 
@@ -167,6 +172,46 @@ namespace AScore_Console
             }
 
             return 0;
+        }
+
+        /// <summary>
+        /// Final evaluation and management of settings
+        /// </summary>
+        /// <param name="messageReporter"></param>
+        /// <returns>true if processing should continue, false if it should be skipped</returns>
+        public bool ProcessSettings(Action<string> messageReporter)
+        {
+            OutputDirectoryInfo = new DirectoryInfo(OutputFolderPath);
+            if (!OutputDirectoryInfo.Exists)
+            {
+                try
+                {
+                    messageReporter("Output folder not found (will auto-create): " + OutputDirectoryInfo.FullName);
+                    OutputDirectoryInfo.Create();
+                }
+                catch (Exception ex)
+                {
+                    messageReporter("Error creating the output folder: " + ex.Message);
+                    OutputDirectoryInfo = new DirectoryInfo(".");
+                    messageReporter("Changed output to " + OutputDirectoryInfo.FullName);
+                    OutputFolderPath = OutputDirectoryInfo.FullName;
+                }
+            }
+
+            var fhtFileBaseName = Path.GetFileNameWithoutExtension(DbSearchResultsFile);
+            if (fhtFileBaseName.ToLower().EndsWith(".mzid"))
+            {
+                fhtFileBaseName = Path.GetFileNameWithoutExtension(fhtFileBaseName);
+            }
+            AScoreResultsFilePath = Path.Combine(OutputDirectoryInfo.FullName, fhtFileBaseName + "_ascore.txt");
+
+            if (SkipExistingResults && File.Exists(AScoreResultsFilePath))
+            {
+                messageReporter("Existing results file found; will not re-create");
+                return false;
+            }
+
+            return true;
         }
     }
 }
