@@ -242,7 +242,14 @@ namespace AScore_DLL
                     spectraManagerCurrentJob = string.Copy(datasetManager.JobNum);
                     Console.Write("\r");
 
-                    modSummaryManager.ReadModSummary(spectraFile.DatasetName, datasetManager.DatasetFilePath, ascoreParameters);
+                    if (datasetManager is MsgfMzid mzid)
+                    {
+                        mzid.SetModifications(ascoreParameters);
+                    }
+                    else
+                    {
+                        modSummaryManager.ReadModSummary(spectraFile.DatasetName, datasetManager.DatasetFilePath, ascoreParameters);
+                    }
 
                     Console.Write("\rPercent Completion " + Math.Round((double)datasetManager.CurrentRowNum / totalRows * 100) + "%");
                 }
@@ -602,7 +609,7 @@ namespace AScore_DLL
         }
 
         /// <summary>
-        /// Gets a clean sequence intitializes dynamic modifications
+        /// Gets a clean sequence initializes dynamic modifications
         /// </summary>
         /// <param name="seq">input protein sequence including mod characters, but without the prefix or suffix residues</param>
         /// <param name="ascoreParameters">ascore parameters reference</param>

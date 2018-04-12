@@ -353,7 +353,12 @@ namespace AScore_Console
                 }
             }
 
-            var ascoreResultsFilePath = Path.Combine(diOutputFolder.FullName, Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile) + "_ascore.txt");
+            var fhtFileBaseName = Path.GetFileNameWithoutExtension(ascoreOptions.FirstHitsFile);
+            if (fhtFileBaseName.ToLower().EndsWith(".mzid"))
+            {
+                fhtFileBaseName = Path.GetFileNameWithoutExtension(fhtFileBaseName);
+            }
+            var ascoreResultsFilePath = Path.Combine(diOutputFolder.FullName, fhtFileBaseName + "_ascore.txt");
 
             if (ascoreOptions.SkipExistingResults && File.Exists(ascoreResultsFilePath))
             {
@@ -385,7 +390,14 @@ namespace AScore_Console
                     case "msgfplus":
                     case "msgf+":
                         ShowMessage("Caching data in " + Path.GetFileName(ascoreOptions.FirstHitsFile));
-                        datasetManager = new MsgfdbFHT(ascoreOptions.FirstHitsFile);
+                        if (ascoreOptions.FirstHitsFile.ToLower().Contains(".mzid"))
+                        {
+                            datasetManager = new MsgfMzid(ascoreOptions.FirstHitsFile);
+                        }
+                        else
+                        {
+                            datasetManager = new MsgfdbFHT(ascoreOptions.FirstHitsFile);
+                        }
                         break;
                     default:
                         ShowError("Incorrect search type: " + ascoreOptions.SearchType + " , supported values are " + supportedSearchModes);
@@ -420,7 +432,7 @@ namespace AScore_Console
                 ShowMessage("AScore Complete");
             }
 
-            if (ascoreOptions.CreateUpdatedFirstHitsFile)
+            if (ascoreOptions.CreateUpdatedFirstHitsFile && !ascoreOptions.FirstHitsFile.ToLower().Contains(".mzid"))
             {
                 var resultsMerger = new AScore_DLL.PHRPResultsMerger();
                 AttachEvents(resultsMerger);

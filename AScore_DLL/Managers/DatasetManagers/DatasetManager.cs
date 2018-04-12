@@ -46,16 +46,24 @@ namespace AScore_DLL.Managers.DatasetManagers
         protected DatasetManager(string fhtFileName)
         {
             mDatasetFilePath = fhtFileName;
-            dt = Utilities.TextFileToDataTableAssignTypeString(fhtFileName, false);
+            if (!fhtFileName.ToLower().Contains("mzid"))
+            {
+                dt = Utilities.TextFileToDataTableAssignTypeString(fhtFileName, false);
 
-            if (dt.Columns.Contains(RESULTS_COL_JOB))
-                m_jobNum = (string)dt.Rows[0][RESULTS_COL_JOB];
+                if (dt.Columns.Contains(RESULTS_COL_JOB))
+                    m_jobNum = (string) dt.Rows[0][RESULTS_COL_JOB];
+                else
+                    m_jobNum = "0";
+
+                m_MSGFSpecProbColumnPresent = dt.Columns.Contains("MSGF_SpecProb");
+
+                maxSteps = dt.Rows.Count;
+            }
             else
+            {
                 m_jobNum = "0";
+            }
 
-            m_MSGFSpecProbColumnPresent = dt.Columns.Contains("MSGF_SpecProb");
-
-            maxSteps = dt.Rows.Count;
             AtEnd = false;
             InitializeAscores();
         }
@@ -76,7 +84,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             dAscores.Columns.Add(RESULTS_COL_MODINFO, typeof(string));
         }
 
-        public int GetRowLength()
+        public virtual int GetRowLength()
         {
             return dt.Rows.Count;
         }
