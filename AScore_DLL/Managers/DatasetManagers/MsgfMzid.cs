@@ -25,7 +25,6 @@ namespace AScore_DLL.Managers.DatasetManagers
             // maxSteps normally set using DataTable information in base constructor
             maxSteps = data.Count;
         }
-        // TODO: also capture mods, and write them to the appropriate AScoreParams object (see ModSummaryFileManager)
 
         private readonly List<SimpleMZIdentMLReader.SpectrumIdItem> data;
 
@@ -49,6 +48,10 @@ namespace AScore_DLL.Managers.DatasetManagers
             return $"{mod.Name}_{mod.Mass:F3}"; // using name and mass to compensate for "unknown modifications"
         }
 
+        /// <summary>
+        /// Populate the AScore modification parameters with the search modifications from the mzid file
+        /// </summary>
+        /// <param name="ascoreParams"></param>
         public void SetModifications(ParameterFileManager ascoreParams)
         {
             ascoreParams.DynamicMods.Clear();
@@ -109,18 +112,31 @@ namespace AScore_DLL.Managers.DatasetManagers
         private void AssignSymbolsToMods(IEnumerable<SimpleMZIdentMLReader.SearchModification> mods)
         {
             var currentSymbolIndex = 0;
-            var nameMap = new Dictionary<string, char>();
+            var nameMap = new Dictionary<string, SearchModificationAndSymbol>();
             foreach (var mod in mods)
             {
                 var nameFmtted = FormatModName(mod);
                 char symbol;
-                if (nameMap.TryGetValue(nameFmtted, out var existing))
+                if (nameMap.TryGetValue(nameFmtted, out var combined))
                 {
-                    symbol = existing;
+                    symbol = combined.Symbol;
+                    // if only the residues don't match, add the residue(s) to the existing mod entry, and go on to the next mod
+                    if (combined.Mod.AreModificationsSimilar(mod))
+                    {
+                        combined.Mod.Residues += mod.Residues;
+                        continue;
+                    }
+
+                    combined = new SearchModificationAndSymbol(mod, symbol);
                 }
                 else
                 {
-                    if (currentSymbolIndex < DEFAULT_MODIFICATION_SYMBOLS.Length)
+                    if (mod.IsFixed)
+                    {
+                        // Static mods don't get a symbol; use '-' as a placeholder
+                        symbol = '-';
+                    }
+                    else if (currentSymbolIndex < DEFAULT_MODIFICATION_SYMBOLS.Length)
                     {
                         symbol = DEFAULT_MODIFICATION_SYMBOLS[currentSymbolIndex];
                         currentSymbolIndex++;
@@ -130,30 +146,49 @@ namespace AScore_DLL.Managers.DatasetManagers
                         symbol = '~'; // TODO: if this is ever hit, then it should be more robust; this could be combatted by adding more symbols to DEFAULT_MODIFICATION_SYMBOLS...
                     }
 
-                    nameMap.Add(nameFmtted, symbol);
+                    combined = new SearchModificationAndSymbol(mod, symbol);
+                    nameMap.Add(nameFmtted, combined);
                 }
-
-                var modSymbol = new SearchModificationAndSymbol(mod, symbol);
-                searchMods.Add(modSymbol);
 
                 if (!modLookup.TryGetValue(nameFmtted, out var similar))
                 {
                     similar = new List<SearchModificationAndSymbol>();
                     modLookup.Add(nameFmtted, similar);
                 }
-                similar.Add(modSymbol);
+
+                similar.Add(combined);
+                searchMods.Add(combined);
             }
         }
 
-        private string GetSequenceWithMods(SimpleMZIdentMLReader.PeptideRef peptide)
+        /// <summary>
+        /// Insert modification symbols into the sequence, and add the pre/post residues.
+        /// </summary>
+        /// <param name="pepEv"></param>
+        /// <returns></returns>
+        private string GetSequenceWithMods(SimpleMZIdentMLReader.PeptideEvidence pepEv)
         {
+            var peptide = pepEv.PeptideRef;
             var sequence = peptide.Sequence;
+            var sequenceOrig = peptide.Sequence;
             var sequenceOrigLength = sequence.Length;
-            foreach (var mod in peptide.Mods.OrderByDescending(x => x.Key)) // insert mods from last to first
+            foreach (var mod in peptide.Mods.OrderByDescending(x => x.Key)) // insert dynamic mods from last to first
             {
                 var isCTerm = mod.Key > sequence.Length;
                 var isNTerm = mod.Key == 0;
-                var residue = sequence[mod.Key - 1];
+                var residue = ' ';
+                if (isNTerm)
+                {
+                    residue = sequenceOrig[0];
+                }
+                else if (isCTerm)
+                {
+                    residue = sequenceOrig[sequenceOrig.Length - 1];
+                }
+                else
+                {
+                    residue = sequenceOrig[mod.Key - 1];
+                }
                 if (!modLookup.TryGetValue(FormatModName(mod.Value), out var matchingMods))
                 {
                     // TODO: report an error!
@@ -161,24 +196,35 @@ namespace AScore_DLL.Managers.DatasetManagers
                 }
 
                 var symbol = "";
+                SearchModificationAndSymbol modAndSymbol = null;
                 foreach (var matchingMod in matchingMods)
                 {
                     if (matchingMod.Mod.Residues.Contains(residue))
                     {
+                        modAndSymbol = matchingMod;
                         symbol = matchingMod.Symbol.ToString();
                         break;
                     }
                     if (isNTerm && matchingMod.Mod.IsNTerm && matchingMod.Mod.Residues.Contains("."))
                     {
+                        modAndSymbol = matchingMod;
                         symbol = matchingMod.Symbol.ToString();
                         break;
                     }
                     if (isCTerm && matchingMod.Mod.IsCTerm && matchingMod.Mod.Residues.Contains("."))
                     {
+                        modAndSymbol = matchingMod;
                         symbol = matchingMod.Symbol.ToString();
                         break;
                     }
                 }
+
+                // Do not add in static mod symbols
+                if (modAndSymbol == null || modAndSymbol.Mod.IsFixed)
+                {
+                    continue;
+                }
+
                 var loc = mod.Key;
                 if (loc > sequenceOrigLength)
                 {
@@ -189,6 +235,8 @@ namespace AScore_DLL.Managers.DatasetManagers
                 var rightSide = sequence.Substring(loc);
                 sequence = leftSide + symbol + rightSide;
             }
+
+            sequence = $"{pepEv.Pre}.{sequence}.{pepEv.Post}";
 
             return sequence;
         }
@@ -209,7 +257,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             scanNumber = id.ScanNum;
             scanCount = 1;
             chargeState = id.Charge;
-            peptideSeq = GetSequenceWithMods(id.Peptide);
+            peptideSeq = GetSequenceWithMods(id.PepEvidence.First());
             msgfScore = id.SpecEv;
 
             if (id.AllParamsDict.TryGetValue("AssumedDissociationMethod", out var fragType))
