@@ -217,7 +217,7 @@ namespace AScore_DLL
                 {
                     // Unmodified peptides will have a ModInfo key of "-"
                     // Skip these entries
-                    if (modInfoEntry.Key != Algorithm.MODINFO_NO_MODIFIED_RESIDUES)
+                    if (modInfoEntry.Key != AScoreProcessor.MODINFO_NO_MODIFIED_RESIDUES)
                     {
                         if (!modInfoNames.Contains(modInfoEntry.Key))
                             modInfoNames.Add(modInfoEntry.Key);
@@ -320,7 +320,7 @@ namespace AScore_DLL
                         outLine.Append("\t" + StringUtilities.ValueToString(ascoreResult.PeptideScore));
 
                         // Count the number of modInfo entries that are not "-"
-                        var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != Algorithm.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
+                        var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != AScoreProcessor.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
                         outLine.Append("\t" + modTypeCount);
 
                         foreach (var modInfoName in modInfoNames)
