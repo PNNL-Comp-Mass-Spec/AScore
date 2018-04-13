@@ -40,7 +40,7 @@ namespace AScore_UnitTests
 
                 var ascoreEngine = new AScore_DLL.AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
-                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
+                ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
         }
 
@@ -62,7 +62,7 @@ namespace AScore_UnitTests
             var fileOutput = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt_ascore.txt";
             var ascoreEngine = new AScore_DLL.AScoreProcessor();
             //ascoreEngine.AlgorithmRun(dta, dataman, par, fileOutput);
-            ascoreEngine.AlgorithmRun(spectraCache, dataman, par, fileOutput);
+            ascoreEngine.RunAScoreOnSingleFile(spectraCache, dataman, par, fileOutput);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace AScore_UnitTests
                 var paramFile = new ParameterFileManager(ascParam[i]);
                 var ascoreEngine = new AScore_DLL.AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
-                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
+                ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
         }
 
@@ -155,7 +155,7 @@ namespace AScore_UnitTests
                 var paramFile = new ParameterFileManager(ascParam[i]);
                 var ascoreEngine = new AScore_DLL.AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
-                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
+                ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
         }
 
@@ -184,7 +184,7 @@ namespace AScore_UnitTests
                 var paramFile = new ParameterFileManager(ascParam[i]);
                 var ascoreEngine = new AScore_DLL.AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
-                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
+                ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
         }
 
@@ -213,7 +213,7 @@ namespace AScore_UnitTests
                 var paramFile = new ParameterFileManager(ascParam[i]);
                 var ascoreEngine = new AScore_DLL.AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
-                ascoreEngine.AlgorithmRun(spectraCache, datasetMan, paramFile, outFile);
+                ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
         }
 
@@ -316,7 +316,7 @@ namespace AScore_UnitTests
 
                 var ascoreEngine = new AScore_DLL.AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
-                ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
+                ascoreEngine.RunAScoreOnSingleFile(spectraCache, dsman, pman, tempout);
             }
         }
 
@@ -368,7 +368,7 @@ namespace AScore_UnitTests
 
                 var ascoreEngine = new AScore_DLL.AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
-                ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
+                ascoreEngine.RunAScoreOnSingleFile(spectraCache, dsman, pman, tempout);
             }
         }
 
@@ -392,7 +392,7 @@ namespace AScore_UnitTests
             var sw = System.Diagnostics.Stopwatch.StartNew();
 
             var ascoreEngine = new AScore_DLL.AScoreProcessor();
-            ascoreEngine.AlgorithmRun(spectraCache, dfht, pfile, resultsFile);
+            ascoreEngine.RunAScoreOnSingleFile(spectraCache, dfht, pfile, resultsFile);
 
             sw.Stop();
             Console.WriteLine("Time elapsed: {0:F1} seconds", sw.Elapsed.TotalSeconds);
@@ -419,7 +419,7 @@ namespace AScore_UnitTests
             var sw = System.Diagnostics.Stopwatch.StartNew();
 
             var ascoreEngine = new AScore_DLL.AScoreProcessor();
-            ascoreEngine.AlgorithmRun(spectraCache, dfht, pfile, resultsFile);
+            ascoreEngine.RunAScoreOnSingleFile(spectraCache, dfht, pfile, resultsFile);
 
             sw.Stop();
             Console.WriteLine("Time elapsed: {0:F1} seconds", sw.Elapsed.TotalSeconds);
@@ -497,7 +497,7 @@ namespace AScore_UnitTests
 
                     var ascoreEngine = new AScore_DLL.AScoreProcessor();
                     //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
-                    ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
+                    ascoreEngine.RunAScoreOnSingleFile(spectraCache, dsman, pman, tempout);
                 }
             }
         }
@@ -576,7 +576,7 @@ namespace AScore_UnitTests
 
                     var ascoreEngine = new AScore_DLL.AScoreProcessor();
                     //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
-                    ascoreEngine.AlgorithmRun(spectraCache, dsman, pman, tempout);
+                    ascoreEngine.RunAScoreOnSingleFile(spectraCache, dsman, pman, tempout);
                 }
             }
         }

@@ -34,7 +34,7 @@ namespace AScore_DLL
         #region Public Methods
 
         /// <summary>
-        /// Configure and run the AScore DLL
+        /// Configure and run the AScore algorithm
         /// </summary>
         /// <param name="ascoreOptions"></param>
         /// <returns></returns>
@@ -92,13 +92,13 @@ namespace AScore_DLL
             // Run the algorithm
             if (ascoreOptions.MultiJobMode)
             {
-                AlgorithmRun(ascoreOptions.JobToDatasetMapFile, spectraManager, datasetManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
+                RunAScoreWithMappingFile(ascoreOptions.JobToDatasetMapFile, spectraManager, datasetManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
             }
             else
             {
                 spectraManager.OpenFile(ascoreOptions.MassSpecFile);
 
-                AlgorithmRun(spectraManager, datasetManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
+                RunAScoreOnSingleFile(spectraManager, datasetManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
             }
 
             OnStatusEvent("AScore Complete");
@@ -128,14 +128,14 @@ namespace AScore_DLL
         /// <summary>
         /// Configure and run the AScore algorithm, optionally can add protein mapping information
         /// </summary>
-        /// <param name="JobToDatasetMapFile"></param>
+        /// <param name="jobToDatasetMapFile"></param>
         /// <param name="spectraManager"></param>
         /// <param name="datasetManager"></param>
         /// <param name="ascoreParameters"></param>
         /// <param name="outputFilePath">Name of the output file</param>
         /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
-        public void AlgorithmRun(string JobToDatasetMapFile, SpectraManagerCache spectraManager, DatasetManager datasetManager,
+        public void RunAScoreWithMappingFile(string jobToDatasetMapFile, SpectraManagerCache spectraManager, DatasetManager datasetManager,
                                  ParameterFileManager ascoreParameters, string outputFilePath, string fastaFilePath = "", bool outputDescriptions = false)
         {
             var jobToDatasetNameMap = new Dictionary<string, string>();
@@ -148,7 +148,7 @@ namespace AScore_DLL
             };
 
             // Read the contents of JobToDatasetMapFile
-            using (var srMapFile = new StreamReader(new FileStream(JobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var srMapFile = new StreamReader(new FileStream(jobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
                 var rowNumber = 0;
                 while (srMapFile.Peek() > -1)
@@ -192,7 +192,7 @@ namespace AScore_DLL
                 }
             }
 
-            AlgorithmRun(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -206,7 +206,7 @@ namespace AScore_DLL
         /// <param name="outputFilePath">Name of the output file</param>
         /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
-        public void AlgorithmRun(SpectraManagerCache spectraManager, DatasetManager datasetManager,
+        public void RunAScoreOnSingleFile(SpectraManagerCache spectraManager, DatasetManager datasetManager,
                                  ParameterFileManager ascoreParameters, string outputFilePath, string fastaFilePath = "", bool outputDescriptions = false)
         {
             var jobToDatasetNameMap = new Dictionary<string, string>
@@ -216,9 +216,9 @@ namespace AScore_DLL
 
             if (spectraManager == null || !spectraManager.Initialized)
                 throw new Exception(
-                    "spectraManager must be instantiated and initialized before calling AlgorithmRun for a single source file");
+                    "spectraManager must be instantiated and initialized before calling RunAScoreOnSingleFile for a single source file");
 
-            AlgorithmRun(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -240,7 +240,7 @@ namespace AScore_DLL
         /// <param name="datasetManager"></param>
         /// <param name="ascoreParameters"></param>
         /// <param name="outputFilePath"></param>
-        private void AlgorithmRun(
+        private void RunAScoreOnPreparedData(
             IReadOnlyDictionary<string, string> jobToDatasetNameMap,
             SpectraManagerCache spectraManager,
             DatasetManager datasetManager,
