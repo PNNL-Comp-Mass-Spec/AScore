@@ -43,10 +43,11 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// Constructor
         /// </summary>
         /// <param name="fhtFileName"></param>
-        protected DatasetManager(string fhtFileName)
+        /// <param name="isFht"></param>
+        protected DatasetManager(string fhtFileName, bool isFht = true)
         {
             mDatasetFilePath = fhtFileName;
-            if (!fhtFileName.ToLower().Contains("mzid"))
+            if (isFht)
             {
                 dt = Utilities.TextFileToDataTableAssignTypeString(fhtFileName, false);
 
@@ -123,7 +124,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// <param name="scanNum"></param>
         /// <param name="topPeptideScore"></param>
         /// <param name="ascoreResult"></param>
-        public void WriteToTable(string peptideSeq, string bestSeq, int scanNum, double topPeptideScore, AScoreResult ascoreResult)
+        public virtual void WriteToTable(string peptideSeq, string bestSeq, int scanNum, double topPeptideScore, AScoreResult ascoreResult)
         {
             //if (peptideSeq == "R.HGTDLWIDNM@SSAVPNHS*PEKK.D")
             //{
@@ -156,7 +157,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// <param name="pScore"></param>
         /// <param name="positionList"></param>
         /// <param name="modInfo"></param>
-        public void WriteToTable(string peptideSeq, int scanNum, double pScore, int[] positionList, string modInfo)
+        public virtual void WriteToTable(string peptideSeq, int scanNum, double pScore, int[] positionList, string modInfo)
         {
             //if (peptideSeq == "R.HGTDLWIDNM@SSAVPNHS*PEKK.D")
             //{

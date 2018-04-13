@@ -62,9 +62,16 @@ namespace AScore_DLL
                 case SearchMode.Msgfdb:
                 case SearchMode.Msgfplus:
                     OnStatusEvent("Caching data in " + Path.GetFileName(ascoreOptions.DbSearchResultsFile));
-                    if (ascoreOptions.DbSearchResultsFile.ToLower().Contains(".mzid"))
+                    if (ascoreOptions.SearchResultsType == DbSearchResultsType.Mzid)
                     {
-                        datasetManager = new MsgfMzid(ascoreOptions.DbSearchResultsFile);
+                        if (ascoreOptions.CreateUpdatedDbSearchResultsFile)
+                        {
+                            datasetManager = new MsgfMzidFull(ascoreOptions.DbSearchResultsFile);
+                        }
+                        else
+                        {
+                            datasetManager = new MsgfMzid(ascoreOptions.DbSearchResultsFile);
+                        }
                     }
                     else
                     {
@@ -103,9 +110,17 @@ namespace AScore_DLL
 
             OnStatusEvent("AScore Complete");
 
-            if (ascoreOptions.CreateUpdatedDbSearchResultsFile && ascoreOptions.SearchResultsType == DbSearchResultsType.Fht)
+            if (ascoreOptions.CreateUpdatedDbSearchResultsFile)
             {
-                CreateUpdatedFirstHitsFile(ascoreOptions);
+                if (ascoreOptions.SearchResultsType == DbSearchResultsType.Fht)
+                {
+                    CreateUpdatedFirstHitsFile(ascoreOptions);
+                }
+                else if (datasetManager is MsgfMzidFull mzidFull)
+                {
+                    mzidFull.WriteToMzidFile(ascoreOptions.UpdatedDbSearchResultsFileName);
+                    OnStatusEvent("Results merged; new file: " + Path.GetFileName(ascoreOptions.UpdatedDbSearchResultsFileName));
+                }
             }
 
             return 0;
@@ -337,6 +352,10 @@ namespace AScore_DLL
                     if (datasetManager is MsgfMzid mzid)
                     {
                         mzid.SetModifications(ascoreParameters);
+                    }
+                    else if (datasetManager is MsgfMzidFull mzidFull)
+                    {
+                        mzidFull.SetModifications(ascoreParameters);
                     }
                     else
                     {

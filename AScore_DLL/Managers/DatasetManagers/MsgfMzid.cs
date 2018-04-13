@@ -12,7 +12,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// </summary>
         public const string DEFAULT_MODIFICATION_SYMBOLS = "*#@$&!%~†‡¤º^`×÷+=ø¢";         // A few other possibilities: €£¥§
 
-        public MsgfMzid(string mzidFileName) : base(mzidFileName)
+        public MsgfMzid(string mzidFileName) : base(mzidFileName, false)
         {
             // load mzid file;
             // obviously won't have a 'Job' number available
