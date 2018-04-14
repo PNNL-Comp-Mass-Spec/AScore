@@ -23,7 +23,31 @@ namespace AScore_DLL.Managers.DatasetManagers
         {
             // load mzid file;
             // obviously won't have a 'Job' number available
-            identData = new IdentDataObj(MzIdentMlReaderWriter.Read(mzidFileName));
+            identData = IdentDataReaderWriter.Read(mzidFileName);
+            identData.Version = "1.2"; // Instruct the output to use MzIdentML 1.2 schema and namespace
+            var ascoreSoftware = new AnalysisSoftwareObj()
+                {
+                    Id = "AScore_software",
+                    Name = "AScore",
+                    Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                    SoftwareName = new ParamObj(),
+                };
+            identData.AnalysisSoftwareList.Add(ascoreSoftware);
+            ascoreSoftware.SoftwareName = new ParamObj();
+            ascoreSoftware.SoftwareName.Item = new CVParamObj(CV.CVID.MS_Ascore_software);
+
+
+            identData.AnalysisProtocolCollection.SpectrumIdentificationProtocols.First().AdditionalSearchParams.Items.Add(new CVParamObj(CV.CVID.MS_modification_localization_scoring));
+
+            foreach (var peptide in identData.SequenceCollection.Peptides)
+            {
+                var modIndex = 1;
+                foreach (var mod in peptide.Modifications)
+                {
+                    mod.CVParams.Add(new CVParamObj(CV.CVID.MS_modification_index, modIndex.ToString()));
+                    modIndex++;
+                }
+            }
 
             foreach (var list in identData.DataCollection.AnalysisData.SpectrumIdentificationList)
             {
@@ -416,46 +440,54 @@ namespace AScore_DLL.Managers.DatasetManagers
             //
             //dAscores.Rows.Add(drow);
 
-            if (ascoreResultsCount >= 1)
-            {
-                return; // TODO: Properly handle multiples (especially since we can output the ascore for each STY mod in the sequence)
-            }
+            ascoreResultsCount++;
 
             var id = data[t];
-            id.SpectrumIdentification.UserParams.Add(new UserParamObj() // TODO: this should probably be the peptide_Ascore
+            if (ascoreResultsCount == 1)
             {
-                Name = "AScore PeptideScore",
-                Value = topPeptideScore.ToString(CultureInfo.InvariantCulture),
-            });
+                id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+                {
+                    Name = "AScore BestSequence",
+                    Value = bestSeq,
+                });
 
-            id.SpectrumIdentification.CVParams.Add(new CVParamObj(CV.CVID.MS_Ascore, ascoreResult.AScore.ToString(CultureInfo.InvariantCulture)));
-            //id.SpectrumIdentification.CVParams.Add(new CVParamObj(CV.CVID.MS_peptide_Ascore, ascoreScore.ToString())); // TODO: which one is correct?
+                id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+                {
+                    Name = "AScore PeptideScore",
+                    Value = topPeptideScore.ToString(CultureInfo.InvariantCulture),
+                });
+            }
+
+            var modSymbol = ascoreResult.ModInfo.Last();
+            var modIndex = GetModIndexForModSpec(id, modSymbol, ascoreResultsCount, out var modLocation);
+
+            var ascoreFmtted = $"{modIndex}:{ascoreResult.AScore.ToString(CultureInfo.InvariantCulture)}:{modLocation}:true"; // TODO: need to modify the threshold (true/false); also, output the scores for the best/second sequence positions
+
+            id.SpectrumIdentification.CVParams.Add(new CVParamObj(CV.CVID.MS_Ascore, ascoreFmtted));
 
             id.SpectrumIdentification.UserParams.Add(new UserParamObj()
             {
-                Name = "AScore BestSequence",
-                Value = bestSeq,
+                Name = $"AScore PTM{ascoreResultsCount}",
+                Value = ascoreResult.AScore.ToString(CultureInfo.InvariantCulture),
             });
 
             id.SpectrumIdentification.UserParams.Add(new UserParamObj()
             {
-                Name = "AScore SecondSequence",
+                Name = $"AScore PTM{ascoreResultsCount} SecondSequence",
                 Value = ascoreResult.SecondSequence,
             });
 
             id.SpectrumIdentification.UserParams.Add(new UserParamObj()
             {
-                Name = "AScore numSiteIonsPoss",
+                Name = $"AScore PTM{ascoreResultsCount} numSiteIonsPoss",
                 Value = ascoreResult.NumSiteIons.ToString(),
             });
 
             id.SpectrumIdentification.UserParams.Add(new UserParamObj()
             {
-                Name = "AScore numSiteIonsMatched",
+                Name = $"AScore PTM{ascoreResultsCount} numSiteIonsMatched",
                 Value = ascoreResult.SiteDetermineMatched.ToString(),
             });
-
-            ascoreResultsCount++;
         }
         /*
          * TermData.Add(CVID.MS_Ascore_software, new TermInfo(CVID.MS_Ascore_software, @"MS", @"MS:1001984", @"Ascore software", @"Ascore software.", false));
@@ -477,28 +509,62 @@ namespace AScore_DLL.Managers.DatasetManagers
         {
             base.WriteToTable(peptideSeq, scanNum, pScore, positionList, modInfo);
 
-            if (ascoreResultsCount >= 1)
-            {
-                return; // TODO: Properly handle multiples
-            }
-
             var id = data[t];
-            id.SpectrumIdentification.UserParams.Add(new UserParamObj() // TODO: this should probably be the peptide_Ascore
-            {
-                Name = "AScore PeptideScore",
-                Value = pScore.ToString(CultureInfo.InvariantCulture),
-            });
 
-            var ascoreScore = -1;
             if (positionList.Count(x => x > 0) != 0)
             {
-                ascoreScore = 1000;
+                id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+                {
+                    Name = "AScore PeptideScore",
+                    Value = pScore.ToString(CultureInfo.InvariantCulture),
+                });
+
+                var ascoreScore = 1000.0;
+                var modSymbol = modInfo.Last();
+                var modIndex = GetModIndexForModSpec(id, modSymbol, 0, out var modLocation);
+
+                var ascoreFmtted = $"{modIndex}:{ascoreScore.ToString(CultureInfo.InvariantCulture)}:{modLocation}:true";
+
+                id.SpectrumIdentification.CVParams.Add(new CVParamObj(CV.CVID.MS_Ascore, ascoreFmtted));
+
+                id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+                {
+                    Name = "AScore PTM1",
+                    Value = ascoreScore.ToString(CultureInfo.InvariantCulture),
+                });
             }
 
-            id.SpectrumIdentification.CVParams.Add(new CVParamObj(CV.CVID.MS_Ascore, ascoreScore.ToString()));
-            //id.SpectrumIdentification.CVParams.Add(new CVParamObj(CV.CVID.MS_peptide_Ascore, ascoreScore.ToString())); // TODO: which one is correct?
-
             ascoreResultsCount++;
+        }
+
+        private int GetModIndexForModSpec(SpectrumIdentificationItemWrapper id, char modSymbol, int modCount, out int modLocation)
+        {
+            var mod = searchMods.First(x => x.Symbol == modSymbol);
+            var modIndex = 0;
+            var count = 0;
+            modLocation = 0;
+            foreach (var pepMod in id.SpectrumIdentification.Peptide.Modifications)
+            {
+                if (FormatModName(GetModName(mod.Mod.CVParams), mod.Mod.MassDelta)
+                    .Equals(FormatModName(GetModName(pepMod.CVParams), pepMod.MonoisotopicMassDelta)))
+                {
+                    count++;
+                    if (count < modCount)
+                    {
+                        continue;
+                    }
+
+                    modLocation = pepMod.Location;
+                    var modIndexParam = pepMod.CVParams.GetCvParam(CV.CVID.MS_modification_index, "0");
+                    if (modIndexParam.Cvid == CV.CVID.MS_modification_index)
+                    {
+                        modIndex = int.Parse(modIndexParam.Value);
+                        break;
+                    }
+                }
+            }
+
+            return modIndex;
         }
 
         /// <summary>
@@ -507,7 +573,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// <param name="outputFilePath"></param>
         public void WriteToMzidFile(string outputFilePath)
         {
-            MzIdentMlReaderWriter.Write(new MzIdentMLType(identData), outputFilePath);
+            IdentDataReaderWriter.Write(identData, outputFilePath);
         }
     }
 }
