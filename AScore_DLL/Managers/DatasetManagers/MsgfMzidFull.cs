@@ -6,7 +6,6 @@ using PSI_Interface;
 using PSI_Interface.CV;
 using PSI_Interface.IdentData;
 using PSI_Interface.IdentData.IdentDataObjs;
-using PSI_Interface.IdentData.mzIdentML;
 
 namespace AScore_DLL.Managers.DatasetManagers
 {
@@ -30,12 +29,9 @@ namespace AScore_DLL.Managers.DatasetManagers
                     Id = "AScore_software",
                     Name = "AScore",
                     Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                    SoftwareName = new ParamObj(),
+                    SoftwareName = new ParamObj() { Item = new CVParamObj(CV.CVID.MS_Ascore_software) },
                 };
             identData.AnalysisSoftwareList.Add(ascoreSoftware);
-            ascoreSoftware.SoftwareName = new ParamObj();
-            ascoreSoftware.SoftwareName.Item = new CVParamObj(CV.CVID.MS_Ascore_software);
-
 
             identData.AnalysisProtocolCollection.SpectrumIdentificationProtocols.First().AdditionalSearchParams.Items.Add(new CVParamObj(CV.CVID.MS_modification_localization_scoring));
 
