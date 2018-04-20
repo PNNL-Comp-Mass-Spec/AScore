@@ -23,7 +23,7 @@ namespace AScore_DLL
 
             if (data.Count == 1)
             {
-                if (Math.Abs(searchMZ - data[0].value1) > toleranceHalfWidth)
+                if (Math.Abs(searchMZ - data[0].Mz) > toleranceHalfWidth)
                 {
                     // Only one data point, and it is not within tolerance
                     matchIndexEnd = -1;
@@ -63,25 +63,25 @@ namespace AScore_DLL
                 if (intIndexMidpoint == matchIndexStart)
                 {
                     // Min and Max are next to each other
-                    if (Math.Abs(searchMZ - data[matchIndexStart].value1) > toleranceHalfWidth)
+                    if (Math.Abs(searchMZ - data[matchIndexStart].Mz) > toleranceHalfWidth)
                     {
                         matchIndexStart = matchIndexEnd;
                     }
-                    if (Math.Abs(searchMZ - data[matchIndexEnd].value1) > toleranceHalfWidth)
+                    if (Math.Abs(searchMZ - data[matchIndexEnd].Mz) > toleranceHalfWidth)
                     {
                         matchIndexEnd = intIndexMidpoint;
                     }
                     return;
                 }
 
-                if (data[intIndexMidpoint].value1 > searchMZ + toleranceHalfWidth)
+                if (data[intIndexMidpoint].Mz > searchMZ + toleranceHalfWidth)
                 {
                     // Out of range on the right
                     matchIndexEnd = intIndexMidpoint;
                     continue;
                 }
 
-                if (data[intIndexMidpoint].value1 < searchMZ - toleranceHalfWidth)
+                if (data[intIndexMidpoint].Mz < searchMZ - toleranceHalfWidth)
                 {
                     // Out of range on the left
                     matchIndexStart = intIndexMidpoint;
@@ -99,7 +99,7 @@ namespace AScore_DLL
                     }
                     else
                     {
-                        if (Math.Abs(searchMZ - data[intLeftIndex].value1) > toleranceHalfWidth)
+                        if (Math.Abs(searchMZ - data[intLeftIndex].Mz) > toleranceHalfWidth)
                         {
                             blnLeftDone = true;
                         }
@@ -116,7 +116,7 @@ namespace AScore_DLL
                     }
                     else
                     {
-                        if (Math.Abs(searchMZ - data[intRightIndex].value1) > toleranceHalfWidth)
+                        if (Math.Abs(searchMZ - data[intRightIndex].Mz) > toleranceHalfWidth)
                         {
                             blnRightDone = true;
                         }

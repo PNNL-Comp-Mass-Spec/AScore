@@ -81,7 +81,6 @@ namespace AScore_DLL
                         OnErrorEvent("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
                 }
 
-                var sortByMass = new ExperimentalSpectraEntry.SortValue1();
                 var binarySearcher = new BinarySearchRange();
                 var modNumber = 0;
                 foreach (var myPositions in myPositionsList)
@@ -94,7 +93,7 @@ namespace AScore_DLL
                     for (var peakDepth = 1; peakDepth < 11; ++peakDepth)
                     {
                         var peakDepthSpectra = expSpec.GetPeakDepthSpectra(peakDepth);
-                        peakDepthSpectra.Sort(sortByMass);
+                        peakDepthSpectra.Sort();
 
                         var matchedIons = GetMatchedMZ(
                             peakDepth, ascoreParameters.FragmentMassTolerance,
@@ -207,7 +206,7 @@ namespace AScore_DLL
                     var siteIons2 = GetSiteDeterminingIons(secondTopTheoIons, topTheoIons);
 
                     var peakDepthSpectraFinal = expSpec.GetPeakDepthSpectra(peakDepthForAScore);
-                    peakDepthSpectraFinal.Sort(sortByMass);
+                    peakDepthSpectraFinal.Sort();
 
                     var bestDeterminingCount = GetMatchedMZ(peakDepthForAScore,
                         ascoreParameters.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal, binarySearcher).Count;

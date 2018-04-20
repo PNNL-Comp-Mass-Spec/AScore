@@ -128,8 +128,8 @@ namespace AScore_DLL.Managers
             var tol = 0.6;
             var index = 0;
 
-            var minMZ = spectra[0].Value1;
-            var maxMZ = spectra[spectra.Count - 1].Value1;
+            var minMZ = spectra[0].Mz;
+            var maxMZ = spectra[spectra.Count - 1].Mz;
             m_minMZ = minMZ;
             m_maxMZ = maxMZ;
             var numSections = Convert.ToInt32(Math.Ceiling((maxMZ - minMZ) / 100.0));
@@ -149,8 +149,8 @@ namespace AScore_DLL.Managers
                 {
                     // Get all of the entries for this mz value
                     var count = 0;
-                    while ((index < spectra.Count) && (spectra[index].Value1 >= mz) &&
-                        (spectra[index].Value1 < (mz + 1.0)))
+                    while ((index < spectra.Count) && (spectra[index].Mz >= mz) &&
+                        (spectra[index].Mz < (mz + 1.0)))
                     {
                         ++index;
                         ++count;
@@ -159,16 +159,14 @@ namespace AScore_DLL.Managers
                     // If there's only one, just add it
                     if (count == 1)
                     {
-                        currentSection.Add(
-                            new ExperimentalSpectraEntry(spectra[index - 1]));
+                        currentSection.Add(spectra[index - 1]);
                     }
                     // If there were more then one, sort them in descending
                     // order and pick the biggest one
                     else if (count > 1)
                     {
                         spectra.Sort(index - count, count, descendSort);
-                        currentSection.Add(
-                            new ExperimentalSpectraEntry(spectra[index - count]));
+                        currentSection.Add(spectra[index - count]);
                     }
                 }
 
@@ -185,7 +183,7 @@ namespace AScore_DLL.Managers
                     foreach (var s in currentSection)
                     {
                         // Make sure the current data point is not too close in mass to the filtered data points
-                        var closeToExistingPoint = currentSectionFiltered.Any(p => Math.Abs(s.Value1 - p.Value1) < tol);
+                        var closeToExistingPoint = currentSectionFiltered.Any(p => Math.Abs(s.Mz - p.Mz) < tol);
                         if (!closeToExistingPoint)
                         {
                             currentSectionFiltered.Add(s);

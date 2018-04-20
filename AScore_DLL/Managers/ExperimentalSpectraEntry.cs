@@ -4,30 +4,23 @@ using System.Collections.Generic;
 namespace AScore_DLL.Managers
 {
     /// <summary>
-    /// Represents an individual entry within a dta file
+    /// Represents an individual entry within a dta file. Default IComparable sorts by Mz, ascending
     /// </summary>
-    public class ExperimentalSpectraEntry
+    public class ExperimentalSpectraEntry : IComparable<ExperimentalSpectraEntry>
     {
         #region Class Members
-
-        #region Variables
-
-        public double value1;
-        public double value2;
-
-        #endregion // Variables
 
         #region Properties
 
         /// <summary>
-        /// Gets the first value in this ExperimentalSpectraEntry
+        /// Gets the m/z in this ExperimentalSpectraEntry
         /// </summary>
-        public double Value1 => value1;
+        public double Mz { get; }
 
         /// <summary>
-        /// Gets the second value in this ExperimentalSpectraEntry
+        /// Gets the intensity in this ExperimentalSpectraEntry
         /// </summary>
-        public double Value2 => value2;
+        public double Intensity { get; }
 
         #endregion // Properties
 
@@ -38,40 +31,22 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Initializes a new instance of ExperimentalSpectraEntry
         /// </summary>
-        /// <param name="val1">First value of this ExperimentalSpectraEntry</param>
-        /// <param name="val2">Second value of this ExperimentalSpectraEntry</param>
-        public ExperimentalSpectraEntry(double val1, double val2)
+        /// <param name="mz">m/z of this ExperimentalSpectraEntry</param>
+        /// <param name="intensity">intensity of this ExperimentalSpectraEntry</param>
+        public ExperimentalSpectraEntry(double mz, double intensity)
         {
-            value1 = val1;
-            value2 = val2;
-        }
-
-        /// <summary>
-        /// Copy constructor
-        /// </summary>
-        /// <param name="copy">ExperimentalSpectraEntry to make a copy of</param>
-        public ExperimentalSpectraEntry(ExperimentalSpectraEntry copy)
-        {
-            value1 = copy.value1;
-            value2 = copy.value2;
+            Mz = mz;
+            Intensity = intensity;
         }
 
         public override string ToString()
         {
-            return (value1 + ", " + value2);
+            return Mz + ", " + Intensity;
         }
 
         #endregion // Constructor
 
         #region Comparison Classes
-
-        public class SortValue1 : IComparer<ExperimentalSpectraEntry>
-        {
-            public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
-            {
-                return (x.value1.CompareTo(y.value1));
-            }
-        }
 
         public class FindValue1InTolerance : IComparer<ExperimentalSpectraEntry>
         {
@@ -84,10 +59,10 @@ namespace AScore_DLL.Managers
 
             public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
             {
-                if (Math.Abs(x.value1 - y.value1) <= mTolerance)
+                if (Math.Abs(x.Mz - y.Mz) <= mTolerance)
                     return 0;
 
-                return (x.value1.CompareTo(y.value1));
+                return x.Mz.CompareTo(y.Mz);
             }
         }
 
@@ -98,10 +73,26 @@ namespace AScore_DLL.Managers
         {
             public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
             {
-                return (-1 * x.value2.CompareTo(y.value2));
+                return -1 * x.Intensity.CompareTo(y.Intensity);
             }
         }
 
         #endregion // Comparison Classes
+
+        /// <summary>
+        /// Default comparable; sorts only by mass
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(ExperimentalSpectraEntry other)
+        {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            //var mzComparison = Mz.CompareTo(other.Mz);
+            //if (mzComparison != 0) return mzComparison;
+            //return Intensity.CompareTo(other.Intensity);
+            // We really only care about the m/z
+            return Mz.CompareTo(other.Mz);
+        }
     }
 }

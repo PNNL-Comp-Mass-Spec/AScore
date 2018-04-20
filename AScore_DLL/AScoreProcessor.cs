@@ -429,7 +429,7 @@ namespace AScore_DLL
                 //Generate all combination mixtures
                 var modMixture = new Combinatorics.ModMixtureCombo(ascoreParameters.DynamicMods, sequenceClean);
 
-                var myPositionsList = GetMyPostionList(sequenceClean, modMixture);
+                var myPositionsList = GetMyPositionList(sequenceClean, modMixture);
 
                 //If I have more than 1 modifiable site proceed to calculation
                 if (myPositionsList.Count > 1)
@@ -532,7 +532,7 @@ namespace AScore_DLL
         /// <param name="sequence"></param>
         /// <param name="modMixture"></param>
         /// <returns></returns>
-        private List<int[]> GetMyPostionList(string sequence, Combinatorics.ModMixtureCombo modMixture)
+        private List<int[]> GetMyPositionList(string sequence, Combinatorics.ModMixtureCombo modMixture)
         {
             var myPositionsList = new List<int[]>();
             foreach (var mycom in modMixture.FinalCombos)
