@@ -62,7 +62,6 @@
     <Compile Include="AScoreProcessor.cs" />
     <Compile Include="AScoreProteinMapper.cs" />
     <Compile Include="AScoreResult.cs" />
-    <Compile Include="BinarySearchRange.cs" />
     <Compile Include="IAScoreOptions.cs" />
     <Compile Include="Managers\DatasetManagers\DatasetManager.cs" />
     <Compile Include="Managers\DatasetManagers\InspectFHT.cs" />

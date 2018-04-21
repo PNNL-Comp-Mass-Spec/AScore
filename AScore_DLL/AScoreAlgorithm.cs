@@ -351,29 +351,81 @@ namespace AScore_DLL
             double tolerance, IEnumerable<double> tempSpec,
             List<ExperimentalSpectraEntry> peakDepthSpectra)
         {
-            var matchedMZ = new List<double>();
+            return tempSpec.Where(mz => FindBinarySearch(mz, tolerance, peakDepthSpectra)).ToList();
 
-            // Uncomment to use .NET's binary search (turns out to be 7% slower than using BinarySearchRange)
-            // var massComparer = new ExperimentalSpectraEntry.FindValue1InTolerance(tolerance);
+            //var matchedMZ = new List<double>();
+            //foreach (var mz in tempSpec)
+            //{
+            //    // A smart usage of the .Net built-in binary search; still about 7% slower than the previous internally implemented binary search
+            //    var searchMz = new ExperimentalSpectraEntry(mz, 0);
+            //    var result = peakDepthSpectra.BinarySearch(searchMz);
+            //    if (result >= 0)
+            //    {
+            //        matchedMZ.Add(mz);
+            //    }
+            //    else
+            //    {
+            //        var loc = ~result;
+            //        var lowerCheck = loc > 0 && mz - peakDepthSpectra[loc - 1].Mz <= tolerance;
+            //        var higherCheck = loc < peakDepthSpectra.Count && peakDepthSpectra[loc].Mz - mz <= tolerance;
+            //        if (lowerCheck || higherCheck)
+            //        {
+            //            matchedMZ.Add(mz);
+            //        }
+            //    }
+            //}
+            //
+            //return matchedMZ;
+        }
 
-            foreach (var mz in tempSpec)
+        /// <summary>
+        /// A fast binary search; oddly, it's faster than the .NET built-in BinarySearch, probably due to dealing with Comparer results.
+        /// </summary>
+        /// <param name="mz"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="peaks"></param>
+        /// <returns></returns>
+        private bool FindBinarySearch(double mz, double tolerance, IReadOnlyList<ExperimentalSpectraEntry> peaks)
+        {
+            if (peaks.Count == 0)
             {
-                // Uncomment to use .NET's binary search
-                //var searchMz = new ExperimentalSpectraEntry(mz, 0);
-                //if (peakDepthSpectra.BinarySearch(searchMz, massComparer) > -1)
-                //{
-                //    // At least one data point is within tolerance of mz
-                //    matchedMZ.Add(mz);
-                //}
-
-                // Use BinarySearchRange
-                if (BinarySearchRange.FindValueRange(peakDepthSpectra, mz, tolerance, out _, out _))
-                {
-                    matchedMZ.Add(mz);
-                }
+                return false;
             }
 
-            return matchedMZ;
+            var minMz = mz - tolerance;
+            var maxMz = mz + tolerance;
+            var minIndex = 0;
+            var maxIndex = peaks.Count - 1;
+
+            // Assuming list is sorted (requirement for binary search), do a fast check for if the m/z is out of range of the list contents.
+            if (maxMz < peaks[minIndex].Mz || peaks[maxIndex].Mz < minMz)
+            {
+                return false;
+            }
+
+            // >= to properly handle a final case
+            while (maxIndex >= minIndex)
+            {
+                var mid = (maxIndex + minIndex) >> 1; // bit-shift for really fast divide by 2
+                if (minMz <= peaks[mid].Mz)
+                {
+                    if (peaks[mid].Mz <= maxMz)
+                    {
+                        // yay! we found it!
+                        return true;
+                    }
+
+                    // mid is too big; set new max to mid - 1 (because we've already tested mid, and don't want to test it again)
+                    maxIndex = mid - 1;
+                    continue;
+                }
+
+                // mid is too small; set new max to mid + 1 (because we've already tested mid, and don't want to test it again)
+                minIndex = mid + 1;
+            }
+
+            // didn't find it
+            return false;
         }
 
         /// <summary>

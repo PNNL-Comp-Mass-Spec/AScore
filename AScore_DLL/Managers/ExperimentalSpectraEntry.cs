@@ -70,8 +70,8 @@ namespace AScore_DLL.Managers
         /// <returns></returns>
         public int CompareTo(ExperimentalSpectraEntry other)
         {
-            if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
+            //if (ReferenceEquals(this, other)) return 0;
+            if (other == null) return 1;
             //var mzComparison = Mz.CompareTo(other.Mz);
             //if (mzComparison != 0) return mzComparison;
             //return Intensity.CompareTo(other.Intensity);
