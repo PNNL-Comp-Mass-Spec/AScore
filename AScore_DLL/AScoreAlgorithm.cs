@@ -81,7 +81,6 @@ namespace AScore_DLL
                         OnErrorEvent("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
                 }
 
-                var binarySearcher = new BinarySearchRange();
                 var modNumber = 0;
                 foreach (var myPositions in myPositionsList)
                 {
@@ -97,7 +96,7 @@ namespace AScore_DLL
 
                         var matchedIons = GetMatchedMZ(
                             peakDepth, ascoreParameters.FragmentMassTolerance,
-                            myIons, peakDepthSpectra, binarySearcher);
+                            myIons, peakDepthSpectra);
 
                         //Adjusted peptide score to score based on tolerance window.
                         var score = PeptideScoresManager.GetPeptideScore(
@@ -121,7 +120,7 @@ namespace AScore_DLL
                     sortedSumScore.Add(new ValueIndexPair<double>(score, seq));
                 }
 
-                sortedSumScore.Sort(new ValueIndexPair<double>.SortValueDescend());
+                sortedSumScore.Sort();
                 var topPeptideScore = sortedSumScore[0].Value;
 
                 // Need the phosphorylation sites for the top peptide
@@ -193,7 +192,7 @@ namespace AScore_DLL
                     }
 
                     // Sort in descending order
-                    diffScore.Sort(new ValueIndexPair<double>.SortValueDescend());
+                    diffScore.Sort();
 
                     // Find the peak depth for the diff score
                     var peakDepthForAScore = 1;
@@ -209,10 +208,10 @@ namespace AScore_DLL
                     peakDepthSpectraFinal.Sort();
 
                     var bestDeterminingCount = GetMatchedMZ(peakDepthForAScore,
-                        ascoreParameters.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal, binarySearcher).Count;
+                        ascoreParameters.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal).Count;
 
                     var secondBestDeterminingCount = GetMatchedMZ(peakDepthForAScore,
-                        ascoreParameters.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal, binarySearcher).Count;
+                        ascoreParameters.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal).Count;
 
                     var a1 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2 / 100,
                         siteIons1.Count, bestDeterminingCount);
@@ -350,8 +349,7 @@ namespace AScore_DLL
         /// <returns></returns>
         private List<double> GetMatchedMZ(int peakDepth,
             double tolerance, IEnumerable<double> tempSpec,
-            List<ExperimentalSpectraEntry> peakDepthSpectra,
-            BinarySearchRange binarySearcher)
+            List<ExperimentalSpectraEntry> peakDepthSpectra)
         {
             var matchedMZ = new List<double>();
 
@@ -369,7 +367,7 @@ namespace AScore_DLL
                 //}
 
                 // Use BinarySearchRange
-                if (binarySearcher.FindValueRange(peakDepthSpectra, mz, tolerance, out _, out _))
+                if (BinarySearchRange.FindValueRange(peakDepthSpectra, mz, tolerance, out _, out _))
                 {
                     matchedMZ.Add(mz);
                 }

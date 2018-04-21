@@ -9,42 +9,25 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
 
 namespace AScore_DLL
 {
     /// <summary>
-    /// Stores a value and a specified index associated with the value.
+    /// Stores a value and a specified index associated with the value. Default sort orders by Value (descending), then by Index
     /// </summary>
-    /// <typeparam name="ValueType">The type of value to store.</typeparam>
-    public struct ValueIndexPair<T> where T : IComparable
+    /// <typeparam name="T">The type of value to store.</typeparam>
+    public struct ValueIndexPair<T> : IComparable<ValueIndexPair<T>>
+        where T : IComparable
     {
-        #region Class Members
-
-        #region Variables
-
-        private readonly T value;
-        private readonly int index;
-
-        #endregion // Variables
-
-        #region Properties
-
         /// <summary>
         /// Gets the value associated with this ValueIndexPair
         /// </summary>
-        public T Value => value;
+        public T Value { get; }
 
         /// <summary>
         /// Gets the index associated with this ValueIndexPair
         /// </summary>
-        public int Index => index;
-
-        #endregion // Properties
-
-        #endregion // Class Members
-
-        #region Constructor
+        public int Index { get; }
 
         /// <summary>
         /// Initializes a new instance of ValueIndexPair
@@ -53,34 +36,20 @@ namespace AScore_DLL
         /// <param name="ind">Index to store in this ValueIndexPair</param>
         public ValueIndexPair(T val, int ind)
         {
-            value = val;
-            index = ind;
+            Value = val;
+            Index = ind;
         }
-
-        #endregion // Constructor
-
-        #region Comparison Classes
 
         /// <summary>
-        /// Implements sorting of ExperimentalSpectraEntry by value2 in
-        /// descending order
+        /// Default sort implementation: Sort by value descending, then by index ascending
         /// </summary>
-        public class SortValueDescend : IComparer<ValueIndexPair<T>>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(ValueIndexPair<T> other)
         {
-            public int Compare(ValueIndexPair<T> x, ValueIndexPair<T> y)
-            {
-                var valueCompare = x.value.CompareTo(y.value);
-                if (valueCompare != 0)
-                {
-                    return -1 * valueCompare;
-                }
-                else
-                {
-                    return x.index.CompareTo(y.index);
-                }
-            }
+            var valueComparison = other.Value.CompareTo(Value);
+            if (valueComparison != 0) return valueComparison;
+            return Index.CompareTo(other.Index);
         }
-
-        #endregion // Comparison Classes
     }
 }

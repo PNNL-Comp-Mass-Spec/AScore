@@ -8,10 +8,6 @@ namespace AScore_DLL.Managers
     /// </summary>
     public class ExperimentalSpectraEntry : IComparable<ExperimentalSpectraEntry>
     {
-        #region Class Members
-
-        #region Properties
-
         /// <summary>
         /// Gets the m/z in this ExperimentalSpectraEntry
         /// </summary>
@@ -21,12 +17,6 @@ namespace AScore_DLL.Managers
         /// Gets the intensity in this ExperimentalSpectraEntry
         /// </summary>
         public double Intensity { get; }
-
-        #endregion // Properties
-
-        #endregion // Class Members
-
-        #region Constructor
 
         /// <summary>
         /// Initializes a new instance of ExperimentalSpectraEntry
@@ -43,10 +33,6 @@ namespace AScore_DLL.Managers
         {
             return Mz + ", " + Intensity;
         }
-
-        #endregion // Constructor
-
-        #region Comparison Classes
 
         public class FindValue1InTolerance : IComparer<ExperimentalSpectraEntry>
         {
@@ -67,17 +53,15 @@ namespace AScore_DLL.Managers
         }
 
         /// <summary>
-        /// Sorts Value2 of the ExperimentalSpectraEntry's in descending order
+        /// Sorts the ExperimentalSpectraEntry by Intensity in descending order
         /// </summary>
-        public class SortValue2Descend : IComparer<ExperimentalSpectraEntry>
+        public class SortIntensityDescend : IComparer<ExperimentalSpectraEntry>
         {
             public int Compare(ExperimentalSpectraEntry x, ExperimentalSpectraEntry y)
             {
                 return -1 * x.Intensity.CompareTo(y.Intensity);
             }
         }
-
-        #endregion // Comparison Classes
 
         /// <summary>
         /// Default comparable; sorts only by mass

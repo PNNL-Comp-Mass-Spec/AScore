@@ -133,7 +133,7 @@ namespace AScore_DLL.Managers
             m_minMZ = minMZ;
             m_maxMZ = maxMZ;
             var numSections = Convert.ToInt32(Math.Ceiling((maxMZ - minMZ) / 100.0));
-            var descendSort = new ExperimentalSpectraEntry.SortValue2Descend();
+            var descendSort = new ExperimentalSpectraEntry.SortIntensityDescend();
 
             // Start getting the top ten hits from each section
             for (var i = 0; i < numSections; ++i)

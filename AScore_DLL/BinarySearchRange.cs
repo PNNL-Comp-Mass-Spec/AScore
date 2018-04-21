@@ -4,9 +4,9 @@ using AScore_DLL.Managers;
 
 namespace AScore_DLL
 {
-    class BinarySearchRange
+    static class BinarySearchRange
     {
-        public bool FindValueRange(List<ExperimentalSpectraEntry> data, double searchMZ, double toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
+        public static bool FindValueRange(List<ExperimentalSpectraEntry> data, double searchMZ, double toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
         {
             // Searches the list for searchValue with a tolerance of +-toleranceHalfWidth
             // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
@@ -45,7 +45,7 @@ namespace AScore_DLL
             return true;
         }
 
-        private void BinarySearch(
+        private static void BinarySearch(
             IReadOnlyList<ExperimentalSpectraEntry> data,
             double searchMZ,
             double toleranceHalfWidth,
