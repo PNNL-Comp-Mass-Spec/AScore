@@ -36,20 +36,8 @@ namespace AScore_DLL
 
             try
             {
-                var theoMono = new TheoreticalSpectra(
-                    sequenceClean,
-                    ascoreParameters,
-                    chargeState,
-                    new List<DynamicModification>(),
-                    MassType.Monoisotopic);
-
-                var theoAve = new TheoreticalSpectra(
-                    sequenceClean,
-                    ascoreParameters,
-                    chargeState,
-                    new List<DynamicModification>(),
-                    MassType.Average);
-
+                var theoMono = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState, new List<DynamicModification>(), MassType.Monoisotopic);
+                var theoAve = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState, new List<DynamicModification>(), MassType.Average);
                 var peptideMassTheoretical = theoMono.PeptideNeutralMassWithStaticMods + GetModMassTotal(peptideSeq, ascoreParameters.DynamicMods);
 
                 if (Math.Abs(peptideMassTheoretical - expSpec.PrecursorNeutralMass) > 20)
@@ -94,9 +82,7 @@ namespace AScore_DLL
                         var peakDepthSpectra = expSpec.GetPeakDepthSpectra(peakDepth);
                         peakDepthSpectra.Sort();
 
-                        var matchedIons = GetMatchedMZ(
-                            peakDepth, ascoreParameters.FragmentMassTolerance,
-                            myIons, peakDepthSpectra);
+                        var matchedIons = GetMatchedMZ(ascoreParameters.FragmentMassTolerance, myIons, peakDepthSpectra);
 
                         //Adjusted peptide score to score based on tolerance window.
                         var score = PeptideScoresManager.GetPeptideScore(
@@ -126,104 +112,8 @@ namespace AScore_DLL
                 // Need the phosphorylation sites for the top peptide
                 var topPeptidePTMsites = myPositionsList[sortedSumScore[0].Index];
 
-                var siteInfo = GetSiteDict(topPeptidePTMsites);
-
-                // Get the top sequence theoretical spectra
-                var topTheoIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, topPeptidePTMsites);
-
-                for (var indSite = 0; indSite < siteInfo.Count; ++indSite)
-                {
-                    var ascoreResult = new AScoreResult();
-                    lstResults.Add(ascoreResult);
-
-                    ascoreResult.ModInfo = LookupModInfoByID(siteInfo.Values[indSite], ascoreParameters.DynamicMods);
-
-                    int secondPeptide;
-                    for (secondPeptide = 0; secondPeptide < sortedSumScore.Count; ++secondPeptide)
-                    {
-                        var secondDict = GetSiteDict(myPositionsList[sortedSumScore[secondPeptide].Index]);
-
-                        var othersMatch = true;
-                        if (!secondDict.ContainsKey(siteInfo.Keys[indSite]))
-                        {
-                            var sites = siteInfo.Keys.ToList();
-                            for (var i = 0; i < sites.Count; i++)
-                                if (i != indSite)
-                                {
-                                    othersMatch = othersMatch && secondDict.ContainsKey(sites[i]);
-                                }
-                            if (othersMatch)
-                            {
-                                ascoreResult.PeptideMods = myPositionsList[sortedSumScore[secondPeptide].Index];
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if (secondDict[siteInfo.Keys[indSite]] != siteInfo.Values[indSite])
-                            {
-                                ascoreResult.PeptideMods = myPositionsList[sortedSumScore[secondPeptide].Index];
-                                break;
-                            }
-                        }
-                    }
-
-                    if (secondPeptide == sortedSumScore.Count)
-                    {
-                        ascoreResult.AScore = 1000;
-                        ascoreResult.NumSiteIons = 0;
-                        ascoreResult.SiteDetermineMatched = 0;
-
-                        continue;
-                    }
-
-                    var secondTopPeptidePTMsites = myPositionsList[sortedSumScore[secondPeptide].Index];
-                    // Get the second best scoring spectra
-
-                    var secondTopTheoIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, secondTopPeptidePTMsites);
-
-                    // Calculate the diff score between the top and second sites
-                    var diffScore = new List<ValueIndexPair<double>>();
-                    for (var i = 0; i < peptideScores[0].Count; ++i)
-                    {
-                        diffScore.Add(new ValueIndexPair<double>(
-                            peptideScores[sortedSumScore[0].Index][i] -
-                            peptideScores[sortedSumScore[secondPeptide].Index][i], i));
-                    }
-
-                    // Sort in descending order
-                    diffScore.Sort();
-
-                    // Find the peak depth for the diff score
-                    var peakDepthForAScore = 1;
-                    if (diffScore[0].Value > 0)
-                    {
-                        peakDepthForAScore = diffScore[0].Index + 1;
-                    }
-
-                    var siteIons1 = GetSiteDeterminingIons(topTheoIons, secondTopTheoIons);
-                    var siteIons2 = GetSiteDeterminingIons(secondTopTheoIons, topTheoIons);
-
-                    var peakDepthSpectraFinal = expSpec.GetPeakDepthSpectra(peakDepthForAScore);
-                    peakDepthSpectraFinal.Sort();
-
-                    var bestDeterminingCount = GetMatchedMZ(peakDepthForAScore,
-                        ascoreParameters.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal).Count;
-
-                    var secondBestDeterminingCount = GetMatchedMZ(peakDepthForAScore,
-                        ascoreParameters.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal).Count;
-
-                    var a1 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2 / 100,
-                        siteIons1.Count, bestDeterminingCount);
-
-                    var a2 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2 / 100,
-                        siteIons2.Count, secondBestDeterminingCount);
-
-                    // Add the results to the list
-                    ascoreResult.AScore = Math.Abs(a1 - a2);
-                    ascoreResult.NumSiteIons = siteIons1.Count;                     // numSiteIonsPoss
-                    ascoreResult.SiteDetermineMatched = bestDeterminingCount;       // numSiteIonsMatched
-                }
+                lstResults = CalculateAScoreForSite(ascoreParameters, expSpec, mzmax, mzmin, myPositionsList, topPeptidePTMsites, peptideScores, theoMono,
+                    theoAve, sortedSumScore);
 
                 foreach (var ascoreResult in lstResults)
                 {
@@ -248,6 +138,127 @@ namespace AScore_DLL
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Calculate the AScore for the given site information
+        /// </summary>
+        /// <param name="ascoreParameters"></param>
+        /// <param name="expSpec"></param>
+        /// <param name="mzmax"></param>
+        /// <param name="mzmin"></param>
+        /// <param name="myPositionsList"></param>
+        /// <param name="topPeptidePTMsites"></param>
+        /// <param name="peptideScores"></param>
+        /// <param name="theoMono"></param>
+        /// <param name="theoAve"></param>
+        /// <param name="sortedSumScore"></param>
+        /// <returns></returns>
+        private List<AScoreResult> CalculateAScoreForSite(ParameterFileManager ascoreParameters, ExperimentalSpectra expSpec,
+            double mzmax, double mzmin, IReadOnlyList<int[]> myPositionsList, int[] topPeptidePTMsites, IReadOnlyList<List<double>> peptideScores,
+            TheoreticalSpectra theoMono, TheoreticalSpectra theoAve, IReadOnlyList<ValueIndexPair<double>> sortedSumScore)
+        {
+            // Initialize AScore results storage
+            var lstResults = new List<AScoreResult>();
+
+            var siteInfo = GetSiteDict(topPeptidePTMsites);
+
+            // Get the top sequence theoretical spectra
+            var topTheoIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, topPeptidePTMsites);
+
+            for (var indSite = 0; indSite < siteInfo.Count; ++indSite)
+            {
+                var ascoreResult = new AScoreResult();
+                lstResults.Add(ascoreResult);
+
+                ascoreResult.ModInfo = LookupModInfoByID(siteInfo.Values[indSite], ascoreParameters.DynamicMods);
+
+                int secondPeptide;
+                for (secondPeptide = 0; secondPeptide < sortedSumScore.Count; ++secondPeptide)
+                {
+                    var secondDict = GetSiteDict(myPositionsList[sortedSumScore[secondPeptide].Index]);
+
+                    var othersMatch = true;
+                    if (!secondDict.ContainsKey(siteInfo.Keys[indSite]))
+                    {
+                        var sites = siteInfo.Keys.ToList();
+                        for (var i = 0; i < sites.Count; i++)
+                            if (i != indSite)
+                            {
+                                othersMatch = othersMatch && secondDict.ContainsKey(sites[i]);
+                            }
+                        if (othersMatch)
+                        {
+                            ascoreResult.PeptideMods = myPositionsList[sortedSumScore[secondPeptide].Index];
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (secondDict[siteInfo.Keys[indSite]] != siteInfo.Values[indSite])
+                        {
+                            ascoreResult.PeptideMods = myPositionsList[sortedSumScore[secondPeptide].Index];
+                            break;
+                        }
+                    }
+                }
+
+                if (secondPeptide == sortedSumScore.Count)
+                {
+                    ascoreResult.AScore = 1000;
+                    ascoreResult.NumSiteIons = 0;
+                    ascoreResult.SiteDetermineMatched = 0;
+
+                    continue;
+                }
+
+                var secondTopPeptidePTMsites = myPositionsList[sortedSumScore[secondPeptide].Index];
+                // Get the second best scoring spectra
+
+                var secondTopTheoIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, secondTopPeptidePTMsites);
+
+                // Calculate the diff score between the top and second sites
+                var diffScore = new List<ValueIndexPair<double>>();
+                for (var i = 0; i < peptideScores[0].Count; ++i)
+                {
+                    diffScore.Add(new ValueIndexPair<double>(
+                        peptideScores[sortedSumScore[0].Index][i] -
+                        peptideScores[sortedSumScore[secondPeptide].Index][i], i));
+                }
+
+                // Sort in descending order
+                diffScore.Sort();
+
+                // Find the peak depth for the diff score
+                var peakDepthForAScore = 1;
+                if (diffScore[0].Value > 0)
+                {
+                    peakDepthForAScore = diffScore[0].Index + 1;
+                }
+
+                var siteIons1 = GetSiteDeterminingIons(topTheoIons, secondTopTheoIons);
+                var siteIons2 = GetSiteDeterminingIons(secondTopTheoIons, topTheoIons);
+
+                var peakDepthSpectraFinal = expSpec.GetPeakDepthSpectra(peakDepthForAScore);
+                peakDepthSpectraFinal.Sort();
+
+                var bestDeterminingCount = GetMatchedMZ(ascoreParameters.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal).Count;
+
+                var secondBestDeterminingCount = GetMatchedMZ(ascoreParameters.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal).Count;
+
+                var a1 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2 / 100,
+                    siteIons1.Count, bestDeterminingCount);
+
+                var a2 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2 / 100,
+                    siteIons2.Count, secondBestDeterminingCount);
+
+                // Add the results to the list
+                ascoreResult.AScore = Math.Abs(a1 - a2);
+                ascoreResult.NumSiteIons = siteIons1.Count;                     // numSiteIonsPoss
+                ascoreResult.SiteDetermineMatched = bestDeterminingCount;       // numSiteIonsMatched
+            }
+
+            return lstResults;
+        }
 
         /// <summary>
         /// Generates a sequence based on final best peptide sequence.
@@ -341,15 +352,11 @@ namespace AScore_DLL
         /// <summary>
         /// Matches the theoretical ions to experimental ions for some tolerance
         /// </summary>
-        /// <param name="peakDepth">number of peaks per 100m/z range</param>
         /// <param name="tolerance">width or window for matching</param>
         /// <param name="tempSpec">theoretical ions</param>
         /// <param name="peakDepthSpectra">Experimental ions; assumed to be sorted by m/z</param>
-        /// <param name="binarySearcher"></param>
         /// <returns></returns>
-        private List<double> GetMatchedMZ(int peakDepth,
-            double tolerance, IEnumerable<double> tempSpec,
-            List<ExperimentalSpectraEntry> peakDepthSpectra)
+        private List<double> GetMatchedMZ(double tolerance, IEnumerable<double> tempSpec, IReadOnlyList<ExperimentalSpectraEntry> peakDepthSpectra)
         {
             return tempSpec.Where(mz => FindBinarySearch(mz, tolerance, peakDepthSpectra)).ToList();
 
