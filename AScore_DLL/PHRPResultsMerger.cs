@@ -11,7 +11,7 @@ namespace AScore_DLL
     /// <summary>
     /// Merges AScore results with an existing PHRP-compatible tab-delimited text file
     /// </summary>
-    public class PHRPResultsMerger : clsEventNotifier
+    public class PHRPResultsMerger : EventNotifier
     {
         protected string m_MergedFilePath = string.Empty;
         protected clsPHRPReader mPHRPReader;

@@ -10,7 +10,7 @@ namespace AScore_DLL.Managers
     /// <summary>
     /// Override the parameter file modifications with modifications listed in the ModSummary file.
     /// </summary>
-    public class ModSummaryFileManager : clsEventNotifier
+    public class ModSummaryFileManager : EventNotifier
     {
         private const string COL_SYMBOL = "Modification_Symbol";
         private const string COL_MASS = "Modification_Mass";

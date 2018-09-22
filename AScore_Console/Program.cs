@@ -138,7 +138,7 @@ namespace AScore_Console
         /// Attaches the Error, Warning, and Message events to the local event handler
         /// </summary>
         /// <param name="oClass"></param>
-        private static void AttachEvents(clsEventNotifier oClass)
+        private static void AttachEvents(EventNotifier oClass)
         {
             oClass.ErrorEvent += ShowError;
             oClass.WarningEvent += ShowWarning;
@@ -163,7 +163,7 @@ namespace AScore_Console
 
             if (ex != null)
             {
-                mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + clsStackTraceFormatter.GetExceptionStackTrace(ex));
+                mLogFile?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt") + "\t" + StackTraceFormatter.GetExceptionStackTrace(ex));
             }
         }
 

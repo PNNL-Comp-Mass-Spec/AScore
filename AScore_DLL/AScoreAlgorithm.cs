@@ -9,7 +9,7 @@ using PRISM;
 
 namespace AScore_DLL
 {
-    public class AScoreAlgorithm : clsEventNotifier
+    public class AScoreAlgorithm : EventNotifier
     {
         private const double MASS_C13 = 1.00335483;
 

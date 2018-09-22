@@ -6,7 +6,7 @@ using PSI_Interface.MSData;
 
 namespace AScore_DLL.Managers.SpectraManagers
 {
-    class MzMLManager : clsEventNotifier, ISpectraManager
+    class MzMLManager : EventNotifier, ISpectraManager
     {
         public const double Proton = 1.00727649;
 

@@ -12,7 +12,7 @@ namespace AScore_DLL.Managers.SpectraManagers
     /// <summary>
     /// Provides an interface to extract individual dta files from the master dta file
     /// </summary>
-    public class DtaManager : clsEventNotifier, ISpectraManager
+    public class DtaManager : EventNotifier, ISpectraManager
     {
         public static string GetFilePath(string datasetFilePath, string datasetName)
         {

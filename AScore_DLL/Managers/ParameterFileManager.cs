@@ -12,7 +12,7 @@ namespace AScore_DLL.Managers
     /// <summary>
     /// A class for managing xml input to ascore parameters
     /// </summary>
-    public class ParameterFileManager : clsEventNotifier
+    public class ParameterFileManager : EventNotifier
     {
         #region Member Variables
         private List<Modification> staticMods;

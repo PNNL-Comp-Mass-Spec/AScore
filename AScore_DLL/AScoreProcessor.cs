@@ -11,7 +11,7 @@ using PRISM;
 
 namespace AScore_DLL
 {
-    public class AScoreProcessor : clsEventNotifier
+    public class AScoreProcessor : EventNotifier
     {
         public const string MODINFO_NO_MODIFIED_RESIDUES = "-";
 

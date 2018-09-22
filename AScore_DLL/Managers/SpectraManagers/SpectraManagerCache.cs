@@ -5,7 +5,7 @@ using PRISM;
 
 namespace AScore_DLL.Managers.SpectraManagers
 {
-    public class SpectraManagerCache : clsEventNotifier
+    public class SpectraManagerCache : EventNotifier
     {
         private readonly MzMLManager _mzMLManager;
         private readonly DtaManager _dtaManager;
