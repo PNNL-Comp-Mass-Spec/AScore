@@ -494,18 +494,19 @@ namespace AScore_DLL
                                            TheoreticalSpectra theoreticalAverageMassSpectra,
                                            int[] myPositions)
         {
-            var mySpectraMono = theoMono.GetTempSpectra(myPositions,
+            const double FRAGMENT_MASS_TOLERANCE = 0.0501;
+
+            var mySpectraMono = theoreticalMonoMassSpectra.GetTempSpectra(myPositions,
                                   ascoreParameters.DynamicMods, MassType.Monoisotopic);
-            Dictionary<int, ChargeStateIons> mySpectraAverage = null;
-            if (ascoreParameters.FragmentMassTolerance <= 0.0501)
-            {
-                mySpectraAverage = theoAve.GetTempSpectra(myPositions,
-                    ascoreParameters.DynamicMods, MassType.Average);
-            }
-            //Get ions within m/z range
+
             var mySpectra = new Dictionary<int, ChargeStateIons>();
-            if (ascoreParameters.FragmentMassTolerance <= 0.0501)
+
+            if (ascoreParameters.FragmentMassTolerance <= FRAGMENT_MASS_TOLERANCE)
             {
+                var mySpectraAverage = theoreticalAverageMassSpectra.GetTempSpectra(myPositions,
+                    ascoreParameters.DynamicMods, MassType.Average);
+
+                //Get ions within m/z range
                 mySpectra.Add(1, mySpectraMono[1]);
                 foreach (var charge in mySpectraAverage.Keys)
                 {
