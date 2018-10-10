@@ -450,7 +450,7 @@ namespace AScore_DLL
                 else
                 {
                     // No modifiable sites
-                    datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], MODINFO_NO_MODIFIED_RESIDUES);
+                    datasetManager.WriteToTable(peptideSeq, scanNumber, 0, new int[0], MOD_INFO_NO_MODIFIED_RESIDUES);
                 }
                 datasetManager.IncrementRow();
             }
