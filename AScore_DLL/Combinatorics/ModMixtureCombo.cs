@@ -57,7 +57,7 @@ namespace AScore_DLL.Combinatorics
         /// ie R.RFLPSCTK.M would have possiblePositions[0] = {4,6} if phosphorylation were the first
         /// mod in dynamic mods
         /// </summary>
-        /// <param name="dynMods">Dynamic modification list from ascoreparamters</param>
+        /// <param name="dynMods">Dynamic modification list from ascore parameters</param>
         /// <param name="sequence">peptide sequence</param>
         /// <returns>list of lists of possible modification sites</returns>
         public List<List<int>> GetSiteLocation(List<Mod.DynamicModification> dynMods, string sequence)
@@ -112,7 +112,7 @@ namespace AScore_DLL.Combinatorics
                     //int countAtSameSite = 0;
                     var siteList = new List<int>();
 
-                    //Add all uniqueids or zeros associated with this sequence positions
+                    //Add all unique ids or zeros associated with this sequence positions
                     foreach (var site in sitePositions)
                     {
                         if (site.Contains(s))
@@ -160,7 +160,7 @@ namespace AScore_DLL.Combinatorics
         /// Creates a list of modification types each having a list of positional combinations which are themselves int lists
         /// </summary>
         /// <param name="sitePositions">list of site position lists</param>
-        /// <param name="myMods">dynamic modications from ascore parameters</param>
+        /// <param name="myMods">dynamic modifications from ascore parameters</param>
         /// <returns></returns>
         public static List<List<List<int>>> GenerateCombosToCheck(List<List<int>> sitePositions, List<Mod.DynamicModification> myMods)
         {

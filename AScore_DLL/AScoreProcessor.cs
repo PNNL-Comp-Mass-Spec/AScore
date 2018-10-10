@@ -486,7 +486,7 @@ namespace AScore_DLL
         /// </summary>
         /// <param name="seq">input protein sequence including mod characters, but without the prefix or suffix residues</param>
         /// <param name="ascoreParameters">ascore parameters reference</param>
-        /// <returns>protein sequence without mods as well as changing ascoreParameterss</returns>
+        /// <returns>protein sequence without mods as well as changing ascoreParameters</returns>
         private string GetCleanSequence(string seq, ref ParameterFileManager ascoreParameters)
         {
             foreach (var dynamicMod in ascoreParameters.DynamicMods)

@@ -443,7 +443,7 @@ namespace AScore_DLL
         }
 
         /// <summary>
-        /// Generates the site determining ions by comparing ions of tope two spectra and removing overlapping ions
+        /// Generates the site determining ions by comparing ions of top two spectra and removing overlapping ions
         /// </summary>
         /// <param name="toGetDetermining">list to get unique from</param>
         /// <param name="secondSpec">list which contains overlap to remove from first list</param>
