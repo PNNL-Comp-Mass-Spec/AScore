@@ -457,7 +457,7 @@ namespace AScore_DLL
 
             Console.WriteLine();
 
-            OnStatusEvent("Writing " + datasetManager.ResultsCount + " rows to " + Path.GetFileName(outputFilePath));
+            OnStatusEvent(string.Format("Writing {0:N0} rows to {1}", datasetManager.ResultsCount, Path.GetFileName(outputFilePath)));
             datasetManager.WriteToFile(outputFilePath);
 
             Console.WriteLine();
@@ -571,7 +571,7 @@ namespace AScore_DLL
 
         private void ReportStatsForFragType(string fragTypeText, IReadOnlyList<int> statsByType, FragmentType fragmentType)
         {
-            OnStatusEvent(fragTypeText + " peptides: " + statsByType[(int)fragmentType]);
+            OnStatusEvent(string.Format("{0} peptides: {1:N0}", fragTypeText, statsByType[(int)fragmentType]));
         }
 
         private string GetDatasetName(string dataFilepath)
