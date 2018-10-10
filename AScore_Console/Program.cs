@@ -1,4 +1,8 @@
-﻿using System;
+﻿
+// Uncomment to disable the try/catch handler in Main
+// #define DISABLE_ROOT_EXCEPTION_HANDLER
+
+using System;
 using System.IO;
 using AScore_DLL;
 using PRISM;
@@ -17,7 +21,8 @@ namespace AScore_Console
         /// <returns></returns>
         static int Main(string[] args)
         {
-#if (!DEBUG)
+
+#if (!DISABLE_ROOT_EXCEPTION_HANDLER)
             try
 #endif
             {
@@ -93,7 +98,7 @@ namespace AScore_Console
                     clsParseCommandLine.PauseAtConsole(1000, 250);
                 }
             }
-#if (!DEBUG)
+#if (!DISABLE_ROOT_EXCEPTION_HANDLER)
             catch (Exception ex)
             {
                 Console.WriteLine();
