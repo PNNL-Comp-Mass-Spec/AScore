@@ -188,11 +188,11 @@ namespace AScore_DLL.Combinatorics
 
             //list of mod types with lists of combinations for each type
             var combinationSets = new List<List<List<int>>>();
-            foreach (var comb in comboTemplate)
+            foreach (var combo in comboTemplate)
             {
                 var allCombos = new List<List<int>>();
-                var modcombos = new Combinatorics.Permutations<int>(comb);
-                foreach (IList<int> combination in modcombos)
+                var modCombos = new Combinatorics.Permutations<int>(combo);
+                foreach (IList<int> combination in modCombos)
                 {
                     allCombos.Add(new List<int>(combination));
                 }

@@ -164,30 +164,30 @@ namespace AScore_DLL.Managers.DatasetManagers
             //    Console.WriteLine("Debug: found " + peptideSeq);
             //}
 
-            var drow = dAscores.NewRow();
+            var dataRow = dAscores.NewRow();
 
-            drow[RESULTS_COL_JOB] = m_jobNum;
-            drow[RESULTS_COL_SCAN] = scanNum;
-            drow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
-            drow[RESULTS_COL_BESTSEQUENCE] = peptideSeq;
-            drow[RESULTS_COL_PEPTIDESCORE] = PRISM.StringUtilities.ValueToString(pScore);
+            dataRow[RESULTS_COL_JOB] = m_jobNum;
+            dataRow[RESULTS_COL_SCAN] = scanNum;
+            dataRow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
+            dataRow[RESULTS_COL_BESTSEQUENCE] = peptideSeq;
+            dataRow[RESULTS_COL_PEPTIDESCORE] = PRISM.StringUtilities.ValueToString(pScore);
 
             var intNonZeroCount = (from item in positionList where item > 0 select item).Count();
 
             if (intNonZeroCount == 0)
             {
-                drow[RESULTS_COL_ASCORE] = "-1";
+                dataRow[RESULTS_COL_ASCORE] = "-1";
             }
             else
             {
-                drow[RESULTS_COL_ASCORE] = "1000";
+                dataRow[RESULTS_COL_ASCORE] = "1000";
             }
-            drow[RESULTS_COL_NUMSITEIONSMATCHED] = 0;
-            drow[RESULTS_COL_NUMSITEIONSPOSS] = 0;
-            drow[RESULTS_COL_SECONDSEQUENCE] = "---";
-            drow[RESULTS_COL_MODINFO] = modInfo;
+            dataRow[RESULTS_COL_NUMSITEIONSMATCHED] = 0;
+            dataRow[RESULTS_COL_NUMSITEIONSPOSS] = 0;
+            dataRow[RESULTS_COL_SECONDSEQUENCE] = "---";
+            dataRow[RESULTS_COL_MODINFO] = modInfo;
 
-            dAscores.Rows.Add(drow);
+            dAscores.Rows.Add(dataRow);
         }
 
         /// <summary>

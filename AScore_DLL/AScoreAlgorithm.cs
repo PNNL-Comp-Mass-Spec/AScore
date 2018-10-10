@@ -19,10 +19,8 @@ namespace AScore_DLL
 
         public void ComputeAScore(DatasetManager datasetManager, ParameterFileManager ascoreParameters, int scanNumber,
             int chargeState, string peptideSeq, string front, string back, string sequenceClean, ExperimentalSpectra expSpec,
-            double mzmax, double mzmin, IReadOnlyList<int[]> myPositionsList)
+            double mzMax, double mzMin, IReadOnlyList<int[]> myPositionsList)
         {
-            // Initialize AScore results storage
-            var lstResults = new List<AScoreResult>();
 
             // Change the charge state to 2+ if it is 1+
             if (chargeState == 1)
@@ -36,9 +34,9 @@ namespace AScore_DLL
 
             try
             {
-                var theoMono = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState, new List<DynamicModification>(), MassType.Monoisotopic);
-                var theoAve = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState, new List<DynamicModification>(), MassType.Average);
-                var peptideMassTheoretical = theoMono.PeptideNeutralMassWithStaticMods + GetModMassTotal(peptideSeq, ascoreParameters.DynamicMods);
+                var theoreticalMonoMassSpectra = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState, new List<DynamicModification>(), MassType.Monoisotopic);
+                var theoreticalAverageMassSpectra = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState, new List<DynamicModification>(), MassType.Average);
+                var peptideMassTheoretical = theoreticalMonoMassSpectra.PeptideNeutralMassWithStaticMods + GetModMassTotal(peptideSeq, ascoreParameters.DynamicMods);
 
                 if (Math.Abs(peptideMassTheoretical - expSpec.PrecursorNeutralMass) > 20)
                 {
@@ -73,7 +71,7 @@ namespace AScore_DLL
                 foreach (var myPositions in myPositionsList)
                 {
                     //Generate spectra for a modification combination
-                    var myIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, myPositions);
+                    var myIons = GetChargeList(ascoreParameters, mzMax, mzMin, theoreticalMonoMassSpectra, theoreticalAverageMassSpectra, myPositions);
                     peptideScores.Add(new List<double>());
                     weightedScores.Add(new List<double>());
 
@@ -110,20 +108,20 @@ namespace AScore_DLL
                 var topPeptideScore = sortedSumScore[0].Value;
 
                 // Need the phosphorylation sites for the top peptide
-                var topPeptidePTMsites = myPositionsList[sortedSumScore[0].Index];
+                var topPeptidePTMSites = myPositionsList[sortedSumScore[0].Index];
 
-                lstResults = CalculateAScoreForSite(ascoreParameters, expSpec, mzmax, mzmin, myPositionsList, topPeptidePTMsites, peptideScores, theoMono,
-                    theoAve, sortedSumScore);
+                var ascoreResults = CalculateAScoreForSite(ascoreParameters, expSpec, mzMax, mzMin, myPositionsList, topPeptidePTMSites, peptideScores, theoreticalMonoMassSpectra,
+                    theoreticalAverageMassSpectra, sortedSumScore);
 
-                foreach (var ascoreResult in lstResults)
+                foreach (var ascoreResult in ascoreResults)
                 {
                     ascoreResult.SecondSequence = front + "." +
                         GenerateFinalSequences(sequenceClean, ascoreParameters, ascoreResult.PeptideMods) + "." + back;
                 }
 
                 //Put scores into our table
-                var bestSeq = front + "." + GenerateFinalSequences(sequenceClean, ascoreParameters, topPeptidePTMsites) + "." + back;
-                foreach (var ascoreResult in lstResults)
+                var bestSeq = front + "." + GenerateFinalSequences(sequenceClean, ascoreParameters, topPeptidePTMSites) + "." + back;
+                foreach (var ascoreResult in ascoreResults)
                 {
                     datasetManager.WriteToTable(peptideSeq, bestSeq, scanNumber, topPeptideScore, ascoreResult);
                 }
@@ -144,26 +142,31 @@ namespace AScore_DLL
         /// </summary>
         /// <param name="ascoreParameters"></param>
         /// <param name="expSpec"></param>
-        /// <param name="mzmax"></param>
-        /// <param name="mzmin"></param>
+        /// <param name="mzMax"></param>
+        /// <param name="mzMin"></param>
         /// <param name="myPositionsList"></param>
-        /// <param name="topPeptidePTMsites"></param>
+        /// <param name="topPeptidePTMSites"></param>
         /// <param name="peptideScores"></param>
-        /// <param name="theoMono"></param>
-        /// <param name="theoAve"></param>
+        /// <param name="theoreticalMonoMassSpectra"></param>
+        /// <param name="theoreticalAverageMassSpectra"></param>
         /// <param name="sortedSumScore"></param>
         /// <returns></returns>
         private List<AScoreResult> CalculateAScoreForSite(ParameterFileManager ascoreParameters, ExperimentalSpectra expSpec,
-            double mzmax, double mzmin, IReadOnlyList<int[]> myPositionsList, int[] topPeptidePTMsites, IReadOnlyList<List<double>> peptideScores,
-            TheoreticalSpectra theoMono, TheoreticalSpectra theoAve, IReadOnlyList<ValueIndexPair<double>> sortedSumScore)
+                                                          double mzMax, double mzMin,
+                                                          IReadOnlyList<int[]> myPositionsList,
+                                                          int[] topPeptidePTMSites,
+                                                          IReadOnlyList<List<double>> peptideScores,
+                                                          TheoreticalSpectra theoreticalMonoMassSpectra,
+                                                          TheoreticalSpectra theoreticalAverageMassSpectra,
+                                                          IReadOnlyList<ValueIndexPair<double>> sortedSumScore)
         {
             // Initialize AScore results storage
             var lstResults = new List<AScoreResult>();
 
-            var siteInfo = GetSiteDict(topPeptidePTMsites);
+            var siteInfo = GetSiteDict(topPeptidePTMSites);
 
             // Get the top sequence theoretical spectra
-            var topTheoIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, topPeptidePTMsites);
+            var topTheoreticalIons = GetChargeList(ascoreParameters, mzMax, mzMin, theoreticalMonoMassSpectra, theoreticalAverageMassSpectra, topPeptidePTMSites);
 
             for (var indSite = 0; indSite < siteInfo.Count; ++indSite)
             {
@@ -211,10 +214,14 @@ namespace AScore_DLL
                     continue;
                 }
 
-                var secondTopPeptidePTMsites = myPositionsList[sortedSumScore[secondPeptide].Index];
+                var secondTopPeptidePTMSites = myPositionsList[sortedSumScore[secondPeptide].Index];
                 // Get the second best scoring spectra
 
-                var secondTopTheoIons = GetChargeList(ascoreParameters, mzmax, mzmin, theoMono, theoAve, secondTopPeptidePTMsites);
+                var secondTopTheoreticalIons = GetChargeList(ascoreParameters,
+                                                             mzMax, mzMin,
+                                                             theoreticalMonoMassSpectra,
+                                                             theoreticalAverageMassSpectra,
+                                                             secondTopPeptidePTMSites);
 
                 // Calculate the diff score between the top and second sites
                 var diffScore = new List<ValueIndexPair<double>>();
@@ -235,8 +242,8 @@ namespace AScore_DLL
                     peakDepthForAScore = diffScore[0].Index + 1;
                 }
 
-                var siteIons1 = GetSiteDeterminingIons(topTheoIons, secondTopTheoIons);
-                var siteIons2 = GetSiteDeterminingIons(secondTopTheoIons, topTheoIons);
+                var siteIons1 = GetSiteDeterminingIons(topTheoreticalIons, secondTopTheoreticalIons);
+                var siteIons2 = GetSiteDeterminingIons(secondTopTheoreticalIons, topTheoreticalIons);
 
                 var peakDepthSpectraFinal = expSpec.GetPeakDepthSpectra(peakDepthForAScore);
                 peakDepthSpectraFinal.Sort();
@@ -284,11 +291,11 @@ namespace AScore_DLL
                 }
                 else
                 {
-                    foreach (var dmod in myParam.DynamicMods)
+                    foreach (var dynamicMod in myParam.DynamicMods)
                     {
-                        if (peptideMods[i] == dmod.UniqueID)
+                        if (peptideMods[i] == dynamicMod.UniqueID)
                         {
-                            sbFinalSeq.Append(seq[i] + dmod.ModSymbol.ToString(CultureInfo.InvariantCulture));
+                            sbFinalSeq.Append(seq[i] + dynamicMod.ModSymbol.ToString(CultureInfo.InvariantCulture));
                         }
                     }
                 }
@@ -322,25 +329,25 @@ namespace AScore_DLL
         /// <summary>
         /// Generates the current modification set of theoretical ions filtered by the mz range
         /// </summary>
-        /// <param name="mzmax">max m/z</param>
-        /// <param name="mzmin">min m/z</param>
+        /// <param name="mzMax">max m/z</param>
+        /// <param name="mzMin">min m/z</param>
         /// <param name="mySpectra">dictionary of theoretical ions organized by charge</param>
         /// <returns>list of theoretical ions</returns>
-        private List<double> GetCurrentComboTheoreticalIons(double mzmax, double mzmin, Dictionary<int, ChargeStateIons> mySpectra)
+        private List<double> GetCurrentComboTheoreticalIons(double mzMax, double mzMin, Dictionary<int, ChargeStateIons> mySpectra)
         {
             var myIons = new List<double>();
             foreach (var csi in mySpectra.Values)
             {
                 foreach (var ion in csi.BIons)
                 {
-                    if (ion < mzmax && ion > mzmin)
+                    if (ion < mzMax && ion > mzMin)
                     {
                         myIons.Add(ion);
                     }
                 }
                 foreach (var ion in csi.YIons)
                 {
-                    if (ion < mzmax && ion > mzmin)
+                    if (ion < mzMax && ion > mzMin)
                     {
                         myIons.Add(ion);
                     }
@@ -457,16 +464,16 @@ namespace AScore_DLL
         /// <summary>
         /// Creates a dictionary to store a position and mod type
         /// </summary>
-        /// <param name="topPeptidePTMsites"></param>
+        /// <param name="topPeptidePTMSites"></param>
         /// <returns></returns>
-        private SortedList<int, int> GetSiteDict(IReadOnlyList<int> topPeptidePTMsites)
+        private SortedList<int, int> GetSiteDict(IReadOnlyList<int> topPeptidePTMSites)
         {
             var siteInfo = new SortedList<int, int>();
-            for (var n = 0; n < topPeptidePTMsites.Count; n++)
+            for (var n = 0; n < topPeptidePTMSites.Count; n++)
             {
-                if (topPeptidePTMsites[n] > 0)
+                if (topPeptidePTMSites[n] > 0)
                 {
-                    siteInfo.Add(n, topPeptidePTMsites[n]);
+                    siteInfo.Add(n, topPeptidePTMSites[n]);
                 }
             }
             return siteInfo;
@@ -476,14 +483,16 @@ namespace AScore_DLL
         /// Gets a list of ions for matching
         /// </summary>
         /// <param name="ascoreParameters">parameters for </param>
-        /// <param name="mzmax"></param>
-        /// <param name="mzmin"></param>
-        /// <param name="theoMono"></param>
-        /// <param name="theoAve"></param>
+        /// <param name="mzMax"></param>
+        /// <param name="mzMin"></param>
+        /// <param name="theoreticalMonoMassSpectra"></param>
+        /// <param name="theoreticalAverageMassSpectra"></param>
         /// <param name="myPositions"></param>
         /// <returns></returns>
-        private List<double> GetChargeList(ParameterFileManager ascoreParameters, double mzmax, double mzmin,
-            TheoreticalSpectra theoMono, TheoreticalSpectra theoAve, int[] myPositions)
+        private List<double> GetChargeList(ParameterFileManager ascoreParameters, double mzMax, double mzMin,
+                                           TheoreticalSpectra theoreticalMonoMassSpectra,
+                                           TheoreticalSpectra theoreticalAverageMassSpectra,
+                                           int[] myPositions)
         {
             var mySpectraMono = theoMono.GetTempSpectra(myPositions,
                                   ascoreParameters.DynamicMods, MassType.Monoisotopic);
@@ -511,7 +520,7 @@ namespace AScore_DLL
                 mySpectra = mySpectraMono;
             }
 
-            var myIons = GetCurrentComboTheoreticalIons(mzmax, mzmin, mySpectra);
+            var myIons = GetCurrentComboTheoreticalIons(mzMax, mzMin, mySpectra);
             return myIons;
         }
 

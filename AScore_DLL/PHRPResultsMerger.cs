@@ -165,9 +165,13 @@ namespace AScore_DLL
                         var bestSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_BESTSEQUENCE, columnHeaders, string.Empty);
                         var peptideScore = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_PEPTIDESCORE, columnHeaders, 0.0);
                         var ascoreValue = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
+
+                        // ReSharper disable CommentTypo
                         //int numSiteIonsPossible = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_NUMSITEIONSPOSS, columnHeaders, 0);
                         //int numSitIonsMatched = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_NUMSITEIONSMATCHED, columnHeaders, 0);
                         //string secondSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_SECONDSEQUENCE, columnHeaders, string.Empty);
+                        // ReSharper restore CommentTypo
+
                         var modInfo = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_MODINFO, columnHeaders, string.Empty);
 
                         var scanPeptideKey = ConstructScanPeptideKey(scanNumber, originalPeptide);
@@ -217,7 +221,7 @@ namespace AScore_DLL
                 {
                     // Unmodified peptides will have a ModInfo key of "-"
                     // Skip these entries
-                    if (modInfoEntry.Key != AScoreProcessor.MODINFO_NO_MODIFIED_RESIDUES)
+                    if (modInfoEntry.Key != AScoreProcessor.MOD_INFO_NO_MODIFIED_RESIDUES)
                     {
                         if (!modInfoNames.Contains(modInfoEntry.Key))
                             modInfoNames.Add(modInfoEntry.Key);
@@ -320,7 +324,7 @@ namespace AScore_DLL
                         outLine.Append("\t" + StringUtilities.ValueToString(ascoreResult.PeptideScore));
 
                         // Count the number of modInfo entries that are not "-"
-                        var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != AScoreProcessor.MODINFO_NO_MODIFIED_RESIDUES select item.Key).Count();
+                        var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != AScoreProcessor.MOD_INFO_NO_MODIFIED_RESIDUES select item.Key).Count();
                         outLine.Append("\t" + modTypeCount);
 
                         foreach (var modInfoName in modInfoNames)

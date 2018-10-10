@@ -13,7 +13,7 @@ namespace AScore_DLL
 {
     public class AScoreProcessor : EventNotifier
     {
-        public const string MODINFO_NO_MODIFIED_RESIDUES = "-";
+        public const string MOD_INFO_NO_MODIFIED_RESIDUES = "-";
 
         private const double lowRangeMultiplier = 0.28;
         private const double maxRange = 2000.0;
@@ -366,16 +366,16 @@ namespace AScore_DLL
                 }
 
                 // perform work on the match
-                var splittedPep = peptideSeq.Split('.');
+                var peptideParts = peptideSeq.Split('.');
                 string sequenceWithoutSuffixOrPrefix;
                 string front;
                 string back;
 
-                if (splittedPep.Length >= 3)
+                if (peptideParts.Length >= 3)
                 {
-                    front = splittedPep[0];
-                    sequenceWithoutSuffixOrPrefix = splittedPep[1];
-                    back = splittedPep[2];
+                    front = peptideParts[0];
+                    sequenceWithoutSuffixOrPrefix = peptideParts[1];
+                    back = peptideParts[2];
                 }
                 else
                 {
@@ -417,13 +417,13 @@ namespace AScore_DLL
                 var precursorMZ = peptideMassCalculator.ConvoluteMass(expSpec.PrecursorMass, 1, chargeState);
 
                 // Set the m/z range
-                // Remove magic numbers parameterize
-                var mzmax = maxRange;
-                var mzmin = precursorMZ * lowRangeMultiplier;
+                var mzMax = maxRange;
+                var mzMin = precursorMZ * lowRangeMultiplier;
+
                 if (ascoreParameters.FragmentType != FragmentType.CID)
                 {
-                    mzmax = maxRange;
-                    mzmin = minRange;
+                    mzMax = maxRange;
+                    mzMin = minRange;
                 }
 
                 //Generate all combination mixtures
@@ -434,14 +434,16 @@ namespace AScore_DLL
                 //If I have more than 1 modifiable site proceed to calculation
                 if (myPositionsList.Count > 1)
                 {
-                    ascoreAlgorithm.ComputeAScore(datasetManager, ascoreParameters, scanNumber, chargeState, peptideSeq, front, back, sequenceClean, expSpec, mzmax, mzmin, myPositionsList);
+                    ascoreAlgorithm.ComputeAScore(datasetManager, ascoreParameters, scanNumber, chargeState,
+                                                  peptideSeq, front, back, sequenceClean, expSpec,
+                                                  mzMax, mzMin, myPositionsList);
                 }
                 else if (myPositionsList.Count == 1)
                 {
                     // Either one or no modifiable sites
                     var uniqueID = myPositionsList[0].Max();
                     if (uniqueID == 0)
-                        datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], MODINFO_NO_MODIFIED_RESIDUES);
+                        datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], MOD_INFO_NO_MODIFIED_RESIDUES);
                     else
                         datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], LookupModInfoByID(uniqueID, ascoreParameters.DynamicMods));
                 }
@@ -487,10 +489,10 @@ namespace AScore_DLL
         /// <returns>protein sequence without mods as well as changing ascoreParameterss</returns>
         private string GetCleanSequence(string seq, ref ParameterFileManager ascoreParameters)
         {
-            foreach (var dmod in ascoreParameters.DynamicMods)
+            foreach (var dynamicMod in ascoreParameters.DynamicMods)
             {
-                var newSeq = seq.Replace(dmod.ModSymbol.ToString(), string.Empty);
-                dmod.Count = seq.Length - newSeq.Length;
+                var newSeq = seq.Replace(dynamicMod.ModSymbol.ToString(), string.Empty);
+                dynamicMod.Count = seq.Length - newSeq.Length;
                 seq = newSeq;
             }
             return seq;
@@ -499,25 +501,25 @@ namespace AScore_DLL
         /// <summary>
         /// Generates the current modification set of theoretical ions filtered by the mz range
         /// </summary>
-        /// <param name="mzmax">max m/z</param>
-        /// <param name="mzmin">min m/z</param>
+        /// <param name="mzMax">max m/z</param>
+        /// <param name="mzMin">min m/z</param>
         /// <param name="mySpectra">dictionary of theoretical ions organized by charge</param>
         /// <returns>list of theoretical ions</returns>
-        private List<double> GetCurrentComboTheoreticalIons(double mzmax, double mzmin, Dictionary<int, ChargeStateIons> mySpectra)
+        private List<double> GetCurrentComboTheoreticalIons(double mzMax, double mzMin, Dictionary<int, ChargeStateIons> mySpectra)
         {
             var myIons = new List<double>();
             foreach (var csi in mySpectra.Values)
             {
                 foreach (var ion in csi.BIons)
                 {
-                    if (ion < mzmax && ion > mzmin)
+                    if (ion < mzMax && ion > mzMin)
                     {
                         myIons.Add(ion);
                     }
                 }
                 foreach (var ion in csi.YIons)
                 {
-                    if (ion < mzmax && ion > mzmin)
+                    if (ion < mzMax && ion > mzMin)
                     {
                         myIons.Add(ion);
                     }
@@ -535,12 +537,12 @@ namespace AScore_DLL
         private List<int[]> GetMyPositionList(string sequence, Combinatorics.ModMixtureCombo modMixture)
         {
             var myPositionsList = new List<int[]>();
-            foreach (var mycom in modMixture.FinalCombos)
+            foreach (var combo in modMixture.FinalCombos)
             {
                 var myPositions = new int[sequence.Length];
-                for (var i = 0; i < mycom.Count; i++)
+                for (var i = 0; i < combo.Count; i++)
                 {
-                    myPositions[modMixture.AllSite[i]] = mycom[i];
+                    myPositions[modMixture.AllSite[i]] = combo[i];
                 }
                 myPositionsList.Add(myPositions);
             }
