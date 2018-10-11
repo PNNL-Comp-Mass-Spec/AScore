@@ -256,36 +256,34 @@ namespace AScore_DLL
             {
                 DeleteTempFiles = true,
                 IgnoreILDifferences = false,
-                InspectParameterFilePath = string.Empty
+                InspectParameterFilePath = string.Empty,
+                MatchPeptidePrefixAndSuffixToProtein = false,
+                OutputProteinSequence = false,
+                PeptideInputFileFormat = clsPeptideToProteinMapEngine.ePeptideInputFileFormatConstants.PeptideListFile,
+                PeptideFileSkipFirstLine = false,
+                ProteinDataRemoveSymbolCharacters = true,
+                ProteinInputFilePath = mFastaFilePath,
+                SaveProteinToPeptideMappingFile = true,
+                SearchAllProteinsForPeptideSequence = true,
+                SearchAllProteinsSkipCoverageComputationSteps = true
             };
 
             if (!string.IsNullOrEmpty(mOutputFolderPath))
             {
                 peptideToProteinMapper.LogMessagesToFile = true;
-                peptideToProteinMapper.LogFolderPath = mOutputFolderPath;
+                peptideToProteinMapper.LogDirectoryPath = mOutputFolderPath;
             }
             else
             {
                 peptideToProteinMapper.LogMessagesToFile = false;
             }
 
-            peptideToProteinMapper.MatchPeptidePrefixAndSuffixToProtein = false;
-            peptideToProteinMapper.OutputProteinSequence = false;
-            peptideToProteinMapper.PeptideInputFileFormat = clsPeptideToProteinMapEngine.ePeptideInputFileFormatConstants.PeptideListFile;
-            peptideToProteinMapper.PeptideFileSkipFirstLine = false;
-            peptideToProteinMapper.ProteinDataRemoveSymbolCharacters = true;
-            peptideToProteinMapper.ProteinInputFilePath = mFastaFilePath;
-            peptideToProteinMapper.SaveProteinToPeptideMappingFile = true;
-            peptideToProteinMapper.SearchAllProteinsForPeptideSequence = true;
-            peptideToProteinMapper.SearchAllProteinsSkipCoverageComputationSteps = true;
-            peptideToProteinMapper.ShowMessages = false;
-
             // Note that clsPeptideToProteinMapEngine utilizes Data.SQLite.dll
-            var bSuccess = peptideToProteinMapper.ProcessFile(mPeptideListFilePath, mOutputFolderPath, string.Empty, true);
+            var success = peptideToProteinMapper.ProcessFile(mPeptideListFilePath, mOutputFolderPath, string.Empty, true);
 
             peptideToProteinMapper.CloseLogFileNow();
 
-            return bSuccess;
+            return success;
         }
 
         /// <summary>
