@@ -22,6 +22,12 @@ ProteinCoverageSummarizer
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="T:ProteinCoverageSummarizer.clsLeaderSequenceCache">
+ <summary>
+ This class tracks the first n letters of each peptide sent to it, while also
+ tracking the peptides and the location of those peptides in the leader sequence hash table
+ </summary>
+</member>
 <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.ProteinName">
  <summary>
  Protein name (optional)
@@ -70,45 +76,64 @@ ProteinCoverageSummarizer
  <summary>
  Caches the peptide and updates mLeaderSequences
  </summary>
- <param name="strPeptideSequence"></param>
- <param name="strProteinName"></param>
- <param name="chPrefixResidue"></param>
- <param name="chSuffixResidue"></param>
+ <param name="peptideSequence">Peptide sequence</param>
+ <param name="proteinName">Protein name</param>
+ <param name="prefixResidue">Prefix residue</param>
+ <param name="suffixResidue">Suffix residue</param>
  <returns></returns>
+</member>
+<member name="T:ProteinCoverageSummarizer.clsProteinCoverageSummarizer">
+ <summary>
+ This class will read in a protein FASTA file or delimited protein info file along with
+ an accompanying file with peptide sequences and compute the percent coverage of each of the proteins
+ </summary>
+</member>
+<member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mProgressPercentComplete">
+ <summary>
+ Percent complete
+ </summary>
+ <remarks>
+ Ranges from 0 to 100, but can contain decimal percentage values
+ </remarks>
+</member>
+<member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.KeepDB">
+ <summary>
+ When this is True, the SQLite Database will not be deleted after processing finishes
+ </summary>
 </member>
 <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ConstructOutputFilePath(System.String,System.String,System.String,System.String)">
  <summary>
  Construct the output file path
  The output file is based on outputFileBaseName if defined, otherwise is based on inputFilePath with the suffix removed
  In either case, suffixToAppend is appended
- The Output fodler is based on outputFolderPath if defined, otherwise it is the folder where inputFilePath resides
+ The Output directory is based on outputDirectoryPath if defined, otherwise it is the directory where inputFilePath resides
  </summary>
  <param name="inputFilePath"></param>
  <param name="suffixToAppend"></param>
- <param name="outputFolderPath"></param>
+ <param name="outputDirectoryPath"></param>
  <param name="outputFileBaseName"></param>
  <returns></returns>
 </member>
 <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptideList(System.Collections.Generic.IDictionary{System.String,System.Int32},System.String)">
  <summary>
  Searches for proteins that contain the peptides in peptideList
- If strProteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
- Otherwise, only searches protein strProteinNameForPeptide
+ If proteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
+ Otherwise, only searches protein proteinNameForPeptide
  </summary>
  <param name="peptideList">Dictionary containing the peptides to search; peptides must be in the format Prefix.Peptide.Suffix where Prefix and Suffix are single characters; peptides are assumed to only contain letters (no symbols)</param>
- <param name="strProteinNameForPeptides">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
+ <param name="proteinNameForPeptides">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
  <remarks></remarks>
 </member>
-<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetOutputFolderPath(System.String,System.String)">
+<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetOutputDirectoryPath(System.String,System.String)">
  <summary>
- Determine the output folder path
- Uses strOutputFolderPath if defined
- Otherwise uses the folder where strOutputFilePath resides
+ Determine the output directory path
+ Uses outputDirectoryPath if defined
+ Otherwise uses the directory where outputFilePath resides
  </summary>
- <param name="strOutputFolderPath"></param>
- <param name="strOutputFilePath"></param>
+ <param name="outputDirectoryPath"></param>
+ <param name="outputFilePath"></param>
  <returns></returns>
- <remarks>If an error, or unable to determine a folder, returns the folder with the application files</remarks>
+ <remarks>If an error, or unable to determine a directory, returns the directory with the application files</remarks>
 </member>
 <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.IncrementCountByKey(System.Collections.Generic.IDictionary{System.String,System.Int32},System.String)">
  <summary>
@@ -116,7 +141,7 @@ ProteinCoverageSummarizer
  If the key is not defined, add it
  </summary>
  <param name="oDictionary"></param>
- <param name="key"></param>
+ <param name="keyName"></param>
  <returns>True if the protein is new and was added tomProteinPeptideStats </returns>
 </member>
 <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ReadProteinInfoChunk(System.Int32,System.Boolean[],System.Boolean)">
@@ -132,11 +157,31 @@ ProteinCoverageSummarizer
  specified mPeptideFileColumnOrdering = ePeptideFileColumnOrderingCode.ProteinName_PeptideSequence
  If mPeptideFileColumnOrdering = ePeptideFileColumnOrderingCode.SequenceOnly, the file isn't even opened
  </summary>
- <param name="strPeptideInputFilePath"></param>
+ <param name="peptideInputFilePath"></param>
  <param name="ePeptideFileColumnOrdering">Input / Output parameter</param>
- <param name="blnSkipFirstLine"></param>
- <param name="chColumnDelimiter"></param>
+ <param name="skipFirstLine"></param>
+ <param name="columnDelimiter"></param>
  <returns>True if no problems; False if the user chooses to abort</returns>
+</member>
+<member name="T:ProteinCoverageSummarizer.clsProteinFileDataCache">
+ <summary>
+ This class will read a protein FASTA file or delimited protein info file and
+ store the proteins in memory
+ </summary>
+</member>
+<member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.udtProteinInfoType.UniqueSequenceID">
+ <summary>
+ Unique sequence ID
+ </summary>
+ <remarks>
+ Index number applied to the proteins stored in the SQL Lite DB; the first protein has UniqueSequenceID = 0
+ </remarks>
+</member>
+<member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.udtProteinInfoType.PercentCoverage">
+ <summary>
+ Percent coverage
+ </summary>
+ <remarks>Value between 0 and 1</remarks>
 </member>
 <member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.AssumeDelimitedFile">
  <summary>
@@ -151,11 +196,23 @@ ProteinCoverageSummarizer
  </summary>
  <returns></returns>
 </member>
+<member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.KeepDB">
+ <summary>
+ When this is True, the SQLite Database will not be deleted after processing finishes
+ </summary>
+</member>
+<member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.DeleteSQLiteDBFile(System.String,System.Boolean)">
+ <summary>
+ Delete the SQLite database file
+ </summary>
+ <param name="callingMethod">Calling method name</param>
+ <param name="forceDelete">Force deletion (ignore KeepDB)</param>
+</member>
 <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.IsFastaFile(System.String)">
  <summary>
  Examines the file's extension and true if it ends in .fasta or .fsa or .faa
  </summary>
- <param name="strFilePath"></param>
+ <param name="filePath"></param>
  <returns></returns>
 </member>
 </members>

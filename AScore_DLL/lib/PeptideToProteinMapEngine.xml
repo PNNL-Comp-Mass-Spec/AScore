@@ -22,6 +22,13 @@ PeptideToProteinMapEngine
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="T:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine">
+ <summary>
+ This class uses ProteinCoverageSummarizer.dll to read in a protein fasta file or delimited protein info file along with
+ an accompanying file with peptide sequences to find the proteins that contain each peptide
+ It will also optionally compute the percent coverage of each of the proteins
+ </summary>
+</member>
 <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.udtProteinIDMapInfoType.ToString">
  <summary>
  Show the peptide sequence
@@ -56,160 +63,6 @@ PeptideToProteinMapEngine
  </summary>
  <param name="peptideSequence"></param>
  <param name="scanNumber"></param>
-</member>
-<member name="T:PeptideToProteinMapEngine.clsProcessFilesBaseClass">
- <summary>
- This class can be used as a base class for classes that process a file or files, and create
- new output files in an output folder.  Note that this class contains simple error codes that
- can be set from any derived classes.  The derived classes can also set their own local error codes
- </summary>
- <remarks>
- Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
- Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
- Started November 9, 2003
- </remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesBaseClass.#ctor">
- <summary>
- Constructor
- </summary>
- <remarks></remarks>
-</member>
-<member name="P:PeptideToProteinMapEngine.clsProcessFilesBaseClass.IgnoreErrorsWhenUsingWildcardMatching">
- <summary>
- This option applies when processing files matched with a wildcard
- </summary>
- <value></value>
- <returns></returns>
- <remarks></remarks>
-</member>
-<member name="P:PeptideToProteinMapEngine.clsProcessFilesBaseClass.ErrorCode">
- <summary>
- Error code reflecting processing outcome
- </summary>
- <returns></returns>
-</member>
-<member name="T:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase">
- <summary>
- This class contains functions used by both clsProcessFilesBaseClass and clsProcessFoldersBaseClass
- </summary>
- <remarks>
- Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
- Created in October 2013
- </remarks>
-</member>
-<member name="F:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.mProgressPercentComplete">
- <summary>
- Percent complete, value between 0 and 100, but can contain decimal percentage values
- </summary>
-</member>
-<member name="F:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.mLogDataCache">
- <summary>
- Keys in this dictionary are the log type and message (separated by an underscore), values are the most recent time the string was logged
- </summary>
- <remarks></remarks>
-</member>
-<member name="P:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.LogFolderPath">
- <summary>
- Log folder path (ignored if LogFilePath is rooted)
- </summary>
- <returns></returns>
- <remarks>
- If blank, mOutputFolderPath will be used; if mOutputFolderPath is also blank, the log is created in the same folder as the executing assembly
- </remarks>
-</member>
-<member name="P:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.ProgressPercentComplete">
- <summary>
- Percent complete, value between 0 and 100, but can contain decimal percentage values
- </summary>
- <returns></returns>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.#ctor">
- <summary>
- Constructor
- </summary>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.CreateSettingsFileIfMissing(System.String,System.String)">
- <summary>
- Verifies that the specified .XML settings file exists in the user's local settings folder
- </summary>
- <param name="applicationName">Application name</param>
- <param name="settingsFileName">Settings file name</param>
- <returns></returns>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.CreateSettingsFileIfMissing(System.String)">
- <summary>
- Verifies that the specified .XML settings file exists in the user's local settings folder
- </summary>
- <param name="settingsFilePathLocal">Full path to the local settings file, for example C:\Users\username\AppData\Roaming\AppName\SettingsFileName.xml</param>
- <returns></returns>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.GarbageCollectNow">
- <summary>
- Perform garbage collection
- </summary>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.GarbageCollectNow(System.Int32)">
- <summary>
- Perform garbage collection
- </summary>
- <param name="maxWaitTimeMSec"></param>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.GetAppDataFolderPath(System.String)">
- <summary>
- Returns the full path to the folder into which this application should read/write settings file information
- </summary>
- <param name="appName"></param>
- <returns></returns>
- <remarks>For example, C:\Users\username\AppData\Roaming\AppName</remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.GetAppFolderPath">
- <summary>
- Returns the full path to the folder that contains the currently executing .Exe or .Dll
- </summary>
- <returns></returns>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.GetAppPath">
- <summary>
- Returns the full path to the executing .Exe or .Dll
- </summary>
- <returns>File path</returns>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.GetAppVersion(System.String)">
- <summary>
- Returns the .NET assembly version followed by the program date
- </summary>
- <param name="programDate"></param>
- <returns></returns>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.GetSettingsFilePathLocal(System.String,System.String)">
- <summary>
- Returns the full path to this application's local settings file
- </summary>
- <param name="applicationName"></param>
- <param name="settingsFileName"></param>
- <returns></returns>
- <remarks>For example, C:\Users\username\AppData\Roaming\AppName\SettingsFileName.xml</remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.LogMessage(System.String,PeptideToProteinMapEngine.clsProcessFilesOrFoldersBase.eMessageTypeConstants,System.Int32)">
- <summary>
- Log a message then raise a Status, Warning, or Error event
- </summary>
- <param name="message"></param>
- <param name="eMessageType"></param>
- <param name="duplicateHoldoffHours"></param>
- <remarks>
- Note that CleanupPaths() will update mOutputFolderPath, which is used here if mLogFolderPath is blank
- Thus, be sure to call CleanupPaths (or update mLogFolderPath) before the first call to LogMessage
- </remarks>
 </member>
 </members>
 </doc>
