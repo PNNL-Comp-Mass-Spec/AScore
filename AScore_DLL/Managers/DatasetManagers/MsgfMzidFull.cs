@@ -359,7 +359,7 @@ namespace AScore_DLL.Managers.DatasetManagers
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam)
         {
-            var id = data[t];
+            var id = data[mCurrentRow];
             ascoreResultsCount = 0;
 
             scanNumber = 0;
@@ -420,25 +420,25 @@ namespace AScore_DLL.Managers.DatasetManagers
         {
             base.WriteToTable(peptideSeq, bestSeq, scanNum, topPeptideScore, ascoreResult);
 
-            //var drow = dAscores.NewRow();
+            //var newRow = mAScoresTable.NewRow();
             //
-            //drow[RESULTS_COL_JOB] = m_jobNum;
-            //drow[RESULTS_COL_SCAN] = scanNum;
-            //drow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
-            //drow[RESULTS_COL_BESTSEQUENCE] = bestSeq;
-            //drow[RESULTS_COL_PEPTIDESCORE] = PRISM.StringUtilities.ValueToString(topPeptideScore);
+            //newRow[RESULTS_COL_JOB] = m_jobNum;
+            //newRow[RESULTS_COL_SCAN] = scanNum;
+            //newRow[RESULTS_COL_ORIGINAL_SEQUENCE] = peptideSeq;
+            //newRow[RESULTS_COL_BEST_SEQUENCE] = bestSeq;
+            //newRow[RESULTS_COL_PEPTIDE_SCORE] = PRISM.StringUtilities.ValueToString(topPeptideScore);
             //
-            //drow[RESULTS_COL_ASCORE] = PRISM.StringUtilities.ValueToString(ascoreResult.AScore);
-            //drow[RESULTS_COL_NUMSITEIONSPOSS] = ascoreResult.NumSiteIons;
-            //drow[RESULTS_COL_NUMSITEIONSMATCHED] = ascoreResult.SiteDetermineMatched;
-            //drow[RESULTS_COL_SECONDSEQUENCE] = ascoreResult.SecondSequence;
-            //drow[RESULTS_COL_MODINFO] = ascoreResult.ModInfo;
+            //newRow[RESULTS_COL_ASCORE] = PRISM.StringUtilities.ValueToString(ascoreResult.AScore);
+            //newRow[RESULTS_COL_NUM_SITE_IONS_POSS] = ascoreResult.NumSiteIons;
+            //newRow[RESULTS_COL_NUM_SITE_IONS_MATCHED] = ascoreResult.SiteDetermineMatched;
+            //newRow[RESULTS_COL_SECOND_SEQUENCE] = ascoreResult.SecondSequence;
+            //newRow[RESULTS_COL_MOD_INFO] = ascoreResult.ModInfo;
             //
-            //dAscores.Rows.Add(drow);
+            //mAScoresTable.Rows.Add(newRow);
 
             ascoreResultsCount++;
 
-            var id = data[t];
+            var id = data[mCurrentRow];
             if (ascoreResultsCount == 1)
             {
                 id.SpectrumIdentification.UserParams.Add(new UserParamObj()
@@ -505,7 +505,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         {
             base.WriteToTable(peptideSeq, scanNum, pScore, positionList, modInfo);
 
-            var id = data[t];
+            var id = data[mCurrentRow];
 
             if (positionList.Count(x => x > 0) != 0)
             {

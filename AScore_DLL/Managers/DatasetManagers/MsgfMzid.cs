@@ -253,7 +253,7 @@ namespace AScore_DLL.Managers.DatasetManagers
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam)
         {
-            var id = data[t];
+            var id = data[mCurrentRow];
             scanNumber = id.ScanNum;
             scanCount = 1;
             chargeState = id.Charge;

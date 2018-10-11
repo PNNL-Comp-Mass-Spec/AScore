@@ -7,17 +7,17 @@
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq,
             ref ParameterFileManager ascoreParam)
         {
-            if (dt.Columns.Contains(RESULTS_COL_JOB))
-                m_jobNum = (string)dt.Rows[t][RESULTS_COL_JOB];
+            if (mDataTable.Columns.Contains(RESULTS_COL_JOB))
+                m_jobNum = (string)mDataTable.Rows[mCurrentRow][RESULTS_COL_JOB];
 
-            scanNumber = int.Parse((string)dt.Rows[t]["Scan"]);
+            scanNumber = int.Parse((string)mDataTable.Rows[mCurrentRow]["Scan"]);
             scanCount = 1;
-            chargeState = int.Parse((string)dt.Rows[t]["Charge"]);
-            peptideSeq = (string)dt.Rows[t]["Peptide"];
+            chargeState = int.Parse((string)mDataTable.Rows[mCurrentRow]["Charge"]);
+            peptideSeq = (string)mDataTable.Rows[mCurrentRow]["Peptide"];
 
-            if (dt.Columns.Contains("FragMethod"))
+            if (mDataTable.Columns.Contains("FragMethod"))
             {
-                var fragtype = ((string)dt.Rows[t]["FragMethod"]).ToLower();
+                var fragtype = ((string)mDataTable.Rows[mCurrentRow]["FragMethod"]).ToLower();
 
                 switch (fragtype)
                 {
@@ -45,14 +45,14 @@
 
             msgfScore = 0;
 
-            if (dt.Columns.Contains("MSGF_SpecProb"))
+            if (mDataTable.Columns.Contains("MSGF_SpecProb"))
             {
-                if (!double.TryParse((string) dt.Rows[t]["MSGF_SpecProb"], out msgfScore))
+                if (!double.TryParse((string) mDataTable.Rows[mCurrentRow]["MSGF_SpecProb"], out msgfScore))
                     msgfScore = 0;
             }
-            else if (dt.Columns.Contains("MSGFDB_SpecEValue"))
+            else if (mDataTable.Columns.Contains("MSGFDB_SpecEValue"))
             {
-                if (!double.TryParse((string)dt.Rows[t]["MSGFDB_SpecEValue"], out msgfScore))
+                if (!double.TryParse((string)mDataTable.Rows[mCurrentRow]["MSGFDB_SpecEValue"], out msgfScore))
                     msgfScore = 0;
             }
         }

@@ -6,7 +6,7 @@ using MSDataFileReader;
 namespace AScore_DLL.Managers.SpectraManagers
 {
     [Obsolete("Unused")]
-    public class MzxmlManager : ISpectraManager
+    public class MzXmlManager : ISpectraManager
     {
         private readonly clsMzXMLFileAccessor mzAccessor;
 
@@ -19,37 +19,37 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mzxmlPath"></param>
+        /// <param name="mzXmlPath"></param>
         /// <param name="peptideMassCalculator"></param>
-        private MzxmlManager(string mzxmlPath, PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
+        private MzXmlManager(string mzXmlPath, PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
         {
             mPeptideMassCalculator = peptideMassCalculator;
 
             try
             {
-                var datasetName  = Path.GetFileNameWithoutExtension(mzxmlPath);
+                var datasetName  = Path.GetFileNameWithoutExtension(mzXmlPath);
 
                 // Note: prior to October 2017 the dataset name was determined by removing the last 4 characters from datasetName
                 // That logic seemed flawed and has thus been removed
                 DatasetName = datasetName;
 
                 mzAccessor = new clsMzXMLFileAccessor();
-                mzAccessor.OpenFile(mzxmlPath);
+                mzAccessor.OpenFile(mzXmlPath);
             }
             catch (DirectoryNotFoundException)
             {
                 throw new DirectoryNotFoundException("The specified directory for " +
-                    "the mzxml could not be found!");
+                    "the mzXml could not be found!");
             }
             catch (FileNotFoundException)
             {
-                var filename = Path.GetFileName(mzxmlPath);
-                throw new FileNotFoundException("The specified mzxml file \"" +
+                var filename = Path.GetFileName(mzXmlPath);
+                throw new FileNotFoundException("The specified mzXml file \"" +
                     filename + "\" could not be found!");
             }
         }
 
-        ~MzxmlManager()
+        ~MzXmlManager()
         {
             mzAccessor.CloseFile();
         }
@@ -69,15 +69,15 @@ namespace AScore_DLL.Managers.SpectraManagers
             var precursorMass = specInfo.ParentIonMZ;
             var precursorChargeState = chargeState;
 
-            var mzlist = specInfo.MZList;
-            var intlist = specInfo.IntensityList;
+            var mzList = specInfo.MZList;
+            var intensityList = specInfo.IntensityList;
 
-            for (var i = 0; i < mzlist.Length; i++)
+            for (var i = 0; i < mzList.Length; i++)
             {
-                var val1 = mzlist[i];
-                double val2 = intlist[i];
+                var mz = mzList[i];
+                double intensity = intensityList[i];
 
-                entries.Add(new ExperimentalSpectraEntry(val1, val2));
+                entries.Add(new ExperimentalSpectraEntry(mz, intensity));
             }
 
             var expSpec = new ExperimentalSpectra(scanNumber, chargeState,

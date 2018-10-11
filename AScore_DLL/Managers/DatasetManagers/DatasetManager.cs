@@ -9,20 +9,20 @@ namespace AScore_DLL.Managers.DatasetManagers
 
         public const string RESULTS_COL_JOB = "Job";
         public const string RESULTS_COL_SCAN = "Scan";
-        public const string RESULTS_COL_ORIGINALSEQUENCE = "OriginalSequence";
-        public const string RESULTS_COL_BESTSEQUENCE = "BestSequence";
-        public const string RESULTS_COL_PEPTIDESCORE = "PeptideScore";
+        public const string RESULTS_COL_ORIGINAL_SEQUENCE = "OriginalSequence";
+        public const string RESULTS_COL_BEST_SEQUENCE = "BestSequence";
+        public const string RESULTS_COL_PEPTIDE_SCORE = "PeptideScore";
         public const string RESULTS_COL_ASCORE = "AScore";
-        public const string RESULTS_COL_NUMSITEIONSPOSS = "numSiteIonsPoss";
-        public const string RESULTS_COL_NUMSITEIONSMATCHED = "numSiteIonsMatched";
-        public const string RESULTS_COL_SECONDSEQUENCE = "SecondSequence";
-        public const string RESULTS_COL_MODINFO = "ModInfo";
+        public const string RESULTS_COL_NUM_SITE_IONS_POSS = "numSiteIonsPoss";
+        public const string RESULTS_COL_NUM_SITE_IONS_MATCHED = "numSiteIonsMatched";
+        public const string RESULTS_COL_SECOND_SEQUENCE = "SecondSequence";
+        public const string RESULTS_COL_MOD_INFO = "ModInfo";
 
         #endregion
 
-        protected DataTable dt;
-        protected DataTable dAscores;
-        protected int t;
+        protected DataTable mDataTable;
+        protected DataTable mAScoresTable;
+        protected int mCurrentRow;
         protected int maxSteps;
         public bool AtEnd { get; set; }
         protected string m_jobNum;
@@ -49,16 +49,16 @@ namespace AScore_DLL.Managers.DatasetManagers
             mDatasetFilePath = fhtFileName;
             if (isFht)
             {
-                dt = Utilities.TextFileToDataTableAssignTypeString(fhtFileName, false);
+                mDataTable = Utilities.TextFileToDataTableAssignTypeString(fhtFileName, false);
 
-                if (dt.Columns.Contains(RESULTS_COL_JOB))
-                    m_jobNum = (string) dt.Rows[0][RESULTS_COL_JOB];
+                if (mDataTable.Columns.Contains(RESULTS_COL_JOB))
+                    m_jobNum = (string) mDataTable.Rows[0][RESULTS_COL_JOB];
                 else
                     m_jobNum = "0";
 
-                m_MSGFSpecProbColumnPresent = dt.Columns.Contains("MSGF_SpecProb");
+                m_MSGFSpecProbColumnPresent = mDataTable.Columns.Contains("MSGF_SpecProb");
 
-                maxSteps = dt.Rows.Count;
+                maxSteps = mDataTable.Rows.Count;
             }
             else
             {
@@ -66,28 +66,28 @@ namespace AScore_DLL.Managers.DatasetManagers
             }
 
             AtEnd = false;
-            InitializeAscores();
+            InitializeAScores();
         }
 
-        private void InitializeAscores()
+        private void InitializeAScores()
         {
-            dAscores = new DataTable();
+            mAScoresTable = new DataTable();
 
-            dAscores.Columns.Add(RESULTS_COL_JOB, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_SCAN, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_ORIGINALSEQUENCE, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_BESTSEQUENCE, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_PEPTIDESCORE, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_ASCORE, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_NUMSITEIONSPOSS, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_NUMSITEIONSMATCHED, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_SECONDSEQUENCE, typeof(string));
-            dAscores.Columns.Add(RESULTS_COL_MODINFO, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_JOB, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_SCAN, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_ORIGINAL_SEQUENCE, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_BEST_SEQUENCE, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_PEPTIDE_SCORE, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_ASCORE, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_NUM_SITE_IONS_POSS, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_NUM_SITE_IONS_MATCHED, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_SECOND_SEQUENCE, typeof(string));
+            mAScoresTable.Columns.Add(RESULTS_COL_MOD_INFO, typeof(string));
         }
 
         public virtual int GetRowLength()
         {
-            return dt.Rows.Count;
+            return mDataTable.Rows.Count;
         }
 
         /// <summary>
@@ -109,12 +109,12 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// </summary>
         public void ResetToStart()
         {
-            t = 0;
+            mCurrentRow = 0;
         }
 
-        public int CurrentRowNum => t;
+        public int CurrentRowNum => mCurrentRow;
 
-        public int ResultsCount => dAscores.Rows.Count;
+        public int ResultsCount => mAScoresTable.Rows.Count;
 
         /// <summary>
         /// Writes ascore information to table
@@ -131,21 +131,21 @@ namespace AScore_DLL.Managers.DatasetManagers
             //    Console.WriteLine("Debug: found " + peptideSeq);
             //}
 
-            var drow = dAscores.NewRow();
+            var newRow = mAScoresTable.NewRow();
 
-            drow[RESULTS_COL_JOB] = m_jobNum;
-            drow[RESULTS_COL_SCAN] = scanNum;
-            drow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
-            drow[RESULTS_COL_BESTSEQUENCE] = bestSeq;
-            drow[RESULTS_COL_PEPTIDESCORE] = PRISM.StringUtilities.ValueToString(topPeptideScore);
+            newRow[RESULTS_COL_JOB] = m_jobNum;
+            newRow[RESULTS_COL_SCAN] = scanNum;
+            newRow[RESULTS_COL_ORIGINAL_SEQUENCE] = peptideSeq;
+            newRow[RESULTS_COL_BEST_SEQUENCE] = bestSeq;
+            newRow[RESULTS_COL_PEPTIDE_SCORE] = PRISM.StringUtilities.ValueToString(topPeptideScore);
 
-            drow[RESULTS_COL_ASCORE] = PRISM.StringUtilities.ValueToString(ascoreResult.AScore);
-            drow[RESULTS_COL_NUMSITEIONSPOSS] = ascoreResult.NumSiteIons;
-            drow[RESULTS_COL_NUMSITEIONSMATCHED] = ascoreResult.SiteDetermineMatched;
-            drow[RESULTS_COL_SECONDSEQUENCE] = ascoreResult.SecondSequence;
-            drow[RESULTS_COL_MODINFO] = ascoreResult.ModInfo;
+            newRow[RESULTS_COL_ASCORE] = PRISM.StringUtilities.ValueToString(ascoreResult.AScore);
+            newRow[RESULTS_COL_NUM_SITE_IONS_POSS] = ascoreResult.NumSiteIons;
+            newRow[RESULTS_COL_NUM_SITE_IONS_MATCHED] = ascoreResult.SiteDetermineMatched;
+            newRow[RESULTS_COL_SECOND_SEQUENCE] = ascoreResult.SecondSequence;
+            newRow[RESULTS_COL_MOD_INFO] = ascoreResult.ModInfo;
 
-            dAscores.Rows.Add(drow);
+            mAScoresTable.Rows.Add(newRow);
         }
 
         /// <summary>
@@ -164,13 +164,13 @@ namespace AScore_DLL.Managers.DatasetManagers
             //    Console.WriteLine("Debug: found " + peptideSeq);
             //}
 
-            var dataRow = dAscores.NewRow();
+            var dataRow = mAScoresTable.NewRow();
 
             dataRow[RESULTS_COL_JOB] = m_jobNum;
             dataRow[RESULTS_COL_SCAN] = scanNum;
-            dataRow[RESULTS_COL_ORIGINALSEQUENCE] = peptideSeq;
-            dataRow[RESULTS_COL_BESTSEQUENCE] = peptideSeq;
-            dataRow[RESULTS_COL_PEPTIDESCORE] = PRISM.StringUtilities.ValueToString(pScore);
+            dataRow[RESULTS_COL_ORIGINAL_SEQUENCE] = peptideSeq;
+            dataRow[RESULTS_COL_BEST_SEQUENCE] = peptideSeq;
+            dataRow[RESULTS_COL_PEPTIDE_SCORE] = PRISM.StringUtilities.ValueToString(pScore);
 
             var intNonZeroCount = (from item in positionList where item > 0 select item).Count();
 
@@ -182,12 +182,12 @@ namespace AScore_DLL.Managers.DatasetManagers
             {
                 dataRow[RESULTS_COL_ASCORE] = "1000";
             }
-            dataRow[RESULTS_COL_NUMSITEIONSMATCHED] = 0;
-            dataRow[RESULTS_COL_NUMSITEIONSPOSS] = 0;
-            dataRow[RESULTS_COL_SECONDSEQUENCE] = "---";
-            dataRow[RESULTS_COL_MODINFO] = modInfo;
+            dataRow[RESULTS_COL_NUM_SITE_IONS_MATCHED] = 0;
+            dataRow[RESULTS_COL_NUM_SITE_IONS_POSS] = 0;
+            dataRow[RESULTS_COL_SECOND_SEQUENCE] = "---";
+            dataRow[RESULTS_COL_MOD_INFO] = modInfo;
 
-            dAscores.Rows.Add(dataRow);
+            mAScoresTable.Rows.Add(dataRow);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// <param name="outputFilePath"></param>
         public void WriteToFile(string outputFilePath)
         {
-            Utilities.WriteDataTableToText(dAscores, outputFilePath);
+            Utilities.WriteDataTableToText(mAScoresTable, outputFilePath);
         }
 
         /// <summary>
@@ -204,8 +204,8 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// </summary>
         public void IncrementRow()
         {
-            t++;
-            if (t == maxSteps)
+            mCurrentRow++;
+            if (mCurrentRow == maxSteps)
             {
                 AtEnd = true;
             }

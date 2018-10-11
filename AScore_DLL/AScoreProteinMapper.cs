@@ -12,7 +12,7 @@ namespace AScore_DLL
     {
         private const string OutputFilenameAddition = "_ProteinMap";
         private const string PeptideFilenameAddition = "_Peptides";
-        private const int MaxUnfoundPeptidesOutput = 30;
+        private const int MaxMissingPeptidesToShow = 30;
 
         private struct ProteinPeptideMapType
         {
@@ -132,7 +132,7 @@ namespace AScore_DLL
                         Console.WriteLine("\nWarning: Some peptide sequences were not found, and are not reverse hits.");
                         Console.WriteLine("\tYou may be using the WRONG FASTA file.");
 
-                        if (mPeptidesReallyNotFound.Count < MaxUnfoundPeptidesOutput)
+                        if (mPeptidesReallyNotFound.Count < MaxMissingPeptidesToShow)
                         {
                             Console.WriteLine("\tCount\tPeptide");
                             foreach (var peptide in mPeptidesReallyNotFound)
@@ -291,7 +291,7 @@ namespace AScore_DLL
         /// </summary>
         private void ReadBackMap()
         {
-            var columnMapPTPM = new Dictionary<string, int>();
+            var columnMap = new Dictionary<string, int>();
             using (var mapReader =
                 new StreamReader(new FileStream(mProteinToPeptideMapFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
@@ -302,18 +302,19 @@ namespace AScore_DLL
                     var columns = line.Split('\t');
                     for (var i = 0; i < columns.Length; ++i)
                     {
-                        columnMapPTPM.Add(columns[i], i);
+                        columnMap.Add(columns[i], i);
                     }
+
                     // Run as long as we can successfully read
                     while ((line = mapReader.ReadLine()) != null)
                     {
                         columns = line.Split('\t');
                         var item = new ProteinPeptideMapType
                         {
-                            residueStart = Convert.ToInt32(columns[columnMapPTPM["Residue Start"]]),
-                            residueEnd = Convert.ToInt32(columns[columnMapPTPM["Residue End"]]),
-                            proteinName = columns[columnMapPTPM["Protein Name"]],
-                            peptideSequence = columns[columnMapPTPM["Peptide Sequence"]]
+                            residueStart = Convert.ToInt32(columns[columnMap["Residue Start"]]),
+                            residueEnd = Convert.ToInt32(columns[columnMap["Residue End"]]),
+                            proteinName = columns[columnMap["Protein Name"]],
+                            peptideSequence = columns[columnMap["Peptide Sequence"]]
                         };
 
                         // Add the key and a new list if it doesn't yet exist
