@@ -143,11 +143,11 @@ namespace AScore_DLL
                 columnHeaders.Add(DatasetManager.RESULTS_COL_SECOND_SEQUENCE, 8);
                 columnHeaders.Add(DatasetManager.RESULTS_COL_MOD_INFO, 9);
 
-                using (var srInFile = new StreamReader(new FileStream(ascoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+                using (var resultsFileReader = new StreamReader(new FileStream(ascoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 {
-                    while (srInFile.Peek() > -1)
+                    while (!resultsFileReader.EndOfStream)
                     {
-                        var lineIn = srInFile.ReadLine();
+                        var lineIn = resultsFileReader.ReadLine();
                         if (string.IsNullOrEmpty(lineIn))
                             continue;
 
@@ -270,20 +270,20 @@ namespace AScore_DLL
         }
 
         private void MakeUpdatedPHRPFile(
-            FileSystemInfo fiInputFile,
-            FileSystemInfo fiOutputFilePath,
-            clsPHRPReader oPHRPReader,
+            FileSystemInfo inputFile,
+            FileSystemInfo outputFile,
+            clsPHRPReader phrpReader,
             Dictionary<string, AScoreResultsType> cachedAscoreResults)
         {
             try
             {
                 // Read the header line from the PHRP file
-                var outputHeaderLine = ReadHeaderLine(fiInputFile.FullName);
+                var outputHeaderLine = ReadHeaderLine(inputFile.FullName);
 
                 var modInfoNames = DetermineModInfoNames(cachedAscoreResults);
 
                 // Create the output file
-                using (var swOutFile = new StreamWriter(new FileStream(fiOutputFilePath.FullName, FileMode.Create, FileAccess.Write, FileShare.Read)))
+                using (var phrpWriter = new StreamWriter(new FileStream(outputFile.FullName, FileMode.Create, FileAccess.Write, FileShare.Read)))
                 {
                     var outLine = new System.Text.StringBuilder();
 
@@ -296,15 +296,15 @@ namespace AScore_DLL
                     {
                         outLine.Append("\t" + modInfoName);
                     }
-                    swOutFile.WriteLine(outLine);
+                    phrpWriter.WriteLine(outLine);
 
                     var skipCount = 0;
 
-                    while (oPHRPReader.MoveNext())
+                    while (phrpReader.MoveNext())
                     {
-                        var oPSM = oPHRPReader.CurrentPSM;
+                        var currentPSM = phrpReader.CurrentPSM;
 
-                        var scanPeptideKey = ConstructScanPeptideKey(oPSM.ScanNumber, oPSM.Peptide);
+                        var scanPeptideKey = ConstructScanPeptideKey(currentPSM.ScanNumber, currentPSM.Peptide);
 
                         if (!cachedAscoreResults.TryGetValue(scanPeptideKey, out var ascoreResult))
                         {
@@ -316,7 +316,7 @@ namespace AScore_DLL
                         }
 
                         // Replace the original peptide with the "best" peptide
-                        var dataLineUpdated = ReplaceFirst(oPSM.DataLineText, oPSM.Peptide, ascoreResult.BestSequence);
+                        var dataLineUpdated = ReplaceFirst(currentPSM.DataLineText, currentPSM.Peptide, ascoreResult.BestSequence);
 
                         outLine.Clear();
                         outLine.Append(dataLineUpdated);
@@ -343,7 +343,7 @@ namespace AScore_DLL
                                 outLine.Append("\t");
                         }
 
-                        swOutFile.WriteLine(outLine);
+                        phrpWriter.WriteLine(outLine);
                     }
 
                     if (skipCount > 0)
@@ -371,11 +371,11 @@ namespace AScore_DLL
         {
             var headerLine = string.Empty;
 
-            using (var srInFile = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var reader = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
-                if (srInFile.Peek() > -1)
+                if (!reader.EndOfStream)
                 {
-                    headerLine = srInFile.ReadLine();
+                    headerLine = reader.ReadLine();
                 }
             }
 

@@ -163,12 +163,12 @@ namespace AScore_DLL
             };
 
             // Read the contents of JobToDatasetMapFile
-            using (var srMapFile = new StreamReader(new FileStream(jobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var mapFileReader = new StreamReader(new FileStream(jobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
                 var rowNumber = 0;
-                while (srMapFile.Peek() > -1)
+                while (!mapFileReader.EndOfStream)
                 {
-                    var dataLine = srMapFile.ReadLine();
+                    var dataLine = mapFileReader.ReadLine();
                     rowNumber++;
 
                     if (string.IsNullOrWhiteSpace(dataLine))

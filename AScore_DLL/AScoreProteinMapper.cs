@@ -193,8 +193,7 @@ namespace AScore_DLL
         private void CreateReversedPeptideList()
         {
             // Write out a list of peptides for clsPeptideToProteinMapEngine
-            using (var peptideWriter =
-                new StreamWriter(new FileStream(mPeptideListFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+            using (var peptideWriter = new StreamWriter(new FileStream(mPeptideListFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
                 foreach (var peptide in mPeptidesNotFound)
                 {
@@ -211,34 +210,31 @@ namespace AScore_DLL
             var columnMap = new Dictionary<string, int>();
             var peptides = new Dictionary<string, int>();
             // Write out a list of peptides for clsPeptideToProteinMapEngine
-            using (var aScoreReader =
-                    new StreamReader(new FileStream(mAScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var aScoreReader = new StreamReader(new FileStream(mAScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var peptideWriter = new StreamWriter(new FileStream(mPeptideListFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
-                using (var peptideWriter =
-                    new StreamWriter(new FileStream(mPeptideListFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+
+                string line;
+                if ((line = aScoreReader.ReadLine()) != null)
                 {
-                    string line;
-                    if ((line = aScoreReader.ReadLine()) != null)
+                    // Assume the first line is column names
+                    var columns = line.Split('\t');
+                    for (var i = 0; i < columns.Length; ++i)
                     {
-                        // Assume the first line is column names
-                        var columns = line.Split('\t');
-                        for (var i = 0; i < columns.Length; ++i)
+                        columnMap.Add(columns[i], i);
+                    }
+                    // Run as long as we can successfully read
+                    while ((line = aScoreReader.ReadLine()) != null)
+                    {
+                        var sequence = line.Split('\t')[columnMap["BestSequence"]];
+                        var cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
+                        if (!peptides.ContainsKey(cleanSequence))
                         {
-                            columnMap.Add(columns[i], i);
+                            peptides.Add(cleanSequence, 0);
                         }
-                        // Run as long as we can successfully read
-                        while ((line = aScoreReader.ReadLine()) != null)
-                        {
-                            var sequence = line.Split('\t')[columnMap["BestSequence"]];
-                            var cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
-                            if (!peptides.ContainsKey(cleanSequence))
-                            {
-                                peptides.Add(cleanSequence, 0);
-                            }
-                            // We are only looking for total distinct peptides, we don't need to keep a count.
-                            //peptides[cleanSequence]++;
-                            peptideWriter.WriteLine(cleanSequence);
-                        }
+                        // We are only looking for total distinct peptides, we don't need to keep a count.
+                        //peptides[cleanSequence]++;
+                        peptideWriter.WriteLine(cleanSequence);
                     }
                 }
             }
@@ -292,8 +288,7 @@ namespace AScore_DLL
         private void ReadBackMap()
         {
             var columnMap = new Dictionary<string, int>();
-            using (var mapReader =
-                new StreamReader(new FileStream(mProteinToPeptideMapFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var mapReader = new StreamReader(new FileStream(mProteinToPeptideMapFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
                 string line;
                 if ((line = mapReader.ReadLine()) != null)
@@ -356,116 +351,115 @@ namespace AScore_DLL
         {
             // Read the ascore again...
             using (var aScoreReader = new StreamReader(new FileStream(mAScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var mappedWriter = new StreamWriter(new FileStream(mMappingResultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
-                using (var mappedWriter = new StreamWriter(new FileStream(mMappingResultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+
+                var columnMapAScore = new Dictionary<string, int>();
+
+                string line;
+                if ((line = aScoreReader.ReadLine()) == null)
                 {
-                    var columnMapAScore = new Dictionary<string, int>();
+                    return;
+                }
 
-                    string line;
-                    if ((line = aScoreReader.ReadLine()) == null)
+                // Assume the first line is column names
+                var columns = line.Split('\t');
+                for (var i = 0; i < columns.Length; ++i)
+                {
+                    columnMapAScore.Add(columns[i], i);
+                }
+
+                // Output the header information, with the new additions
+                mappedWriter.Write(line + "\t");
+                mappedWriter.Write("ProteinName\t");
+                // Protein Description - if it contains key-value pairs, use it.
+                if (mOutputProteinDescriptions)
+                {
+                    mappedWriter.Write("Description\t");
+                }
+                mappedWriter.WriteLine("ProteinCount\tResidue\tPosition");
+
+                // Run as long as we can successfully read
+                while ((line = aScoreReader.ReadLine()) != null)
+                {
+                    var sequence = line.Split('\t')[columnMapAScore["BestSequence"]];
+
+                    var cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
+
+                    ++mTotalPeptides;
+
+                    if (!mPeptideToProteinMap.ContainsKey(cleanSequence))
                     {
-                        return;
-                    }
+                        // Match not found
+                        WriteCombinedLine(mappedWriter, line);
 
-                    // Assume the first line is column names
-                    var columns = line.Split('\t');
-                    for (var i = 0; i < columns.Length; ++i)
-                    {
-                        columnMapAScore.Add(columns[i], i);
-                    }
-
-                    // Output the header information, with the new additions
-                    mappedWriter.Write(line + "\t");
-                    mappedWriter.Write("ProteinName\t");
-                    // Protein Description - if it contains key-value pairs, use it.
-                    if (mOutputProteinDescriptions)
-                    {
-                        mappedWriter.Write("Description\t");
-                    }
-                    mappedWriter.WriteLine("ProteinCount\tResidue\tPosition");
-
-                    // Run as long as we can successfully read
-                    while ((line = aScoreReader.ReadLine()) != null)
-                    {
-                        var sequence = line.Split('\t')[columnMapAScore["BestSequence"]];
-
-                        var cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
-
-                        ++mTotalPeptides;
-
-                        if (!mPeptideToProteinMap.ContainsKey(cleanSequence))
+                        if (!mPeptidesNotFound.ContainsKey(cleanSequence))
                         {
-                            // Match not found
-                            WriteCombinedLine(mappedWriter, line);
-
-                            if (!mPeptidesNotFound.ContainsKey(cleanSequence))
-                            {
-                                mPeptidesNotFound.Add(cleanSequence, 0);
-                            }
-                            mPeptidesNotFound[cleanSequence]++;
-                            ++mTotalPeptidesNotFound;
-
-                            continue;
+                            mPeptidesNotFound.Add(cleanSequence, 0);
                         }
+                        mPeptidesNotFound[cleanSequence]++;
+                        ++mTotalPeptidesNotFound;
 
-                        clsPeptideCleavageStateCalculator.SplitPrefixAndSuffixFromSequence(sequence, out var noPrefixSequence, out _, out _);
+                        continue;
+                    }
 
-                        var mods = new List<int>();
+                    clsPeptideCleavageStateCalculator.SplitPrefixAndSuffixFromSequence(sequence, out var noPrefixSequence, out _, out _);
 
-                        for (var i = 0; i < noPrefixSequence.Length; ++i)
+                    var mods = new List<int>();
+
+                    for (var i = 0; i < noPrefixSequence.Length; ++i)
+                    {
+                        if (noPrefixSequence[i] == '*')
                         {
-                            if (noPrefixSequence[i] == '*')
-                            {
-                                mods.Add(i);
-                            }
-                        }
-
-                        foreach (var match in mPeptideToProteinMap[cleanSequence])
-                        {
-                            // Protein Name
-                            var proteinName = match.proteinName;
-
-                            var proteinDescription = string.Empty;
-
-                            // Protein Description - if it contains key-value pairs, use it.
-                            if (mOutputProteinDescriptions)
-                            {
-                                proteinDescription = mProteinDescriptions[match.proteinName];
-                            }
-
-                            // # of proteins occurred in
-                            var proteinCount = mPeptideToProteinMap[cleanSequence].Count;
-
-                            var matchFound = false;
-
-                            for (var i = 0; i < mods.Count; ++i)
-                            {
-                                matchFound = true;
-
-                                var modifiedResidue = ' ';
-
-                                // Residue of mod
-                                if (mods[i] > 0)
-                                    modifiedResidue = noPrefixSequence[mods[i] - 1];
-
-                                // Position of residue
-                                // With multiple residues, we need to adjust the position of each subsequent residue by the number of residues we have read
-                                var residuePosition = match.residueStart + mods[i] - i - 1;
-
-                                WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
-                            }
-
-                            if (!matchFound)
-                            {
-                                const char modifiedResidue = ' ';
-                                const int residuePosition = 0;
-
-                                WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
-                            }
+                            mods.Add(i);
                         }
                     }
-                } // End Using
-            } // End Using
+
+                    foreach (var match in mPeptideToProteinMap[cleanSequence])
+                    {
+                        // Protein Name
+                        var proteinName = match.proteinName;
+
+                        var proteinDescription = string.Empty;
+
+                        // Protein Description - if it contains key-value pairs, use it.
+                        if (mOutputProteinDescriptions)
+                        {
+                            proteinDescription = mProteinDescriptions[match.proteinName];
+                        }
+
+                        // # of proteins occurred in
+                        var proteinCount = mPeptideToProteinMap[cleanSequence].Count;
+
+                        var matchFound = false;
+
+                        for (var i = 0; i < mods.Count; ++i)
+                        {
+                            matchFound = true;
+
+                            var modifiedResidue = ' ';
+
+                            // Residue of mod
+                            if (mods[i] > 0)
+                                modifiedResidue = noPrefixSequence[mods[i] - 1];
+
+                            // Position of residue
+                            // With multiple residues, we need to adjust the position of each subsequent residue by the number of residues we have read
+                            var residuePosition = match.residueStart + mods[i] - i - 1;
+
+                            WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
+                        }
+
+                        if (!matchFound)
+                        {
+                            const char modifiedResidue = ' ';
+                            const int residuePosition = 0;
+
+                            WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

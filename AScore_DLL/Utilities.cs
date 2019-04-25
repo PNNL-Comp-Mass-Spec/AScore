@@ -10,21 +10,21 @@ namespace AScore_DLL
     class Utilities
     {
         /// <summary>
-        /// Generates a datatable with all entries being a string
+        /// Generates a DataTable with all entries being a string
         /// </summary>
         /// <param name="fileName">input file name</param>
-        /// <param name="addDataSetName">whether to add the datasetname as a column</param>
+        /// <param name="addDataSetName">whether to add the dataset name as a column</param>
         /// <returns></returns>
         public static DataTable TextFileToDataTableAssignTypeString(string fileName, bool addDataSetName)
         {
             var dt = new DataTable();
 
-            using (var sr = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (var reader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 // first line has headers
-                if (!sr.EndOfStream)
+                if (!reader.EndOfStream)
                 {
-                    var headerLine = sr.ReadLine();
+                    var headerLine = reader.ReadLine();
 
                     if (headerLine == null)
                     {
@@ -46,9 +46,9 @@ namespace AScore_DLL
                 }
 
                 // fill the rest of the table; positional
-                while (!sr.EndOfStream)
+                while (!reader.EndOfStream)
                 {
-                    var line = sr.ReadLine();
+                    var line = reader.ReadLine();
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
 
@@ -69,20 +69,20 @@ namespace AScore_DLL
         }
 
         /// <summary>
-        /// Writes a datatable to text file
+        /// Writes a DataTable to text file
         /// </summary>
         /// <param name="dt"></param>
         /// <param name="filePath"></param>
         public static void WriteDataTableToText(DataTable dt, string filePath)
         {
-            using (var sw = new StreamWriter(filePath))
+            using (var writer = new StreamWriter(filePath))
             {
                 var headerLine = dt.Columns[0].ColumnName;
                 for (var i = 1; i < dt.Columns.Count; i++)
                 {
                     headerLine += "\t" + dt.Columns[i].ColumnName;
                 }
-                sw.WriteLine(headerLine);
+                writer.WriteLine(headerLine);
 
                 foreach (DataRow row in dt.Rows)
                 {
@@ -91,7 +91,7 @@ namespace AScore_DLL
                     {
                         dataLine += "\t" + row[i];
                     }
-                    sw.WriteLine(dataLine);
+                    writer.WriteLine(dataLine);
                 }
             }
         }
