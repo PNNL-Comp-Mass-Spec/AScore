@@ -41,7 +41,7 @@ Alternatively, manually create the PHRP data files using
 
 Unzip the _DTA.zip files
 
-Copy the AScore parameter file from `\\gigasax\DMS_Parameter_FilesAScore` to your local computer.
+Copy the AScore parameter file from `\\gigasax\DMS_Parameter_Files\AScore` to your local computer.
 Use either of these files:
 * AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml
 * AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da_MSGF1E-12.xml
