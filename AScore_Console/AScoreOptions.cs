@@ -82,11 +82,11 @@ namespace AScore_Console
             AScoreResultsFilePath = string.Empty;
         }
 
-        public bool Validate()
+        public bool Validate(out string errorMessage)
         {
             if (string.IsNullOrWhiteSpace(MassSpecFile) && string.IsNullOrWhiteSpace(JobToDatasetMapFile))
             {
-                Console.WriteLine("ERROR: Must specify -D or -JM!");
+                errorMessage = "ERROR: Must specify -D or -JM!";
                 return false;
             }
 
@@ -132,6 +132,7 @@ namespace AScore_Console
                 LogFilePath = null;
             }
 
+            errorMessage = string.Empty;
             return true;
         }
 

@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using AScore_DLL;
 using PRISM;
 
@@ -61,17 +62,31 @@ namespace AScore_Console
                                   " -Fasta:C:\\Temp\\H_sapiens_Uniprot_SPROT_2013-09-18.fasta\n" +
                                   " -PD");
 
-                var results = parser.ParseArgs(args);
-                var ascoreOptions = results.ParsedResults;
-                if (!results.Success || !ascoreOptions.Validate())
+                var parseResults = parser.ParseArgs(args);
+                var ascoreOptions = parseResults.ParsedResults;
+
+                if (!parseResults.Success)
                 {
-                    System.Threading.Thread.Sleep(1500);
+                    Thread.Sleep(1500);
+                    return -1;
+                }
+
+                if (!ascoreOptions.Validate(out var errorMessage))
+                {
+                    parser.PrintHelp();
+
+                    Console.WriteLine();
+                    ConsoleMsgUtils.ShowWarning("Validation error:");
+                    ConsoleMsgUtils.ShowWarning(errorMessage);
+
+                    Thread.Sleep(1500);
                     return -1;
                 }
 
                 mLogFilePath = ascoreOptions.LogFilePath;
 
                 var returnCode = ascoreOptions.CheckFiles(x => ShowError(x));
+
                 // If we encountered an error in the input - a necessary file does not exist - then exit.
                 if (returnCode != 0)
                 {
