@@ -1,0 +1,40 @@
+2019-05-09 04:34:21 PM	Output directory not found (will auto-create): AScore\AScore_Console\Data\MSGFPlus_ITRAQ4plex_CDTA\Results_QPyroGlu
+2019-05-09 04:34:21 PM	Caching data in CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_msgfplus_fht.txt
+2019-05-09 04:34:21 PM	Output directory: AScore\AScore_Console\Data\MSGFPlus_ITRAQ4plex_CDTA\Results_QPyroGlu
+2019-05-09 04:34:22 PM	Filtering using MSGF_SpecProb <= 1.0E-07
+2019-05-09 04:34:22 PM	Warning: Scan 18490 not found in spectra file for peptide R.SKEGHSLEMENENLVENGADS*DEDDNSFLKQQS*PQEPK.S
+2019-05-09 04:34:23 PM	Warning: Scan 22697 not found in spectra file for peptide K.TLSVAAAFNEDEDS*EPEEM@PPEAK.M
+2019-05-09 04:34:23 PM	Warning: Scan 23825 not found in spectra file for peptide R.GIQYIDLSSDS*EDVVSPNCSNTVQEK.T
+2019-05-09 04:34:24 PM	Warning: Scan 18683 not found in spectra file for peptide K.AGGGDLLLPPS*PK.V
+2019-05-09 04:34:24 PM	Warning: Scan 18459 not found in spectra file for peptide K.AGGGDLLLPPS*PK.V
+2019-05-09 04:34:24 PM	Warning: Scan 24610 not found in spectra file for peptide K.IVEPEVVGES*DS*EVEGDAWR.M
+2019-05-09 04:34:24 PM	Warning: Scan 18586 not found in spectra file for peptide K.AGGGDLLLPPS*PK.V
+2019-05-09 04:34:25 PM	Warning: Scan 20029 not found in spectra file for peptide K.GGLLTSEEDSGFSTS*PKDNSLPK.K
+2019-05-09 04:34:27 PM	Warning: Scan 18470 not found in spectra file for peptide R.SKEGHSLEMENENLVENGADS*DEDDNSFLKQQS*PQEPK.S
+2019-05-09 04:34:27 PM	Warning: Scan 18461 not found in spectra file for peptide R.SKEGHSLEMENENLVENGADS*DEDDNS*FLKQQSPQEPK.S
+2019-05-09 04:34:27 PM	Warning: Scan 18594 not found in spectra file for peptide R.SKEGHSLEMENENLVENGADS*DEDDNS*FLKQQSPQEPK.S
+2019-05-09 04:34:27 PM	Warning: Scan 22781 not found in spectra file for peptide K.TLSVAAAFNEDEDS*EPEEM@PPEAK.M
+2019-05-09 04:34:27 PM	Warning: Scan 23859 not found in spectra file for peptide R.GIQYIDLSSDS*EDVVSPNCSNTVQEK.T
+2019-05-09 04:34:28 PM	Warning: Scan 24483 not found in spectra file for peptide K.IVEPEVVGES*DS*EVEGDAWR.M
+2019-05-09 04:34:28 PM	Warning: Scan 22682 not found in spectra file for peptide K.TLSVAAAFNEDEDS*EPEEM@PPEAK.M
+2019-05-09 04:34:28 PM	Warning: Scan 22630 not found in spectra file for peptide K.TLSVAAAFNEDEDS*EPEEM@PPEAK.M
+2019-05-09 04:34:28 PM	Warning: Scan 18497 not found in spectra file for peptide R.SKEGHSLEMENENLVENGADS*DEDDNSFLKQQS*PQEPK.S
+2019-05-09 04:34:28 PM	Warning: Scan 22903 not found in spectra file for peptide K.TLSVAAAFNEDEDS*EPEEM@PPEAK.M
+2019-05-09 04:34:28 PM	Warning: Scan 18495 not found in spectra file for peptide R.SKEGHSLEMENENLVENGADS*DEDDNSFLKQQS*PQEPK.S
+2019-05-09 04:34:28 PM	Warning: Scan 15673 not found in spectra file for peptide K.SLFTSQPS*GEAEAPQTTDSPTTK.V
+2019-05-09 04:34:29 PM	Warning: Scan 18653 not found in spectra file for peptide R.SKEGHSLEMENENLVENGADS*DEDDNSFLKQQS*PQEPK.S
+2019-05-09 04:34:29 PM	Warning: Scan 20914 not found in spectra file for peptide R.DNLTLWTSDTQGDEAEAGEGGEN.-
+2019-05-09 04:34:29 PM	Warning: Scan 20072 not found in spectra file for peptide K.RPSFSST*PVISPAPNSTPANSNTNSNSSLITSQDAVER.A
+2019-05-09 04:34:29 PM	Warning: Scan 20167 not found in spectra file for peptide K.TENGTCPSPPQPLS*PAAALGSGS*AAAVPK.I
+2019-05-09 04:34:29 PM	Warning: Scan 24749 not found in spectra file for peptide K.IVEPEVVGES*DS*EVEGDAWR.M
+2019-05-09 04:34:30 PM	Warning: Scan 24278 not found in spectra file for peptide R.TTQSMQDFPVVDS*EEEAEEEFQK.E
+2019-05-09 04:34:30 PM	Warning: Scan 16459 not found in spectra file for peptide K.TTTAAAVASTGPS*SRSPSTLLPK.K
+2019-05-09 04:34:30 PM	Warning: Scan 20112 not found in spectra file for peptide K.TENGTCPS*PPQPLS*PAAALGSGSAAAVPK.I
+2019-05-09 04:34:30 PM	Writing 4,449 rows to CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_msgfplus_fht_ascore.txt
+2019-05-09 04:34:30 PM	Stats by fragmentation ion type:
+2019-05-09 04:34:30 PM	  CID peptides: 0
+2019-05-09 04:34:30 PM	  ETD peptides: 0
+2019-05-09 04:34:30 PM	  HCD peptides: 0
+2019-05-09 04:34:33 PM	AScore Complete
+2019-05-09 04:34:33 PM	  Skipped 35 PHRP results without an AScore result
+2019-05-09 04:34:33 PM	Results merged; new file: CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_msgfplus_fht_WithAScore.txt

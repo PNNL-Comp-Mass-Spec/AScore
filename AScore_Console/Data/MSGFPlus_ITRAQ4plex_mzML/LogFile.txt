@@ -1,16 +1,15 @@
-2018-01-13 04:17:19 PM	Caching data in Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt
-2018-01-13 04:17:19 PM	Output folder: AScore\AScore_Console\Data\MSGFPlus_ITRAQ4plex_mzML
-2018-01-13 04:17:19 PM	Filtering using MSGF_SpecProb <= 1.0E-07
-2018-01-13 04:17:19 PM	Loaded modifications from: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ModSummary.txt
-2018-01-13 04:17:19 PM	    Static,   57.021465 on C
-2018-01-13 04:17:19 PM	    Static,   229.162933 on K
-2018-01-13 04:17:19 PM	    Dynamic,  15.994915 on M
-2018-01-13 04:17:19 PM	    Terminus, 229.162933 on <
-2018-01-13 04:17:22 PM	Writing 344 rows to Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore.txt
-2018-01-13 04:17:22 PM	Stats by fragmentation ion type:
-2018-01-13 04:17:22 PM	  CID peptides: 0
-2018-01-13 04:17:22 PM	  ETD peptides: 0
-2018-01-13 04:17:22 PM	  HCD peptides: 344
-2018-01-13 04:17:22 PM	AScore Complete
-2018-01-13 04:17:23 PM	  Skipped 7721 PHRP results without an AScore result
-2018-01-13 04:17:23 PM	Results merged; new file: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt
+2019-05-09 04:24:55 PM	Caching data in Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt
+2019-05-09 04:24:56 PM	Output directory: AScore\AScore_Console\Data\MSGFPlus_ITRAQ4plex_mzML
+2019-05-09 04:24:56 PM	Filtering using MSGF_SpecProb <= 1.0E-07
+2019-05-09 04:24:56 PM	Loaded modifications from: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ModSummary.txt
+2019-05-09 04:24:56 PM	    Static,   57.021465 on C
+2019-05-09 04:24:56 PM	    Static,   229.162933 on K
+2019-05-09 04:24:56 PM	    Dynamic,  15.994915 on M
+2019-05-09 04:24:56 PM	    Terminus, 229.162933 on <
+2019-05-09 04:25:07 PM	Writing 344 rows to Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore.txt
+2019-05-09 04:25:07 PM	Stats by fragmentation ion type:
+2019-05-09 04:25:07 PM	  CID peptides: 0
+2019-05-09 04:25:07 PM	  ETD peptides: 0
+2019-05-09 04:25:07 PM	  HCD peptides: 344
+2019-05-09 04:25:09 PM	AScore Complete
+2019-05-09 04:25:09 PM	Results merged; new file: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt
