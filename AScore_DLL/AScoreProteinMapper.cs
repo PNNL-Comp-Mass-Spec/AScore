@@ -307,6 +307,8 @@ namespace AScore_DLL
                 peptideToProteinMapper.LogMessagesToFile = false;
             }
 
+            peptideToProteinMapper.ProgressUpdate += PeptideToProteinMapper_ProgressUpdate;
+
             // Note that clsPeptideToProteinMapEngine utilizes Data.SQLite.dll
             var success = peptideToProteinMapper.ProcessFile(mPeptideListFilePath, mOutputDirectoryPath, string.Empty, true);
 
@@ -631,6 +633,16 @@ namespace AScore_DLL
             mappedWriter.WriteLine(string.Join("\t", dataToWrite));
         }
 
+
+        private void PeptideToProteinMapper_ProgressUpdate(string progressMessage, float percentComplete)
+        {
+            if (DateTime.UtcNow.Subtract(mLastProgressTime).TotalSeconds < 1)
+                return;
+
+            mLastProgressTime = DateTime.UtcNow;
+
+            ConsoleMsgUtils.ShowDebug("Peptide to protein mapper is {0:F1}% complete: {1}", percentComplete, progressMessage);
         }
+
     }
 }
