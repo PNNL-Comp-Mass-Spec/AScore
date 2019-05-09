@@ -607,26 +607,30 @@ namespace AScore_DLL
             char modifiedResidue,
             int residuePosition)
         {
-            // Original AScore data
-            mappedWriter.Write(ascoreLine + "\t");
+            var dataToWrite = new List<string> {
+                ascoreLine,     // Original AScore data
+                proteinName
+            };
 
-            // Protein Name
-            mappedWriter.Write(proteinName + "\t");
 
             // Protein Description - if it contains key-value pairs, use it.
             if (mOutputProteinDescriptions)
             {
-                mappedWriter.Write(proteinDescription + "\t");
+                dataToWrite.Add(proteinDescription);
             }
 
             // # of proteins occurred in
-            mappedWriter.Write(proteinCount + "\t");
+            dataToWrite.Add(proteinCount.ToString());
 
             // Residue of mod
-            mappedWriter.Write(modifiedResidue + "\t");
+            dataToWrite.Add(modifiedResidue.ToString());
 
             // Position of residue
-            mappedWriter.WriteLine(residuePosition);
+            dataToWrite.Add(residuePosition.ToString());
+
+            mappedWriter.WriteLine(string.Join("\t", dataToWrite));
+        }
+
         }
     }
 }
