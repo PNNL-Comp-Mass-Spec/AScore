@@ -4,6 +4,7 @@ using System.IO;
 // The DLL is required for execution of the PeptideToProteinMapper
 using PeptideToProteinMapEngine;
 using PHRPReader;
+using PRISM;
 using ProteinCoverageSummarizer;
 
 namespace AScore_DLL
@@ -35,10 +36,27 @@ namespace AScore_DLL
         private readonly string mPeptideListFilePath;
         private readonly string mProteinToPeptideMapFilePath;
         private readonly string mMappingResultsFilePath;
+
+        /// <summary>
+        /// Keys are peptide clean sequence, values are the list of proteins that contain the peptide
+        /// </summary>
         readonly Dictionary<string, List<ProteinPeptideMapType>> mPeptideToProteinMap;
+
+        /// <summary>
+        /// Keys are protein names, values are descriptions (from the FASTA file)
+        /// </summary>
         private readonly Dictionary<string, string> mProteinDescriptions;
+
+        /// <summary>
+        /// Dictionary that keeps track of peptides not found in mPeptideToProteinMap
+        /// Keys are peptide sequence, values are the number of times the peptide is in the input file
+        /// </summary>
         private readonly Dictionary<string, int> mPeptidesNotFound;
+
         private readonly Dictionary<string, int> mPeptidesReallyNotFound;
+
+        private DateTime mLastProgressTime = DateTime.UtcNow;
+
         private int mTotalPeptidesNotFound;
         private int mTotalPeptides;
         private int mDistinctPeptides;
@@ -207,36 +225,50 @@ namespace AScore_DLL
         /// </summary>
         private void CreatePeptideList()
         {
-            var columnMap = new Dictionary<string, int>();
+            var columnMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             var peptides = new Dictionary<string, int>();
+
             // Write out a list of peptides for clsPeptideToProteinMapEngine
-            using (var aScoreReader = new StreamReader(new FileStream(mAScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var aScoreReader = new StreamReader(new FileStream(mAScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             using (var peptideWriter = new StreamWriter(new FileStream(mPeptideListFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
-
-                string line;
-                if ((line = aScoreReader.ReadLine()) != null)
+                while (!aScoreReader.EndOfStream)
                 {
-                    // Assume the first line is column names
-                    var columns = line.Split('\t');
-                    for (var i = 0; i < columns.Length; ++i)
+                    var dataLine = aScoreReader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(dataLine))
+                        continue;
+
+                    var columns = dataLine.Split('\t');
+
+                    if (columnMap.Count == 0)
                     {
-                        columnMap.Add(columns[i], i);
-                    }
-                    // Run as long as we can successfully read
-                    while ((line = aScoreReader.ReadLine()) != null)
-                    {
-                        var sequence = line.Split('\t')[columnMap["BestSequence"]];
-                        var cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
-                        if (!peptides.ContainsKey(cleanSequence))
+                        // Assume the first line is column names
+                        for (var i = 0; i < columns.Length; ++i)
                         {
-                            peptides.Add(cleanSequence, 0);
+                            columnMap.Add(columns[i], i);
                         }
-                        // We are only looking for total distinct peptides, we don't need to keep a count.
-                        //peptides[cleanSequence]++;
-                        peptideWriter.WriteLine(cleanSequence);
+
+                        var requiredColumns = new List<string>
+                        {
+                            "BestSequence"
+                        };
+
+                        if (!VerifyRequiredColumns(requiredColumns, columnMap, "CreatePeptideList", mAScoreResultsFilePath))
+                            return;
+
+                        continue;
                     }
+
+                    var sequence = columns[columnMap["BestSequence"]];
+                    var cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
+                    if (!peptides.ContainsKey(cleanSequence))
+                    {
+                        peptides.Add(cleanSequence, 0);
+                    }
+
+                    peptideWriter.WriteLine(cleanSequence);
                 }
+
             }
             mDistinctPeptides = peptides.Count;
         }
@@ -288,38 +320,59 @@ namespace AScore_DLL
         /// </summary>
         private void ReadBackMap()
         {
-            var columnMap = new Dictionary<string, int>();
+            var columnMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
             using (var mapReader = new StreamReader(new FileStream(mProteinToPeptideMapFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
-                string line;
-                if ((line = mapReader.ReadLine()) != null)
+                while (!mapReader.EndOfStream)
                 {
-                    // Assume the first line is column names
-                    var columns = line.Split('\t');
-                    for (var i = 0; i < columns.Length; ++i)
-                    {
-                        columnMap.Add(columns[i], i);
-                    }
+                    var dataLine = mapReader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(dataLine))
+                        continue;
 
-                    // Run as long as we can successfully read
-                    while ((line = mapReader.ReadLine()) != null)
+                    var columns = dataLine.Split('\t');
+
+                    if (columnMap.Count == 0)
                     {
-                        columns = line.Split('\t');
-                        var item = new ProteinPeptideMapType
+                        // Assume the first line is column names
+                        for (var i = 0; i < columns.Length; ++i)
                         {
-                            residueStart = Convert.ToInt32(columns[columnMap["Residue Start"]]),
-                            residueEnd = Convert.ToInt32(columns[columnMap["Residue End"]]),
-                            proteinName = columns[columnMap["Protein Name"]],
-                            peptideSequence = columns[columnMap["Peptide Sequence"]]
+                            columnMap.Add(columns[i], i);
+                        }
+
+                        var requiredColumns = new List<string>
+                        {
+                            "Residue Start",
+                            "Residue End",
+                            "Protein Name",
+                            "Peptide Sequence"
                         };
 
-                        // Add the key and a new list if it doesn't yet exist
-                        if (!mPeptideToProteinMap.ContainsKey(item.peptideSequence))
-                        {
-                            mPeptideToProteinMap.Add(item.peptideSequence, new List<ProteinPeptideMapType>());
-                        }
-                        mPeptideToProteinMap[item.peptideSequence].Add(item);
+                        if (!VerifyRequiredColumns(requiredColumns, columnMap, "ReadBackMap", mProteinToPeptideMapFilePath))
+                            return;
+
+                        continue;
                     }
+
+                    var item = new ProteinPeptideMapType
+                    {
+                        residueStart = Convert.ToInt32(columns[columnMap["Residue Start"]]),
+                        residueEnd = Convert.ToInt32(columns[columnMap["Residue End"]]),
+                        proteinName = columns[columnMap["Protein Name"]],
+                        peptideSequence = columns[columnMap["Peptide Sequence"]]
+                    };
+
+                    // Add the key and a new list if it doesn't yet exist
+                    if (mPeptideToProteinMap.TryGetValue(item.peptideSequence, out var proteinsForPeptide))
+                    {
+                        proteinsForPeptide.Add(item);
+                    }
+                    else
+                    {
+                        var newProteinList = new List<ProteinPeptideMapType> { item };
+                        mPeptideToProteinMap.Add(item.peptideSequence, newProteinList);
+                    }
+
                 }
             }
         }
@@ -331,15 +384,25 @@ namespace AScore_DLL
         {
             using (var fastaReader = new StreamReader(new FileStream(mFastaFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-                string line;
-                while ((line = fastaReader.ReadLine()) != null)
+                while (!fastaReader.EndOfStream)
                 {
-                    // We only care about the protein name/description line
-                    if (line[0] == '>')
+                    var line = fastaReader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(line) || line[0] != '>')
+                        continue;
+
+                    // This is a protein name/description line (starts with >)
+                    // Extract the protein description
+                    var spaceIndex = line.IndexOf(' ');
+
+                    if (spaceIndex > 0)
                     {
-                        var firstSpace = line.IndexOf(' ');
-                        // Skip the '>' and split at the first space
-                        mProteinDescriptions.Add(line.Substring(1, firstSpace - 1), line.Substring(firstSpace + 1));
+                        var proteinName = line.Substring(1, spaceIndex - 1);
+                        var proteinDescription = line.Substring(spaceIndex + 1);
+                        mProteinDescriptions.Add(proteinName, proteinDescription);
+                    }
+                    else
+                    {
+                        mProteinDescriptions.Add(line, string.Empty);
                     }
                 }
             }
@@ -355,35 +418,61 @@ namespace AScore_DLL
             using (var mappedWriter = new StreamWriter(new FileStream(mMappingResultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
 
-                var columnMapAScore = new Dictionary<string, int>();
+                var columnMapAScore = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-                string line;
-                if ((line = aScoreReader.ReadLine()) == null)
+                if (aScoreReader.EndOfStream)
                 {
                     return;
                 }
 
-                // Assume the first line is column names
-                var columns = line.Split('\t');
-                for (var i = 0; i < columns.Length; ++i)
-                {
-                    columnMapAScore.Add(columns[i], i);
-                }
-
-                // Output the header information, with the new additions
-                mappedWriter.Write(line + "\t");
-                mappedWriter.Write("ProteinName\t");
-                // Protein Description - if it contains key-value pairs, use it.
-                if (mOutputProteinDescriptions)
-                {
-                    mappedWriter.Write("Description\t");
-                }
-                mappedWriter.WriteLine("ProteinCount\tResidue\tPosition");
-
                 // Run as long as we can successfully read
-                while ((line = aScoreReader.ReadLine()) != null)
+                while (!aScoreReader.EndOfStream)
                 {
-                    var sequence = line.Split('\t')[columnMapAScore["BestSequence"]];
+                    var dataLine = aScoreReader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(dataLine))
+                        continue;
+
+                    var columns = dataLine.Split('\t');
+
+                    if (columnMapAScore.Count == 0)
+                    {
+                        for (var i = 0; i < columns.Length; ++i)
+                        {
+                            columnMapAScore.Add(columns[i], i);
+                        }
+
+                        var requiredColumns = new List<string>
+                        {
+                            "BestSequence"
+                        };
+
+                        if (!VerifyRequiredColumns(requiredColumns, columnMapAScore, "CombineAScoreAndProteinData", mAScoreResultsFilePath))
+                        {
+                            return;
+                        }
+
+                        var outputFileHeaders = new List<string>();
+                        outputFileHeaders.AddRange(columns);
+
+                        // Append additional columns to outputFileHeaders
+                        outputFileHeaders.Add("ProteinName");
+
+                        // Protein Description - if it contains key-value pairs, use it.
+                        if (mOutputProteinDescriptions)
+                        {
+                            outputFileHeaders.Add("Description");
+                        }
+
+                        outputFileHeaders.Add("ProteinCount");
+                        outputFileHeaders.Add("Residue");
+                        outputFileHeaders.Add("Position");
+
+                        mappedWriter.WriteLine(string.Join("\t", outputFileHeaders));
+
+                        continue;
+                    }
+
+                    var sequence = columns[columnMapAScore["BestSequence"]];
 
                     var cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
 
@@ -392,7 +481,7 @@ namespace AScore_DLL
                     if (!mPeptideToProteinMap.ContainsKey(cleanSequence))
                     {
                         // Match not found
-                        WriteCombinedLine(mappedWriter, line);
+                        WriteCombinedLine(mappedWriter, dataLine);
 
                         if (!mPeptidesNotFound.ContainsKey(cleanSequence))
                         {
@@ -448,7 +537,7 @@ namespace AScore_DLL
                             // With multiple residues, we need to adjust the position of each subsequent residue by the number of residues we have read
                             var residuePosition = match.residueStart + mods[i] - i - 1;
 
-                            WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
+                            WriteCombinedLine(mappedWriter, dataLine, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
                         }
 
                         if (!matchFound)
@@ -456,11 +545,37 @@ namespace AScore_DLL
                             const char modifiedResidue = ' ';
                             const int residuePosition = 0;
 
-                            WriteCombinedLine(mappedWriter, line, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
+                            WriteCombinedLine(mappedWriter, dataLine, proteinName, proteinDescription, proteinCount, modifiedResidue, residuePosition);
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Verifies that the specified column names are present in columnMap
+        /// </summary>
+        /// <param name="requiredColumns"></param>
+        /// <param name="columnMap"></param>
+        /// <param name="callingMethod"></param>
+        /// <param name="sourceFile"></param>
+        /// <returns></returns>
+        private bool VerifyRequiredColumns(
+            IEnumerable<string> requiredColumns,
+            IReadOnlyDictionary<string, int> columnMap,
+            string callingMethod,
+            string sourceFile)
+        {
+            foreach (var columnName in requiredColumns)
+            {
+                if (columnMap.ContainsKey(columnName))
+                    continue;
+
+                ConsoleMsgUtils.ShowError("Error in {0}: Required column '{1}' not found in {2}", callingMethod, columnName, sourceFile);
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
