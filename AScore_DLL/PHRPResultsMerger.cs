@@ -82,7 +82,7 @@ namespace AScore_DLL
                 if (fiAScoreResultsFile.DirectoryName == null)
                     m_MergedFilePath = mergedPhrpDataFileName;
                 else
-                    m_MergedFilePath = Path.Combine(fiAScoreResultsFile.DirectoryName, mergedPhrpDataFileName);
+                    m_MergedFilePath = Path.Combine(fiAScoreResultsFile.DirectoryName, Path.GetFileName(mergedPhrpDataFileName));
 
                 var fiOutputFilePath = new FileInfo(m_MergedFilePath);
 
