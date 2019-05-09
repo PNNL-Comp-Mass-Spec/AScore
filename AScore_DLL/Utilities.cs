@@ -3,7 +3,6 @@
 using System;
 using System.Data;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace AScore_DLL
 {
@@ -26,10 +25,12 @@ namespace AScore_DLL
                 {
                     var headerLine = reader.ReadLine();
 
-                    if (headerLine == null)
+                    if (string.IsNullOrWhiteSpace(headerLine))
                     {
                         // it's empty, that's an error
-                        throw new ApplicationException("The data provided is not in a valid format (empty header line)");
+                        throw new ApplicationException(string.Format(
+                                                           "The data provided in {0} is not in a valid format (empty header line found by {1})",
+                                                           fileName, "TextFileToDataTableAssignTypeString"));
                     }
 
                     var headers = headerLine.Split('\t', ',');
@@ -42,7 +43,9 @@ namespace AScore_DLL
                 else
                 {
                     // it's empty, that's an error
-                    throw new ApplicationException("The data provided is not in a valid format (empty data file)");
+                    throw new ApplicationException(string.Format(
+                                                       "The data provided in {0} is not in a valid format (empty data file found by {1})",
+                                                       fileName, "TextFileToDataTableAssignTypeString"));
                 }
 
                 // fill the rest of the table; positional

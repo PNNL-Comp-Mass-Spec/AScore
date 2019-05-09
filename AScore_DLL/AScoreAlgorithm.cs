@@ -40,7 +40,12 @@ namespace AScore_DLL
 
                 if (Math.Abs(peptideMassTheoretical - expSpec.PrecursorNeutralMass) > 20)
                 {
-                    OnWarningEvent("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is more than 20 Da away from the computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da");
+                    OnWarningEvent(string.Format(
+                                       "Scan {0}: Observed precursor mass of {1:F1} Da is more than 20 Da away from the computed mass of {2:F1} Da; DeltaMass = {3:F1} Da",
+                                       scanNumber,
+                                       expSpec.PrecursorNeutralMass,
+                                       peptideMassTheoretical,
+                                       expSpec.PrecursorNeutralMass - peptideMassTheoretical));
                 }
                 else
                 {
@@ -63,8 +68,18 @@ namespace AScore_DLL
                             break;
                     }
 
-                        OnErrorEvent("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
                     if (!validMatch)
+                    {
+                        OnWarningEvent(string.Format(
+                                         "Scan {0}: Observed precursor mass of {1:F1} Da is not a reasonable match for computed mass of {2:F1} Da; " +
+                                         "DeltaMass = {3:F1} Da; Peptide = {4}",
+                                         scanNumber,
+                                         expSpec.PrecursorNeutralMass,
+                                         peptideMassTheoretical,
+                                         expSpec.PrecursorNeutralMass - peptideMassTheoretical,
+                                         peptideSeq
+                                     ));
+                    }
                 }
 
                 var modNumber = 0;
