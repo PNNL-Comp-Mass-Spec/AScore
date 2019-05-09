@@ -29,7 +29,7 @@ namespace AScore_DLL
         }
 
         private readonly string mAScoreResultsFilePath;
-        private readonly string mOutputFolderPath;
+        private readonly string mOutputDirectoryPath;
         private readonly bool mOutputProteinDescriptions;
         private readonly string mFastaFilePath;
         private readonly string mPeptideListFilePath;
@@ -55,12 +55,12 @@ namespace AScore_DLL
         public AScoreProteinMapper(string aScoreResultsFilePath, string fastaFilePath, bool outputDescriptions)
         {
             mAScoreResultsFilePath = aScoreResultsFilePath;
-            mOutputFolderPath = Path.GetDirectoryName(aScoreResultsFilePath);
+            mOutputDirectoryPath = Path.GetDirectoryName(aScoreResultsFilePath);
             mOutputProteinDescriptions = outputDescriptions;
             mFastaFilePath = fastaFilePath;
-            mMappingResultsFilePath = Path.Combine(mOutputFolderPath, Path.GetFileNameWithoutExtension(mAScoreResultsFilePath) + OutputFilenameAddition + Path.GetExtension(mAScoreResultsFilePath));
-            mPeptideListFilePath = Path.Combine(mOutputFolderPath, Path.GetFileNameWithoutExtension(mAScoreResultsFilePath) + PeptideFilenameAddition + Path.GetExtension(mAScoreResultsFilePath));
-            mProteinToPeptideMapFilePath = Path.Combine(mOutputFolderPath, Path.GetFileNameWithoutExtension(mPeptideListFilePath) + clsProteinCoverageSummarizer.FILENAME_SUFFIX_PROTEIN_TO_PEPTIDE_MAPPING);
+            mMappingResultsFilePath = Path.Combine(mOutputDirectoryPath, Path.GetFileNameWithoutExtension(mAScoreResultsFilePath) + OutputFilenameAddition + Path.GetExtension(mAScoreResultsFilePath));
+            mPeptideListFilePath = Path.Combine(mOutputDirectoryPath, Path.GetFileNameWithoutExtension(mAScoreResultsFilePath) + PeptideFilenameAddition + Path.GetExtension(mAScoreResultsFilePath));
+            mProteinToPeptideMapFilePath = Path.Combine(mOutputDirectoryPath, Path.GetFileNameWithoutExtension(mPeptideListFilePath) + clsProteinCoverageSummarizer.FILENAME_SUFFIX_PROTEIN_TO_PEPTIDE_MAPPING);
 
             mPeptideToProteinMap = new Dictionary<string, List<ProteinPeptideMapType>>();
             mProteinDescriptions = new Dictionary<string, string>();
@@ -145,7 +145,7 @@ namespace AScore_DLL
             }
             else
             {
-                Console.WriteLine("Error: Failed to map the peptides to proteins. See Log file in \"" + mOutputFolderPath + "\" for details.");
+                Console.WriteLine("Error: Failed to map the peptides to proteins. See Log file in \"" + mOutputDirectoryPath + "\" for details.");
             }
         }
 
@@ -188,7 +188,7 @@ namespace AScore_DLL
         }
 
         /// <summary>
-        /// Output the list of not found peptides to a file, and
+        /// Output the list of not found peptides to a file
         /// </summary>
         private void CreateReversedPeptideList()
         {
@@ -264,10 +264,11 @@ namespace AScore_DLL
                 SearchAllProteinsSkipCoverageComputationSteps = true
             };
 
-            if (!string.IsNullOrEmpty(mOutputFolderPath))
+            if (!string.IsNullOrEmpty(mOutputDirectoryPath))
             {
                 peptideToProteinMapper.LogMessagesToFile = true;
-                peptideToProteinMapper.LogDirectoryPath = mOutputFolderPath;
+                peptideToProteinMapper.LogDirectoryPath = mOutputDirectoryPath;
+                peptideToProteinMapper.LogFilePath = "PeptideToProteinMapper_Log.txt";
             }
             else
             {
@@ -275,7 +276,7 @@ namespace AScore_DLL
             }
 
             // Note that clsPeptideToProteinMapEngine utilizes Data.SQLite.dll
-            var success = peptideToProteinMapper.ProcessFile(mPeptideListFilePath, mOutputFolderPath, string.Empty, true);
+            var success = peptideToProteinMapper.ProcessFile(mPeptideListFilePath, mOutputDirectoryPath, string.Empty, true);
 
             peptideToProteinMapper.CloseLogFileNow();
 

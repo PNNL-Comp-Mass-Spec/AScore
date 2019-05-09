@@ -29,7 +29,7 @@ namespace AScore_DLL
 
         string AScoreParamFile { get; }
 
-        string OutputFolderPath { get; }
+        string OutputDirectoryPath { get; }
 
         bool FilterOnMSGFScore { get; }
 

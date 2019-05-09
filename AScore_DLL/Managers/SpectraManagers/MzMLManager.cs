@@ -16,12 +16,12 @@ namespace AScore_DLL.Managers.SpectraManagers
             return GetFilePath(datasetFile.Directory, datasetName);
         }
 
-        public static string GetFilePath(DirectoryInfo datasetFolder, string datasetName)
+        public static string GetFilePath(DirectoryInfo datasetDirectory, string datasetName)
         {
             var mzMLFilePath = datasetName + ".mzML";
-            if (datasetFolder != null)
+            if (datasetDirectory != null)
             {
-                mzMLFilePath = Path.Combine(datasetFolder.FullName, mzMLFilePath);
+                mzMLFilePath = Path.Combine(datasetDirectory.FullName, mzMLFilePath);
             }
 
             // Only grab a gzipped mzML file if an unzipped one doesn't exist.

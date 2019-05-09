@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using PRISM;
 
-//TODO: leverage mzxmlfilereader and random access indexing to insert experimental spectra as needed.  may want to use an abstract class that DTAmanager can inherit from.  Make all the same calls.
+//TODO: leverage mzXmlFileReader and random access indexing to insert experimental spectra as needed.  may want to use an abstract class that DtaManager can inherit from.  Make all the same calls.
 //Need to add some intelligence fro grabbing msxml instead of dta when requesting the msgfdb results.
 
 namespace AScore_DLL.Managers.SpectraManagers
@@ -20,12 +20,12 @@ namespace AScore_DLL.Managers.SpectraManagers
             return GetFilePath(datasetFile.Directory, datasetName);
         }
 
-        public static string GetFilePath(DirectoryInfo datasetFolder, string datasetName)
+        public static string GetFilePath(DirectoryInfo datasetDirectory, string datasetName)
         {
             var dtaFilePath = datasetName + "_dta.txt";
-            if (datasetFolder != null)
+            if (datasetDirectory != null)
             {
-                dtaFilePath = Path.Combine(datasetFolder.FullName, dtaFilePath);
+                dtaFilePath = Path.Combine(datasetDirectory.FullName, dtaFilePath);
             }
 
             return dtaFilePath;

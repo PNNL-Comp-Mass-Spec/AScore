@@ -23,8 +23,8 @@ namespace AScore_Console
         [Option("P", Required = true, HelpText = "Parameter file path", HelpShowsDefault = false)]
         public string AScoreParamFile { get; set; }
 
-        [Option("O", HelpText = "Output folder path")]
-        public string OutputFolderPath { get; set; }
+        [Option("O", HelpText = "Output directory path")]
+        public string OutputDirectoryPath { get; set; }
 
         [Option("L", HelpText = "Log file path")]
         public string LogFilePath { get; set; }
@@ -69,7 +69,7 @@ namespace AScore_Console
             MassSpecFile = string.Empty;
             JobToDatasetMapFile = string.Empty;
             AScoreParamFile = string.Empty;
-            OutputFolderPath = ".";
+            OutputDirectoryPath = ".";
             DoNotFilterOnMSGFScore = false;
 
             SkipExistingResults = false;
@@ -95,9 +95,9 @@ namespace AScore_Console
                 MultiJobMode = true;
             }
 
-            if (string.IsNullOrWhiteSpace(OutputFolderPath))
+            if (string.IsNullOrWhiteSpace(OutputDirectoryPath))
             {
-                OutputFolderPath = ".";
+                OutputDirectoryPath = ".";
             }
 
             if (DbSearchResultsFile.ToLower().EndsWith(".mzid") || DbSearchResultsFile.ToLower().EndsWith(".mzid.gz"))
@@ -105,11 +105,11 @@ namespace AScore_Console
                 SearchResultsType = DbSearchResultsType.Mzid;
             }
 
-            // If OutputFolderPath points to a file, change it to the parent folder
-            var outputFolderPathFile = new FileInfo(OutputFolderPath);
-            if (outputFolderPathFile.Extension.Length > 1 && outputFolderPathFile.Directory != null && outputFolderPathFile.Directory.Exists)
+            // If OutputDirectoryPath points to a file, change it to the parent directory
+            var outputDirectoryFile = new FileInfo(OutputDirectoryPath);
+            if (outputDirectoryFile.Extension.Length > 1 && outputDirectoryFile.Directory != null && outputDirectoryFile.Directory.Exists)
             {
-                OutputFolderPath = outputFolderPathFile.Directory.FullName;
+                OutputDirectoryPath = outputDirectoryFile.Directory.FullName;
             }
 
             if (!string.IsNullOrWhiteSpace(UpdatedDbSearchResultsFileName))
@@ -119,7 +119,7 @@ namespace AScore_Console
 
             if (string.IsNullOrWhiteSpace(FastaFilePath))
             {
-                FastaFilePath = "";
+                FastaFilePath = string.Empty;
             }
 
             if (OutputProteinDescriptions && string.IsNullOrWhiteSpace(FastaFilePath))
@@ -181,20 +181,20 @@ namespace AScore_Console
         /// <returns>true if processing should continue, false if it should be skipped</returns>
         public bool ProcessSettings(Action<string> messageReporter)
         {
-            OutputDirectoryInfo = new DirectoryInfo(OutputFolderPath);
+            OutputDirectoryInfo = new DirectoryInfo(OutputDirectoryPath);
             if (!OutputDirectoryInfo.Exists)
             {
                 try
                 {
-                    messageReporter("Output folder not found (will auto-create): " + OutputDirectoryInfo.FullName);
+                    messageReporter("Output directory not found (will auto-create): " + OutputDirectoryInfo.FullName);
                     OutputDirectoryInfo.Create();
                 }
                 catch (Exception ex)
                 {
-                    messageReporter("Error creating the output folder: " + ex.Message);
+                    messageReporter("Error creating the output directory: " + ex.Message);
                     OutputDirectoryInfo = new DirectoryInfo(".");
                     messageReporter("Changed output to " + OutputDirectoryInfo.FullName);
-                    OutputFolderPath = OutputDirectoryInfo.FullName;
+                    OutputDirectoryPath = OutputDirectoryInfo.FullName;
                 }
             }
 

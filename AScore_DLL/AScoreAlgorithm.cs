@@ -45,7 +45,7 @@ namespace AScore_DLL
                 else
                 {
                     // Make sure the masses agree within a reasonable tolerance
-                    var bValidMatch = false;
+                    var validMatch = false;
 
                     for (double chargeAdjust = 0; chargeAdjust < 0.1; chargeAdjust += 0.005)
                     {
@@ -54,17 +54,17 @@ namespace AScore_DLL
                             var delM = peptideMassTheoretical - expSpec.PrecursorNeutralMass + massAdjust * MASS_C13;
                             if (Math.Abs(delM) < 0.15 + chargeState * chargeAdjust)
                             {
-                                bValidMatch = true;
+                                validMatch = true;
                                 break;
                             }
                         }
 
-                        if (bValidMatch)
+                        if (validMatch)
                             break;
                     }
 
-                    if (!bValidMatch)
                         OnErrorEvent("Scan " + scanNumber + ": Observed precursor mass of " + expSpec.PrecursorNeutralMass.ToString("0.0") + " Da is not a reasonable match for computed mass of " + peptideMassTheoretical.ToString("0.0") + " Da; DeltaMass = " + (expSpec.PrecursorNeutralMass - peptideMassTheoretical).ToString("0.0") + " Da; Peptide = " + peptideSeq);
+                    if (!validMatch)
                 }
 
                 var modNumber = 0;

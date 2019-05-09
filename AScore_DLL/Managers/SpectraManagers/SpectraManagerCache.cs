@@ -38,17 +38,18 @@ namespace AScore_DLL.Managers.SpectraManagers
             {
                 throw new DirectoryNotFoundException("Unable to determine the parent directory for " + datasetFilePath);
             }
-            var foldersToCheck = new List<DirectoryInfo> { fiDatasetFile.Directory };
+
+            var directoriesToCheck = new List<DirectoryInfo> { fiDatasetFile.Directory };
 
             if (fiDatasetFile.Directory.Parent != null)
             {
-                foldersToCheck.Add(fiDatasetFile.Directory.Parent);
+                directoriesToCheck.Add(fiDatasetFile.Directory.Parent);
             }
 
-            foreach (var folder in foldersToCheck)
+            foreach (var directory in directoriesToCheck)
             {
-                var mzMLFile = MzMLManager.GetFilePath(folder, datasetName);
-                var dtaFile = DtaManager.GetFilePath(folder, datasetName);
+                var mzMLFile = MzMLManager.GetFilePath(directory, datasetName);
+                var dtaFile = DtaManager.GetFilePath(directory, datasetName);
 
                 if (File.Exists(mzMLFile))
                 {
@@ -60,9 +61,9 @@ namespace AScore_DLL.Managers.SpectraManagers
                 }
             }
 
-            // _dta.txt or .mzML file not found (checked both the folder with the dataset file and the parent folder)
+            // _dta.txt or .mzML file not found (checked both the directory with the dataset file and the parent directory)
 
-            OnErrorEvent(string.Format("Could not find the spectra file for dataset \"{0}\" in {1} or one folder up", datasetName, fiDatasetFile.Directory.FullName));
+            OnErrorEvent(string.Format("Could not find the spectra file for dataset \"{0}\" in {1} or one directory up", datasetName, fiDatasetFile.Directory.FullName));
 
             return null;
         }

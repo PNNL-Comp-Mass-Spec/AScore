@@ -88,7 +88,7 @@ namespace AScore_DLL
 
             RegisterEvents(spectraManager);
 
-            OnStatusEvent("Output folder: " + ascoreOptions.OutputDirectoryInfo.FullName);
+            OnStatusEvent("Output directory: " + ascoreOptions.OutputDirectoryInfo.FullName);
 
             var ascoreEngine = new AScore_DLL.AScoreAlgorithm();
             RegisterEvents(ascoreEngine);
@@ -155,8 +155,8 @@ namespace AScore_DLL
         {
             var jobToDatasetNameMap = new Dictionary<string, string>();
 
-            var lstColumnMapping = new Dictionary<string, int>();
-            var lstColumnNames = new List<string>
+            var columnMap = new Dictionary<string, int>();
+            var requiredColumns = new List<string>
             {
                 "Job",
                 "Dataset"
@@ -166,6 +166,8 @@ namespace AScore_DLL
             using (var mapFileReader = new StreamReader(new FileStream(jobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
                 var rowNumber = 0;
+                var requiredColumnCount = 0;
+
                 while (!mapFileReader.EndOfStream)
                 {
                     var dataLine = mapFileReader.ReadLine();
@@ -176,11 +178,10 @@ namespace AScore_DLL
 
                     var dataColumns = dataLine.Split('\t').ToList();
 
-                    if (rowNumber == 1)
+                    if (requiredColumnCount == 0)
                     {
                         // Parse the headers
-
-                        foreach (var columnName in lstColumnNames)
+                        foreach (var columnName in requiredColumns)
                         {
                             var colIndex = dataColumns.IndexOf(columnName);
                             if (colIndex < 0)
@@ -189,19 +190,21 @@ namespace AScore_DLL
                                 OnErrorEvent(errorMessage);
                                 throw new Exception(errorMessage);
                             }
-                            lstColumnMapping.Add(columnName, colIndex);
+                            columnMap.Add(columnName, colIndex);
                         }
+
+                        requiredColumnCount = dataColumns.Count;
                         continue;
                     }
 
-                    if (dataColumns.Count < lstColumnMapping.Count)
+                    if (dataColumns.Count < requiredColumnCount)
                     {
-                        OnWarningEvent("Row " + rowNumber + " has fewer than " + lstColumnMapping.Count + " columns; skipping this row");
+                        OnWarningEvent("Row " + rowNumber + " has fewer than " + columnMap.Count + " columns; skipping this row");
                         continue;
                     }
 
-                    var job = dataColumns[lstColumnMapping["Job"]];
-                    var dataset = dataColumns[lstColumnMapping["Dataset"]];
+                    var job = dataColumns[columnMap["Job"]];
+                    var dataset = dataColumns[columnMap["Dataset"]];
 
                     jobToDatasetNameMap.Add(job, dataset);
                 }
