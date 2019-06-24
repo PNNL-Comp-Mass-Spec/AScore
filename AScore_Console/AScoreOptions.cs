@@ -8,6 +8,8 @@ namespace AScore_Console
 
     public class AScoreOptions : IAScoreOptions
     {
+        public const string PROGRAM_DATE = "June 23, 2019";
+
         [Option("T", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
 

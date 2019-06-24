@@ -65,6 +65,9 @@ namespace AScore_Console
                 var parseResults = parser.ParseArgs(args);
                 var ascoreOptions = parseResults.ParsedResults;
 
+                Console.WriteLine("AScore version " + GetAppVersion());
+                Console.WriteLine();
+
                 if (!parseResults.Success)
                 {
                     Thread.Sleep(1500);
@@ -163,6 +166,11 @@ namespace AScore_Console
             oClass.ErrorEvent += ShowError;
             oClass.WarningEvent += ShowWarning;
             oClass.StatusEvent += ShowMessage;
+        }
+
+        private static string GetAppVersion()
+        {
+            return PRISM.FileProcessor.ProcessFilesOrDirectoriesBase.GetAppVersion(AScoreOptions.PROGRAM_DATE);
         }
 
         private static void ShowMessage(string message)
