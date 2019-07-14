@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using PRISM;
+using PSI_Interface.CV;
 using PSI_Interface.MSData;
 
 namespace AScore_DLL.Managers.SpectraManagers
@@ -92,7 +93,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             {
                 reader.Close();
             }
-            m_initialized =false;
+            m_initialized = false;
         }
 
         #endregion // Destructor
@@ -166,7 +167,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (!m_initialized)
                 throw new Exception("Class has not yet been initialized; call OpenFile() before calling this function");
 
-            if (!(m_MzMLReader.ReadMassSpectrum(scanNumber) is SimpleMzMLReader.SimpleProductSpectrum spectrum))
+            if (!(m_MzMLReader.ReadMassSpectrum(scanNumber) is SimpleMzMLReader.SimpleSpectrum spectrum))
             {
                 return null;
             }
@@ -184,8 +185,39 @@ namespace AScore_DLL.Managers.SpectraManagers
             // precursorMass precursorCharge ScanNumber dtaChargeState
             // 1196.03544724 3   scan=99 cs=3
 
-            var precursorMass = CalculateMPlusHMass(spectrum.MonoisotopicMz, spectrum.Charge);
-            var precursorChargeState = (spectrum.Charge != 0 ? spectrum.Charge : 1);
+            var monoMzText = "";
+            var chargeStateText = "";
+
+            if (spectrum.Precursors.Count > 0 &&
+                spectrum.Precursors[0].SelectedIons != null &&
+                spectrum.Precursors[0].SelectedIons.Count > 0)
+            {
+                foreach (var cvParam in spectrum.Precursors[0].SelectedIons[0].CVParams)
+                {
+                    switch (cvParam.TermInfo.Cvid)
+                    {
+                        case CV.CVID.MS_selected_ion_m_z:
+                        case CV.CVID.MS_selected_precursor_m_z:
+                            monoMzText = cvParam.Value;
+                            break;
+
+                        case CV.CVID.MS_charge_state:
+                            chargeStateText = cvParam.Value;
+                            break;
+                    }
+                }
+
+            }
+
+            double precursorMass = 0;
+            var precursorChargeState = 0;
+
+            if (double.TryParse(monoMzText, out var precursorMonoMz) &&
+                int.TryParse(chargeStateText, out var precursorCharge))
+            {
+                precursorMass = CalculateMPlusHMass(precursorMonoMz, precursorCharge);
+                precursorChargeState = (precursorCharge != 0 ? precursorCharge : 1);
+            }
             //scanNumber = spectrum.ScanNum;
 
             // Process the spectra binary data
