@@ -3,7 +3,7 @@
 System.Data.SQLite DLLs in the x86 and x64 directories are compiled against Windows and thus will not work on Linux.  
 To use System.Data.SQLite on Linux, compile the .so file using the following steps:
 
-1) Download the latest sqlite-netFx-full-source from https://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki
+1) Download sqlite-netFx-full-source v1.0.108 from https://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki
 * Specifically https://system.data.sqlite.org/downloads/1.0.108.0/sqlite-netFx-full-source-1.0.108.0.zip
 
 2) Transfer to the Linux server, storing in <code>/home/username/System.Data.SQLite</code>
@@ -32,7 +32,7 @@ chmod +x compile-interop-assembly-release.sh
 
 6) Look for the .so file named <code>libSQLite.Interop.so</code> and remove the execute permission (execute bit not needed)
 <pre>cd ../bin/2013/Release/bin
-chymod -x libSQLite.Interop.so
+chmod -x libSQLite.Interop.so
 </pre>
 
 7) Copy libSQLite.Interop.so to the directory where your Mono/.NET application's binaries reside (not the x64 or x86 subdirectories containing SQLite.Interop.dll).  For example:
