@@ -72,6 +72,34 @@ ProteinCoverageSummarizer
  </summary>
  <returns></returns>
 </member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mCachedPeptideToHashIndexPointer">
+ <summary>
+ Parallel to mCachedPeptideSeqInfo
+ </summary>
+</member>
+<member name="E:ProteinCoverageSummarizer.clsLeaderSequenceCache.ProgressChanged">
+ <summary>
+ Progress changed event
+ </summary>
+ <param name="taskDescription"></param>
+ <param name="percentComplete">Value between 0 and 100, but can contain decimal percentage values</param>
+</member>
+<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mProgressPercentComplete">
+ <summary>
+ Percent complete
+ </summary>
+ <remarks>
+ Value between 0 and 100, but can contain decimal percentage values
+ </remarks>
+</member>
+<member name="P:ProteinCoverageSummarizer.clsLeaderSequenceCache.ProgressPercentComplete">
+ <summary>
+ Percent complete
+ </summary>
+ <remarks>
+ Value between 0 and 100, but can contain decimal percentage values
+ </remarks>
+</member>
 <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.CachePeptide(System.String,System.String,System.Char,System.Char)">
  <summary>
  Caches the peptide and updates mLeaderSequences
@@ -88,18 +116,44 @@ ProteinCoverageSummarizer
  an accompanying file with peptide sequences and compute the percent coverage of each of the proteins
  </summary>
 </member>
+<member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mResultsFilePath">
+ <summary>
+ This is populated by function ProcessFile()
+ </summary>
+</member>
+<member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mPercentCompleteStartLevels">
+ <summary>
+ Array that lists the percent complete value to report at the start
+ of each of the various processing steps performed in this procedure
+ </summary>
+ <remarks>The percent complete values range from 0 to 100</remarks>
+</member>
+<member name="E:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProgressChanged">
+ <summary>
+ Progress changed event
+ </summary>
+ <param name="taskDescription"></param>
+ <param name="percentComplete">Value between 0 and 100, but can contain decimal percentage values</param>
+</member>
 <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mProgressPercentComplete">
  <summary>
  Percent complete
  </summary>
  <remarks>
- Ranges from 0 to 100, but can contain decimal percentage values
+ Value between 0 and 100, but can contain decimal percentage values
  </remarks>
 </member>
 <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.KeepDB">
  <summary>
  When this is True, the SQLite Database will not be deleted after processing finishes
  </summary>
+</member>
+<member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProgressPercentComplete">
+ <summary>
+ Percent complete
+ </summary>
+ <returns></returns>
+ <remarks>Value between 0 and 100, but can contain decimal percentage values</remarks>
 </member>
 <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ConstructOutputFilePath(System.String,System.String,System.String,System.String)">
  <summary>
@@ -140,7 +194,7 @@ ProteinCoverageSummarizer
  Increment the observation count for the given key in the given dictionary
  If the key is not defined, add it
  </summary>
- <param name="oDictionary"></param>
+ <param name="dictionaryToUpdate"></param>
  <param name="keyName"></param>
  <returns>True if the protein is new and was added tomProteinPeptideStats </returns>
 </member>
@@ -174,7 +228,7 @@ ProteinCoverageSummarizer
  Unique sequence ID
  </summary>
  <remarks>
- Index number applied to the proteins stored in the SQL Lite DB; the first protein has UniqueSequenceID = 0
+ Index number applied to the proteins stored in the SQLite DB; the first protein has UniqueSequenceID = 0
  </remarks>
 </member>
 <member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.udtProteinInfoType.PercentCoverage">
