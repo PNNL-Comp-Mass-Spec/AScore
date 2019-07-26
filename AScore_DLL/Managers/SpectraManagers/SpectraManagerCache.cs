@@ -91,7 +91,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         public void OpenFile(string filePath)
         {
-            if (filePath.EndsWith(".mzML") || filePath.EndsWith(".mzML.gz"))
+            if (filePath.EndsWith(".mzML", StringComparison.OrdinalIgnoreCase) || filePath.EndsWith(".mzML.gz", StringComparison.OrdinalIgnoreCase))
             {
                 _currentSpectrumManager = _mzMLManager;
             }

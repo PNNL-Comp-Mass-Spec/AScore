@@ -594,7 +594,7 @@ namespace AScore_DLL
 
             foreach (var suffix in suffixes)
             {
-                if (dataFileName.ToLower().EndsWith(suffix.ToLower()))
+                if (dataFileName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
                 {
                     return dataFileName.Substring(0, dataFileName.Length - suffix.Length);
                 }

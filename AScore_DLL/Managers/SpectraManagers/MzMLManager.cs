@@ -122,7 +122,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             try
             {
                 m_datasetName = Path.GetFileNameWithoutExtension(mzMLPath);
-                if (m_datasetName != null && m_datasetName.ToLowerInvariant().EndsWith(".mzml"))
+                if (m_datasetName != null && m_datasetName.EndsWith(".mzML", StringComparison.OrdinalIgnoreCase))
                 {
                     m_datasetName = Path.GetFileNameWithoutExtension(m_datasetName);
                 }
