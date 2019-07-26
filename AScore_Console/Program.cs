@@ -113,7 +113,7 @@ namespace AScore_Console
                 }
                 else
                 {
-                    clsParseCommandLine.PauseAtConsole(1000, 250);
+                    Thread.Sleep(1000);
                 }
             }
 #if (!DISABLE_ROOT_EXCEPTION_HANDLER)
