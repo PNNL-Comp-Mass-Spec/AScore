@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using PRISM;
 
 //TODO: leverage mzXmlFileReader and random access indexing to insert experimental spectra as needed.  may want to use an abstract class that DtaManager can inherit from.  Make all the same calls.
-//Need to add some intelligence fro grabbing msxml instead of dta when requesting the msgfdb results.
+//Need to add some intelligence for grabbing msxml instead of dta when requesting the msgfdb results.
 
 namespace AScore_DLL.Managers.SpectraManagers
 {

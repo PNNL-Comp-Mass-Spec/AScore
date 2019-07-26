@@ -115,9 +115,9 @@ namespace AScore_DLL.Managers.DatasetManagers
             var nameMap = new Dictionary<string, SearchModificationAndSymbol>();
             foreach (var mod in mods)
             {
-                var nameFmtted = FormatModName(mod);
+                var modNameFormatted = FormatModName(mod);
                 char symbol;
-                if (nameMap.TryGetValue(nameFmtted, out var combined))
+                if (nameMap.TryGetValue(modNameFormatted, out var combined))
                 {
                     symbol = combined.Symbol;
                     // if only the residues don't match, add the residue(s) to the existing mod entry, and go on to the next mod
@@ -147,13 +147,13 @@ namespace AScore_DLL.Managers.DatasetManagers
                     }
 
                     combined = new SearchModificationAndSymbol(mod, symbol);
-                    nameMap.Add(nameFmtted, combined);
+                    nameMap.Add(modNameFormatted, combined);
                 }
 
-                if (!modLookup.TryGetValue(nameFmtted, out var similar))
+                if (!modLookup.TryGetValue(modNameFormatted, out var similar))
                 {
                     similar = new List<SearchModificationAndSymbol>();
-                    modLookup.Add(nameFmtted, similar);
+                    modLookup.Add(modNameFormatted, similar);
                 }
 
                 similar.Add(combined);

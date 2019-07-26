@@ -229,7 +229,7 @@ namespace AScore_DLL
         {
             var jobToDatasetNameMap = new Dictionary<string, string>
             {
-                {datasetManager.JobNum, spectraManager.DatasetName}
+                {datasetManager.JobNum, spectraManager.SpectrumFilePath}
             };
 
             if (spectraManager == null || !spectraManager.Initialized)

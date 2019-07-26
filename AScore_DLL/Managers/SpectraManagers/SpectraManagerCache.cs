@@ -9,8 +9,8 @@ namespace AScore_DLL.Managers.SpectraManagers
     {
         private readonly MzMLManager _mzMLManager;
         private readonly DtaManager _dtaManager;
-        private ISpectraManager _lastOpened;
-        private string _lastDatasetOpened;
+        private ISpectraManager _currentSpectrumManager;
+        private string _currentSpectrumFilePath;
 
         /// <summary>
         /// Constructor
@@ -23,27 +23,28 @@ namespace AScore_DLL.Managers.SpectraManagers
             RegisterEvents(_mzMLManager);
         }
 
-        public bool Initialized => _lastOpened != null && _lastOpened.Initialized;
+        public bool Initialized => _currentSpectrumManager != null && _currentSpectrumManager.Initialized;
 
         /// <summary>
         ///
         /// </summary>
-        /// <param name="datasetFilePath">_fht.txt or _syn.txt file</param>
+        /// <param name="psmResultsFilePath">_fht.txt or _syn.txt file</param>
         /// <param name="datasetName">_dta.txt or .mzML file</param>
         /// <returns></returns>
-        public string GetFilePath(string datasetFilePath, string datasetName)
+        public string GetFilePath(string psmResultsFilePath, string datasetName)
         {
-            var fiDatasetFile = new FileInfo(datasetFilePath);
-            if (fiDatasetFile.Directory == null)
+            var psmResultsFile = new FileInfo(psmResultsFilePath);
+
+            if (psmResultsFile.Directory == null)
             {
-                throw new DirectoryNotFoundException("Unable to determine the parent directory for " + datasetFilePath);
+                throw new DirectoryNotFoundException("Unable to determine the parent directory for " + psmResultsFilePath);
             }
 
-            var directoriesToCheck = new List<DirectoryInfo> { fiDatasetFile.Directory };
+            var directoriesToCheck = new List<DirectoryInfo> { psmResultsFile.Directory };
 
-            if (fiDatasetFile.Directory.Parent != null)
+            if (psmResultsFile.Directory.Parent != null)
             {
-                directoriesToCheck.Add(fiDatasetFile.Directory.Parent);
+                directoriesToCheck.Add(psmResultsFile.Directory.Parent);
             }
 
             foreach (var directory in directoriesToCheck)
@@ -63,44 +64,45 @@ namespace AScore_DLL.Managers.SpectraManagers
 
             // _dta.txt or .mzML file not found (checked both the directory with the dataset file and the parent directory)
 
-            OnErrorEvent(string.Format("Could not find the spectra file for dataset \"{0}\" in {1} or one directory up", datasetName, fiDatasetFile.Directory.FullName));
+            OnErrorEvent(string.Format("Could not find the spectra file for dataset \"{0}\" in {1} or one directory up", datasetName, psmResultsFile.Directory.FullName));
 
             return null;
         }
 
+
         /// <summary>
-        ///
+        ///Open the .mzML or _dta.txt file that corresponds to the _fht.txt or _syn.txt file specified by psmResultsFilePath
         /// </summary>
-        /// <param name="datasetFilePath">_fht.txt or _syn.txt file</param>
+        /// <param name="psmResultsFilePath">_fht.txt or _syn.txt file</param>
         /// <param name="datasetName">dataset name</param>
         /// <returns></returns>
-        public ISpectraManager GetSpectraManagerForFile(string datasetFilePath, string datasetName)
+        public ISpectraManager GetSpectraManagerForFile(string psmResultsFilePath, string datasetName)
         {
-            var filePath = GetFilePath(datasetFilePath, datasetName);
-            if (string.IsNullOrWhiteSpace(filePath))
+            var spectrumFilePath = GetFilePath(psmResultsFilePath, datasetName);
+            if (string.IsNullOrWhiteSpace(spectrumFilePath))
             {
-                var errorMessage = "Could not find spectra file for dataset \"" + datasetName + "\" in path \"" + Path.GetDirectoryName(datasetFilePath) + "\"";
+                var errorMessage = "Could not find spectra file for dataset \"" + datasetName + "\" in path \"" + Path.GetDirectoryName(psmResultsFilePath) + "\"";
                 OnErrorEvent(errorMessage);
                 throw new Exception(errorMessage);
             }
-            OpenFile(filePath);
-            return _lastOpened;
+            OpenFile(spectrumFilePath);
+            return _currentSpectrumManager;
         }
 
         public void OpenFile(string filePath)
         {
             if (filePath.EndsWith(".mzML") || filePath.EndsWith(".mzML.gz"))
             {
-                _lastOpened = _mzMLManager;
+                _currentSpectrumManager = _mzMLManager;
             }
             else
             {
-                _lastOpened = _dtaManager;
+                _currentSpectrumManager = _dtaManager;
             }
-            _lastDatasetOpened = filePath;
-            _lastOpened.OpenFile(filePath);
+            _currentSpectrumFilePath = filePath;
+            _currentSpectrumManager.OpenFile(filePath);
         }
 
-        public string DatasetName => _lastDatasetOpened;
+        public string SpectrumFilePath => _currentSpectrumFilePath;
     }
 }
