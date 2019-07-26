@@ -150,8 +150,14 @@ namespace AScore_DLL
         /// <param name="outputFilePath">Name of the output file</param>
         /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
-        public void RunAScoreWithMappingFile(string jobToDatasetMapFile, SpectraManagerCache spectraManager, DatasetManager datasetManager,
-                                 ParameterFileManager ascoreParameters, string outputFilePath, string fastaFilePath = "", bool outputDescriptions = false)
+        public void RunAScoreWithMappingFile(
+            string jobToDatasetMapFile,
+            SpectraManagerCache spectraManager,
+            DatasetManager datasetManager,
+            ParameterFileManager ascoreParameters,
+            string outputFilePath,
+            string fastaFilePath = "",
+            bool outputDescriptions = false)
         {
             var jobToDatasetNameMap = new Dictionary<string, string>();
 
@@ -210,7 +216,7 @@ namespace AScore_DLL
                 }
             }
 
-            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath,false);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -224,8 +230,13 @@ namespace AScore_DLL
         /// <param name="outputFilePath">Name of the output file</param>
         /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
-        public void RunAScoreOnSingleFile(SpectraManagerCache spectraManager, DatasetManager datasetManager,
-                                 ParameterFileManager ascoreParameters, string outputFilePath, string fastaFilePath = "", bool outputDescriptions = false)
+        public void RunAScoreOnSingleFile(
+            SpectraManagerCache spectraManager,
+            DatasetManager datasetManager,
+            ParameterFileManager ascoreParameters,
+            string outputFilePath,
+            string fastaFilePath = "",
+            bool outputDescriptions = false)
         {
             var jobToDatasetNameMap = new Dictionary<string, string>
             {
@@ -236,7 +247,7 @@ namespace AScore_DLL
                 throw new Exception(
                     "spectraManager must be instantiated and initialized before calling RunAScoreOnSingleFile for a single source file");
 
-            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath, true);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -254,16 +265,18 @@ namespace AScore_DLL
         /// Runs the all the tools necessary to perform an ascore run
         /// </summary>
         /// <param name="jobToDatasetNameMap">Keys are job numbers (stored as strings); values are Dataset Names or the path to the _dta.txt file</param>
-        /// <param name="spectraManager">DtaManager, which the calling class must have already initialized</param>
+        /// <param name="spectraManager">Manager for reading _dta.txt or .mzML files; must have already been initialized by the calling class</param>
         /// <param name="datasetManager"></param>
         /// <param name="ascoreParameters"></param>
         /// <param name="outputFilePath"></param>
+        /// <param name="spectraFileOpened">Set to true if processing a single dataset, and spectraManager.OpenFile() has already been called</param>
         private void RunAScoreOnPreparedData(
             IReadOnlyDictionary<string, string> jobToDatasetNameMap,
             SpectraManagerCache spectraManager,
             DatasetManager datasetManager,
             ParameterFileManager ascoreParameters,
-            string outputFilePath)
+            string outputFilePath,
+            bool spectraFileOpened)
         {
             var totalRows = datasetManager.GetRowLength();
             var dctPeptidesProcessed = new Dictionary<string, int>();
@@ -275,14 +288,13 @@ namespace AScore_DLL
                 throw new ArgumentException(errorMessage);
             }
 
+            ISpectraManager spectraFile = null;
             string spectraManagerCurrentJob = null; // Force open after first read from fht
 
             var modSummaryManager = new ModSummaryFileManager();
             RegisterEvents(modSummaryManager);
 
             var peptideMassCalculator = new PHRPReader.clsPeptideMassCalculator();
-
-            ISpectraManager spectraFile = new DtaManager(peptideMassCalculator);
 
             if (FilterOnMSGFScore)
             {
@@ -347,7 +359,14 @@ namespace AScore_DLL
 
                     datasetName = GetDatasetName(datasetName);
 
-                    spectraFile = spectraManager.GetSpectraManagerForFile(datasetManager.DatasetFilePath, datasetName);
+                    if (!spectraFileOpened)
+                    {
+                        spectraFile = spectraManager.GetSpectraManagerForFile(datasetManager.DatasetFilePath, datasetName);
+                    }
+                    else
+                    {
+                        spectraFile = spectraManager.GetCurrentSpectrumManager();
+                    }
 
                     spectraManagerCurrentJob = string.Copy(datasetManager.JobNum);
                     Console.Write("\r");
@@ -404,6 +423,13 @@ namespace AScore_DLL
                 }
 
                 //Get experimental spectra
+                if (spectraFile == null)
+                {
+                    var errorMessage = "spectraFile is uninitialized in RunAScoreOnPreparedData; this indicates a programming bug";
+                    OnErrorEvent(errorMessage);
+                    throw new Exception(errorMessage);
+                }
+
                 var expSpec = spectraFile.GetExperimentalSpectra(scanNumber, scanCount, chargeState);
 
                 if (expSpec == null)

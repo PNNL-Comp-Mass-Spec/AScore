@@ -69,6 +69,10 @@ namespace AScore_DLL.Managers.SpectraManagers
             return null;
         }
 
+        public ISpectraManager GetCurrentSpectrumManager()
+        {
+            return _currentSpectrumManager;
+        }
 
         /// <summary>
         ///Open the .mzML or _dta.txt file that corresponds to the _fht.txt or _syn.txt file specified by psmResultsFilePath
