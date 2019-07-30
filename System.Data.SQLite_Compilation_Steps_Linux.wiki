@@ -35,7 +35,9 @@ chmod +x compile-interop-assembly-release.sh
 chmod -x libSQLite.Interop.so
 </pre>
 
-7) Copy libSQLite.Interop.so to the directory where your Mono/.NET application's binaries reside (not the x64 or x86 subdirectories containing SQLite.Interop.dll).  For example:
-<pre>cp libSQLite.Interop.so /opt/DMS_Programs/AScore</pre>
+7) Copy libSQLite.Interop.so to the directory where the Mono/.NET application's binaries reside (not the x64 or x86 subdirectories containing SQLite.Interop.dll).  For example:
+<pre>
+cp libSQLite.Interop.so /opt/DMS_Programs/AScore
+</pre>
 
 Note that the version of System.Data.SQLite.dll in that directory must be 1.0.111 if the .so file was compiled using 1.0.111 source.
