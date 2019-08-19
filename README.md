@@ -1,8 +1,32 @@
 # AScore Console
 
 The AScore program can process first-hits or synopsis files from MSGF+, SEQUEST, or X!Tandem
-to compute confidence scores for the position of phosphorylated residues.
+to compute confidence scores for the position of modified residues.  It is most commonly used
+to compute confidence scores for phosphorylated residues (phosphosites).
 
+## Scores
+
+The output file includes the following columns
+
+| Column              | Description |
+|---------------------|-------------|
+| Job                 | Analysis ID; 0 if no job number |
+| Scan                | Scan number of the MS/MS spectrum |
+| OriginalSequence    | Peptide sequence, as reported in the PSM results from the search engine |
+| BestSequence        | Either the original sequence if the modified residue is unchanged, or an updated sequence if the modification site has been moved |
+| PeptideScore        | Score of the top scoring peptide from the list of variants considered for a given scan |
+| AScore              | Phosphosite localization score; higher scores are better (see below for more info)
+| numSiteIonsPoss     | Possible number of site determining ions in the theoretical fragmentation spectrum  |
+| numSiteIonsMatched  | Number of experimental ions that matched the theoretical ions |
+| SecondSequence      | Second highest scoring sequence (the modified residue will be different than the BestSequence peptide) |
+| ModInfo             | Modified residue and modification symbol |
+
+For the AScore value:
+* 0 means unable to localize (too ambiguous due to too many S, T, and Y residues)
+* 19 or higher indicates 99% certainty of the phosphosite localization
+* 1000 means the peptide only has one phosphosite
+* -1 means the peptide has no modified residues
+        
 # Usage
 
 Use the following steps to analyze results from a set of DMS analysis jobs.
