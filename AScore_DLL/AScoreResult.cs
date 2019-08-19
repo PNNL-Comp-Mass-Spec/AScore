@@ -2,7 +2,11 @@
 {
     public class AScoreResult
     {
-        // AScore value (closer to 0 is better; 1000 means horrible, -1 means no modified residues)
+        // AScore value (larger is better)
+        // 0 means unable to localize (too ambiguous due to too many S, T, Y residues)
+        // 19 or higher indicates 99% certainty of the phosphosite localization
+        // 1000 means the peptide only has one phosphosite
+        // -1 means no modified residues
         public double AScore { get; set; }
 
         // Number of b/y ions that could be matched
