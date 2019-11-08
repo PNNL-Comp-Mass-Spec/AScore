@@ -120,7 +120,7 @@ namespace AScore_Console
             catch (Exception ex)
             {
                 Console.WriteLine();
-                ShowError("Program failure, possibly incorrect search engine type; " + ex.Message, ex);
+                ShowError("Program failure", ex);
 
                 return ex.Message.GetHashCode();
             }
