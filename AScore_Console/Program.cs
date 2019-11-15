@@ -99,6 +99,19 @@ namespace AScore_Console
 
                 if (!string.IsNullOrWhiteSpace(mLogFilePath))
                 {
+                    var logFile = new FileInfo(mLogFilePath);
+                    if (logFile.Directory == null)
+                    {
+                        PRISM.ConsoleMsgUtils.ShowWarning("Unable to determine the parent directory of " + mLogFilePath);
+                        return -1;
+                    }
+
+                    if (!logFile.Directory.Exists)
+                    {
+                        Console.WriteLine("Creating " + logFile.Directory.FullName);
+                        logFile.Directory.Create();
+                    }
+
                     mLogFile = new StreamWriter(new FileStream(mLogFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
                     {
                         AutoFlush = true
