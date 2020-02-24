@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AScore_DLL</RootNamespace>
     <AssemblyName>AScore_DLL</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -98,7 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PRISM-Library">
-      <Version>2.5.30</Version>
+      <Version>2.6.1</Version>
     </PackageReference>
     <PackageReference Include="ProteinFileReader">
       <Version>1.3.1</Version>
