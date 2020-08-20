@@ -5,7 +5,6 @@ using PRISM;
 
 namespace AScore_Console
 {
-
     public class AScoreOptions : IAScoreOptions
     {
         public const string PROGRAM_DATE = "August 20, 2020";
@@ -147,35 +146,53 @@ namespace AScore_Console
         {
             if (!File.Exists(AScoreParamFile))
             {
-                errorReporter("Input file not found: " + AScoreParamFile);
+                errorReporter(GetInputFileNotFoundMessage("Input file not found: " + AScoreParamFile));
                 return -10;
             }
 
             if (!string.IsNullOrEmpty(MassSpecFile) && !File.Exists(MassSpecFile))
             {
-                errorReporter("Input file not found: " + MassSpecFile);
+                errorReporter(GetInputFileNotFoundMessage(MassSpecFile));
                 return -11;
             }
 
             if (!string.IsNullOrEmpty(JobToDatasetMapFile) && !File.Exists(JobToDatasetMapFile))
             {
-                errorReporter("Input file not found: " + JobToDatasetMapFile);
+                errorReporter(GetInputFileNotFoundMessage(JobToDatasetMapFile));
                 return -11;
             }
 
             if (!File.Exists(DbSearchResultsFile))
             {
-                errorReporter("Input file not found: " + DbSearchResultsFile);
+                errorReporter(GetInputFileNotFoundMessage(DbSearchResultsFile));
                 return -12;
             }
 
             if (!string.IsNullOrEmpty(FastaFilePath) && !File.Exists(FastaFilePath))
             {
-                errorReporter("Fasta file not found: " + FastaFilePath);
+                errorReporter(GetInputFileNotFoundMessage(FastaFilePath, "Fasta file"));
                 return -13;
             }
 
             return 0;
+        }
+
+        private string GetInputFileNotFoundMessage(string filePath, string fileDescription = "Input file")
+        {
+            try
+            {
+                var inputFile = new FileInfo(filePath);
+                var fullFilePath =
+                    string.Equals(filePath, inputFile.FullName, StringComparison.OrdinalIgnoreCase) ?
+                    string.Empty :
+                    ";\n" + inputFile.FullName;
+
+                return string.Format("{0} not found: {1}{2}", fileDescription, filePath, fullFilePath);
+            }
+            catch (Exception)
+            {
+                return string.Format("Input file not found: ", filePath ?? "?UnknownFile?");
+            }
         }
 
         /// <summary>
