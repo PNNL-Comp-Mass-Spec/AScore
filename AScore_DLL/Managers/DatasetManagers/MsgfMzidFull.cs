@@ -178,7 +178,8 @@ namespace AScore_DLL.Managers.DatasetManagers
         {
             foreach (var cvp in cvps)
             {
-                if (cvp.Accession.ToLower().Contains("unimod") || cvp.Cvid == CV.CVID.MS_unknown_modification)
+                if (cvp.Accession.IndexOf("unimod", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    cvp.Cvid == CV.CVID.MS_unknown_modification)
                 {
                     return cvp.Name;
                 }

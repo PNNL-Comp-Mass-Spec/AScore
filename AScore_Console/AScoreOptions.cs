@@ -102,7 +102,8 @@ namespace AScore_Console
                 OutputDirectoryPath = ".";
             }
 
-            if (DbSearchResultsFile.ToLower().EndsWith(".mzid") || DbSearchResultsFile.ToLower().EndsWith(".mzid.gz"))
+            if (DbSearchResultsFile.EndsWith(".mzid", StringComparison.OrdinalIgnoreCase) ||
+                DbSearchResultsFile.EndsWith(".mzid.gz", StringComparison.OrdinalIgnoreCase))
             {
                 SearchResultsType = DbSearchResultsType.Mzid;
             }
@@ -202,7 +203,7 @@ namespace AScore_Console
             }
 
             var fhtFileBaseName = Path.GetFileNameWithoutExtension(DbSearchResultsFile);
-            if (fhtFileBaseName.ToLower().EndsWith(".mzid"))
+            if (fhtFileBaseName.EndsWith(".mzid", StringComparison.OrdinalIgnoreCase))
             {
                 fhtFileBaseName = Path.GetFileNameWithoutExtension(fhtFileBaseName);
             }
