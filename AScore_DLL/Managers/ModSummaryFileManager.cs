@@ -32,14 +32,20 @@ namespace AScore_DLL.Managers
             ParameterFileManager ascoreParams)
         {
             var fiDataFile = new FileInfo(datasetFilePath);
-            var diWorkingDirectory = fiDataFile.Directory;
-            if (diWorkingDirectory == null)
+            var workingDirectory = fiDataFile.Directory;
+            if (workingDirectory == null)
                 return false;
 
-            var modSummaryFiles = diWorkingDirectory.GetFiles(datasetName + "*ModSummary.txt").ToList();
+            var modSummaryFileSpec = datasetName + "*ModSummary.txt";
+
+            var modSummaryFiles = workingDirectory.GetFiles(modSummaryFileSpec).ToList();
             if (modSummaryFiles.Count == 0)
+            {
+                OnWarningEvent(string.Format(
+                    "ModSummary.txt file not found; PSMs may not be recognized properly;\nLooked for {0} in directory {1}",
+                    modSummaryFileSpec, PathUtils.CompactPathString(workingDirectory.FullName, 100)));
                 return false;
-
+            }
             var modSummaryFile = modSummaryFiles.First();
 
             ReadModSummary(modSummaryFile, ascoreParams);
