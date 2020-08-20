@@ -1,0 +1,70 @@
+AScore version 1.0.7537.24916 (August 20, 2020)
+
+CID Mass Tolerance: 0.5 Da
+ETD Mass Tolerance: 0.5 Da
+HCD Mass Tolerance: 0.05 Da
+
+Caching data in data/MSGFPlus_ITRAQ4plex_mzML/Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt
+Output directory: /home/d3l243/AScore/data/MSGFPlus_ITRAQ4plex_mzML
+Opening data/MSGFPlus_ITRAQ4plex_mzML/Dataset_W_S2_Fr_04_2May17.mzML
+Filtering using MSGF_SpecProb <= 1.0E-07
+
+Dataset name: Dataset_W_S2_Fr_04_2May17
+Loaded modifications from: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ModSummary.txt
+    Static,   57.021465 on C
+    Static,   229.162933 on K
+    Dynamic,  15.994915 on M
+    Terminus, 229.162933 on <
+
+Percent Completion 87%
+Writing 344 rows to /.../MSGFPlus_ITRAQ4plex_mzML/Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore.txt
+
+Stats by fragmentation ion type:
+  CID peptides: 0
+  ETD peptides: 0
+  HCD peptides: 344
+
+
+  Checking for write permission by creating file /home/d3l243/AScore/TempFileToTestFileIOPermissions.tmp
+
+  Deleting /home/d3l243/AScore/TempFileToTestFileIOPermissions.tmp
+
+   SQLite DB Path defined: /home/d3l243/AScore/tmpProteinInfoCache.db3
+Processing Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore_Peptides.txt
+Preprocessing input file
+Running protein coverage summarizer (5.0% complete)
+Initializing
+
+  DeleteSQLiteDBFile: File doesn't exist; nothing to do (/home/d3l243/AScore/tmpProteinInfoCache.db3); calling method: clsProteinCoverageSummarizer.ProcessFile_Start
+Reading protein input file: H_sapiens_M_musculus_RefSeq_Excerpt.fasta (5.9% complete)
+
+  Connecting to SQLite DB: Data Source=/home/d3l243/AScore/tmpProteinInfoCache.db3;
+
+  Disabling Journaling and setting Synchronous mode to 0 (improves update speed)
+
+  ParseProteinFile: Creating table with CREATE TABLE udtProteinInfoType( Name TEXT, Description TEXT, sequence TEXT, UniquesequenceID INTEGER PRIMARY KEY, PercentCoverage REAL);
+Reading protein input file (27.1% complete)
+Done: Processed 421 proteins (5,492 lines)
+Complete reading protein input file: H_sapiens_M_musculus_RefSeq_Excerpt.fasta (45.5% complete)
+
+Parsing Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore_Peptides.txt
+Reading peptides from Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore_Peptides.txt and finding leader sequences (45.5% complete)
+Determining the shortest peptide in the input file (45.5% complete)
+Reading peptides from Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore_Peptides.txt and finding leader sequences (leader seq length = 7) (50.0% complete)
+Creating the protein to peptide mapping file: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore_Peptides_ProteinToPeptideMapping.txt (50.0% complete)
+Comparing proteins to peptide leader sequences
+Comparing proteins to peptide leader sequences (54.5% complete)
+
+  Connecting to SQLite DB: Data Source=/home/d3l243/AScore/tmpProteinInfoCache.db3;
+
+  GetCachedProteinFromSQLiteDB: running query  SELECT UniqueSequenceID, Name, Description, Sequence, PercentCoverage FROM udtProteinInfoType WHERE UniqueSequenceID BETWEEN 0 AND 49999
+Processing complete; deleting the temporary SQLite database (93.2% complete)
+
+  Closing persistent SQLite connection; calling method: clsProteinCoverageSummarizer.ProcessFile_Complete
+
+  DeleteSQLiteDBFile: Deleting /home/d3l243/AScore/tmpProteinInfoCache.db3; calling method: clsProteinCoverageSummarizer.ProcessFile_Complete
+Done (93.2% complete)
+Postprocessing (95.0% complete)
+Processing successful
+AScore Complete
+Results merged; new file: /.../MSGFPlus_ITRAQ4ple../Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt

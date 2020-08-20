@@ -1,0 +1,17 @@
+2020-08-20 02:07:35 PM	Caching data in data/MSGFPlus_ITRAQ4plex_mzML/Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt
+2020-08-20 02:07:35 PM	Output directory: /home/d3l243/AScore/data/MSGFPlus_ITRAQ4plex_mzML
+2020-08-20 02:07:35 PM	Opening data/MSGFPlus_ITRAQ4plex_mzML/Dataset_W_S2_Fr_04_2May17.mzML
+2020-08-20 02:07:36 PM	Filtering using MSGF_SpecProb <= 1.0E-07
+2020-08-20 02:07:36 PM	Dataset name: Dataset_W_S2_Fr_04_2May17
+2020-08-20 02:07:36 PM	Loaded modifications from: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ModSummary.txt
+2020-08-20 02:07:36 PM	    Static,   57.021465 on C
+2020-08-20 02:07:36 PM	    Static,   229.162933 on K
+2020-08-20 02:07:36 PM	    Dynamic,  15.994915 on M
+2020-08-20 02:07:36 PM	    Terminus, 229.162933 on <
+2020-08-20 02:07:37 PM	Writing 344 rows to /.../MSGFPlus_ITRAQ4plex_mzML/Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore.txt
+2020-08-20 02:07:37 PM	Stats by fragmentation ion type:
+2020-08-20 02:07:37 PM	  CID peptides: 0
+2020-08-20 02:07:37 PM	  ETD peptides: 0
+2020-08-20 02:07:37 PM	  HCD peptides: 344
+2020-08-20 02:07:39 PM	AScore Complete
+2020-08-20 02:07:39 PM	Results merged; new file: /.../MSGFPlus_ITRAQ4ple../Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt
