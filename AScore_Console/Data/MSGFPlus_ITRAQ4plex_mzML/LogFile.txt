@@ -1,17 +1,17 @@
-2020-08-20 11:04:50 AM	Caching data in Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt
-2020-08-20 11:04:50 AM	Output directory: F:\Documents\Projects\JoshAldrich\AScore\AScore_Console\Data\MSGFPlus_ITRAQ4plex_mzML
-2020-08-20 11:04:50 AM	Opening Dataset_W_S2_Fr_04_2May17.mzML
-2020-08-20 11:04:51 AM	Filtering using MSGF_SpecProb <= 1.0E-07
-2020-08-20 11:04:51 AM	Dataset name: Dataset_W_S2_Fr_04_2May17
-2020-08-20 11:04:51 AM	Loaded modifications from: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ModSummary.txt
-2020-08-20 11:04:51 AM	    Static,   57.021465 on C
-2020-08-20 11:04:51 AM	    Static,   229.162933 on K
-2020-08-20 11:04:51 AM	    Dynamic,  15.994915 on M
-2020-08-20 11:04:51 AM	    Terminus, 229.162933 on <
-2020-08-20 11:04:55 AM	Writing 344 rows to F:\...\MSGFPlus_ITRAQ4plex_m..\Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore.txt
-2020-08-20 11:04:55 AM	Stats by fragmentation ion type:
-2020-08-20 11:04:55 AM	  CID peptides: 0
-2020-08-20 11:04:55 AM	  ETD peptides: 0
-2020-08-20 11:04:55 AM	  HCD peptides: 344
-2020-08-20 11:04:57 AM	AScore Complete
-2020-08-20 11:04:57 AM	Results merged; new file: F:\...\MSGFPlus_ITRAQ4p..\Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt
+2020-08-20 01:58:05 PM	Caching data in Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt
+2020-08-20 01:58:05 PM	Output directory: F:\...\AScore\AScore_Console\Data\MSGFPlus_ITRAQ4plex_mzML
+2020-08-20 01:58:05 PM	Opening Dataset_W_S2_Fr_04_2May17.mzML
+2020-08-20 01:58:06 PM	Filtering using MSGF_SpecProb <= 1.0E-07
+2020-08-20 01:58:06 PM	Dataset name: Dataset_W_S2_Fr_04_2May17
+2020-08-20 01:58:06 PM	Loaded modifications from: Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ModSummary.txt
+2020-08-20 01:58:06 PM	    Static,   57.021465 on C
+2020-08-20 01:58:06 PM	    Static,   229.162933 on K
+2020-08-20 01:58:06 PM	    Dynamic,  15.994915 on M
+2020-08-20 01:58:06 PM	    Terminus, 229.162933 on <
+2020-08-20 01:58:10 PM	Writing 344 rows to F:\...\MSGFPlus_ITRAQ4plex_m..\Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore.txt
+2020-08-20 01:58:10 PM	Stats by fragmentation ion type:
+2020-08-20 01:58:10 PM	  CID peptides: 0
+2020-08-20 01:58:10 PM	  ETD peptides: 0
+2020-08-20 01:58:10 PM	  HCD peptides: 344
+2020-08-20 01:58:12 PM	AScore Complete
+2020-08-20 01:58:12 PM	Results merged; new file: F:\...\MSGFPlus_ITRAQ4p..\Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt
