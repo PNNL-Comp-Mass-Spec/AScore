@@ -14,6 +14,8 @@ namespace AScore_DLL.Managers.SpectraManagers
     /// </summary>
     public class DtaManager : EventNotifier, ISpectraManager
     {
+        // Ignore Spelling: dta, msxml, msgfdb
+
         public static string GetFilePath(string datasetFilePath, string datasetName)
         {
             var datasetFile = new FileInfo(datasetFilePath);
@@ -118,8 +120,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 if (string.IsNullOrEmpty(m_datasetName))
                     throw new FileNotFoundException("Master Dta filename is empty");
 
-                if (m_datasetName.ToLower().EndsWith("_dta"))
-                    m_datasetName = m_datasetName.Substring(0, m_datasetName.Length - 4);
+                m_datasetName = Utilities.TrimEnd(m_datasetName, "_dta");
 
                 Initialize(filePath);
             }

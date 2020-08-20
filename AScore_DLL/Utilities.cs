@@ -70,6 +70,22 @@ namespace AScore_DLL
         }
 
         /// <summary>
+        /// If value ends with suffixToRemove, remove it; otherwise, return value
+        /// </summary>
+        /// <param name="textToTrim"></param>
+        /// <param name="suffixToRemove"></param>
+        /// <returns></returns>
+        public static string TrimEnd(string value, string suffixToRemove, bool caseSensitiveMatch = true)
+        {
+            if (!value.EndsWith(suffixToRemove, caseSensitiveMatch ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase))
+            {
+                return value;
+            }
+
+            return value.Substring(0, value.Length - suffixToRemove.Length);
+        }
+
+        /// <summary>
         /// Writes a DataTable to text file
         /// </summary>
         /// <param name="dt"></param>
