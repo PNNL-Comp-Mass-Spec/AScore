@@ -432,7 +432,7 @@ namespace AScore_DLL
                 //Get experimental spectra
                 if (spectraFile == null)
                 {
-                    var errorMessage = "spectraFile is uninitialized in RunAScoreOnPreparedData; this indicates a programming bug";
+                    const string errorMessage = "spectraFile is uninitialized in RunAScoreOnPreparedData; this indicates a programming bug";
                     OnErrorEvent(errorMessage);
                     throw new Exception(errorMessage);
                 }

@@ -7,6 +7,8 @@ namespace AScore_DLL.Managers.SpectraManagers
 {
     public class SpectraManagerCache : EventNotifier
     {
+        // Ignore Spelling: psm
+
         private readonly MzMLManager _mzMLManager;
         private readonly DtaManager _dtaManager;
         private ISpectraManager _currentSpectrumManager;
@@ -26,7 +28,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         public bool Initialized => _currentSpectrumManager != null && _currentSpectrumManager.Initialized;
 
         /// <summary>
-        /// Determine the input file path, given psmResutlsFielPath
+        /// Determine the input file path, given psmResultsFilePath
         /// </summary>
         /// <param name="psmResultsFilePath">_fht.txt or _syn.txt file</param>
         /// <param name="datasetName">_dta.txt or .mzML file</param>

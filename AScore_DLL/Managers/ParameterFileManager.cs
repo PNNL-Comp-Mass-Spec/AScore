@@ -311,7 +311,7 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Method to get fragment type from xml
         /// </summary>
-        /// <param name="fragmentTypeNode">xmlnode with fragment type info</param>
+        /// <param name="fragmentTypeNode">XML node with fragment type info</param>
         /// <returns>the type of fragmentation</returns>
         private FragmentType GetFragmentType(XmlNode fragmentTypeNode)
         {
@@ -320,7 +320,7 @@ namespace AScore_DLL.Managers
             {
                 f = FragmentType.CID;
             }
-            else if (Regex.IsMatch(fragmentTypeNode.InnerText,"ETD"))
+            else if (Regex.IsMatch(fragmentTypeNode.InnerText, "ETD"))
             {
                 f = FragmentType.ETD;
             }

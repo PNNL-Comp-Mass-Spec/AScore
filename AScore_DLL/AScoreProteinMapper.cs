@@ -70,7 +70,7 @@ namespace AScore_DLL
         /// Configure the AScore Protein Mapper
         /// </summary>
         /// <param name="aScoreResultsFilePath">Results file from running AScore algorithm</param>
-        /// <param name="fastaFilePath">Path the the desired FASTA file</param>
+        /// <param name="fastaFilePath">Path to the desired FASTA file</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output</param>
         public AScoreProteinMapper(string aScoreResultsFilePath, string fastaFilePath, bool outputDescriptions)
         {
@@ -270,7 +270,6 @@ namespace AScore_DLL
 
                     peptideWriter.WriteLine(cleanSequence);
                 }
-
             }
             mDistinctPeptides = peptides.Count;
         }
@@ -376,7 +375,6 @@ namespace AScore_DLL
                         var newProteinList = new List<ProteinPeptideMapType> { item };
                         mPeptideToProteinMap.Add(item.peptideSequence, newProteinList);
                     }
-
                 }
             }
         }
@@ -421,7 +419,6 @@ namespace AScore_DLL
             using (var aScoreReader = new StreamReader(new FileStream(mAScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             using (var mappedWriter = new StreamWriter(new FileStream(mMappingResultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
-
                 var columnMapAScore = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                 if (aScoreReader.EndOfStream)
@@ -616,7 +613,6 @@ namespace AScore_DLL
                 proteinName
             };
 
-
             // Protein Description - if it contains key-value pairs, use it.
             if (mOutputProteinDescriptions)
             {
@@ -635,7 +631,6 @@ namespace AScore_DLL
             mappedWriter.WriteLine(string.Join("\t", dataToWrite));
         }
 
-
         private void PeptideToProteinMapper_ProgressUpdate(string progressMessage, float percentComplete)
         {
             if (DateTime.UtcNow.Subtract(mLastProgressTime).TotalSeconds < 1)
@@ -645,6 +640,5 @@ namespace AScore_DLL
 
             ConsoleMsgUtils.ShowDebug("Peptide to protein mapper is {0:F1}% complete: {1}", percentComplete, progressMessage);
         }
-
     }
 }

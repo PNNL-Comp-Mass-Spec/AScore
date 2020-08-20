@@ -11,6 +11,8 @@ namespace AScore_DLL
 {
     public class AScoreAlgorithm : EventNotifier
     {
+        // Ignore Spelling: Da, diff, ascore
+
         private const double MASS_C13 = 1.00335483;
 
         private readonly double[] ScoreWeights = { 0.5, 0.75, 1.0, 1.0, 1.0, 1.0, 0.75, 0.5, 0.25, 0.25 };
@@ -21,7 +23,6 @@ namespace AScore_DLL
             int chargeState, string peptideSeq, string front, string back, string sequenceClean, ExperimentalSpectra expSpec,
             double mzMax, double mzMin, IReadOnlyList<int[]> myPositionsList)
         {
-
             // Change the charge state to 2+ if it is 1+
             if (chargeState == 1)
             {
@@ -383,7 +384,7 @@ namespace AScore_DLL
             return tempSpec.Where(mz => FindBinarySearch(mz, tolerance, peakDepthSpectra)).ToList();
 
             //var matchedMZ = new List<double>();
-            //foreach (var mz in tempSpec)
+            //ForEach (var mz in tempSpec)
             //{
             //    // A smart usage of the .Net built-in binary search; still about 7% slower than the previous internally implemented binary search
             //    var searchMz = new ExperimentalSpectraEntry(mz, 0);
@@ -440,7 +441,7 @@ namespace AScore_DLL
                 {
                     if (peaks[mid].Mz <= maxMz)
                     {
-                        // yay! we found it!
+                        // Match found
                         return true;
                     }
 

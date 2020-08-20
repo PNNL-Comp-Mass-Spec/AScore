@@ -209,7 +209,6 @@ namespace AScore_DLL.Managers.SpectraManagers
                             break;
                     }
                 }
-
             }
 
             double precursorMass = 0;

@@ -2,23 +2,37 @@
 {
     public class AScoreResult
     {
-        // AScore value (larger is better)
-        // 0 means unable to localize (too ambiguous due to too many S, T, Y residues)
-        // 19 or higher indicates 99% certainty of the phosphosite localization
-        // 1000 means the peptide only has one phosphosite
-        // -1 means no modified residues
+        // Ignore Spelling: phosphosite
+
+        /// <summary>
+        ///  AScore value (larger is better)
+        /// </summary>
+        /// <remarks>
+        /// 0 means unable to localize (too ambiguous due to too many S, T, Y residues)
+        /// 19 or higher indicates 99% certainty of the phosphosite localization
+        /// 1000 means the peptide only has one phosphosite
+        /// -1 means no modified residues
+        /// </remarks>
         public double AScore { get; set; }
 
-        // Number of b/y ions that could be matched
+        /// <summary>
+        /// Number of b/y ions that could be matched
+        /// </summary>
         public int NumSiteIons { get; set; }
 
-        // Number of b/y ions that were matched
+        /// <summary>
+        /// Number of b/y ions that were matched
+        /// </summary>
         public int SiteDetermineMatched { get; set; }
 
-        // Mod symbol was permuted for this result
+        /// <summary>
+        /// Mod symbol was permuted for this result
+        /// </summary>
         public string ModInfo { get; set; }
 
-        // Mod types and locations
+        /// <summary>
+        /// Mod types and locations
+        /// </summary>
         public int[] PeptideMods;
 
         public string SecondSequence { get; set; }

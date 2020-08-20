@@ -10,8 +10,10 @@ using PRISM;
 
 namespace AScore_Console
 {
-    class Program
+    static class Program
     {
+        // Ignore Spelling: dyn, iodo, phos, yyyy-MM-dd hh:mm:ss tt
+
         static StreamWriter mLogFile;
         static string mLogFilePath = string.Empty;
 
@@ -19,10 +21,9 @@ namespace AScore_Console
         /// Main entry point
         /// </summary>
         /// <param name="args"></param>
-        /// <returns></returns>
+        /// <returns>0 if successful; error code if a problem</returns>
         static int Main(string[] args)
         {
-
 #if (!DISABLE_ROOT_EXCEPTION_HANDLER)
             try
 #endif

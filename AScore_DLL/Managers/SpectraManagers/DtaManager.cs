@@ -179,7 +179,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             // Find the desired spectrum
             // Dictionary keys are the header text for each DTA in the _DTA.txt file, for example:
             // MyDataset.0538.0538.3.dta
-            // Note that scans could have one or more leading zeroes, so we may need to check for that
+            // Note that scans could have one or more leading zeros, so we may need to check for that
 
             var spectraName = GetDtaFileName(scanNumber, scanCount, dtaChargeState);
             if (!dtaEntries.ContainsKey(spectraName))

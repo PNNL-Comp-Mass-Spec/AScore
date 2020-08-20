@@ -5,6 +5,8 @@ namespace AScore_DLL.Managers.DatasetManagers
 {
     public abstract class DatasetManager
     {
+        // Ignore Spelling: ascore
+
         #region "Constants"
 
         public const string RESULTS_COL_JOB = "Job";

@@ -7,6 +7,8 @@ namespace AScore_DLL.Managers.DatasetManagers
 {
     public class MsgfMzid : DatasetManager
     {
+        // Ignore Spelling: hcd, etd, cid, pre
+
         /// <summary>
         /// Default modification symbols
         /// </summary>
@@ -143,7 +145,9 @@ namespace AScore_DLL.Managers.DatasetManagers
                     }
                     else
                     {
-                        symbol = '~'; // TODO: if this is ever hit, then it should be more robust; this could be combatted by adding more symbols to DEFAULT_MODIFICATION_SYMBOLS...
+                        // TODO: if this is ever hit, then it should be more robust
+                        // This could be addressed by adding more symbols to DEFAULT_MODIFICATION_SYMBOLS
+                        symbol = '~';
                     }
 
                     combined = new SearchModificationAndSymbol(mod, symbol);
