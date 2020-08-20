@@ -21,15 +21,9 @@ namespace AScore_DLL
         private const double maxRange = 2000.0;
         private const double minRange = 50.0;
 
-        private bool m_filterOnMSGFScore = true;
-
         #region "Properties"
 
-        public bool FilterOnMSGFScore
-        {
-            get => m_filterOnMSGFScore;
-            set => m_filterOnMSGFScore = value;
-        }
+        public bool FilterOnMSGFScore { get; set; } = true;
 
         #endregion
 
@@ -325,7 +319,7 @@ namespace AScore_DLL
                 string peptideSeq;
                 double msgfScore;
 
-                if (m_filterOnMSGFScore)
+                if (FilterOnMSGFScore)
                     datasetManager.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out msgfScore, ref ascoreParameters);
                 else
                 {
@@ -414,7 +408,7 @@ namespace AScore_DLL
                 }
 
                 var sequenceClean = GetCleanSequence(sequenceWithoutSuffixOrPrefix, ref ascoreParameters);
-                var skipPSM = m_filterOnMSGFScore && msgfScore > ascoreParameters.MSGFPreFilter;
+                var skipPSM = FilterOnMSGFScore && msgfScore > ascoreParameters.MSGFPreFilter;
 
                 var scanChargePeptide = scanNumber + "_" + chargeState + "_" + sequenceWithoutSuffixOrPrefix;
                 if (dctPeptidesProcessed.ContainsKey(scanChargePeptide))
