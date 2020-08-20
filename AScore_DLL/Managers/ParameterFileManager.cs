@@ -24,11 +24,24 @@ namespace AScore_DLL.Managers
 
         #region Public Properties
 
-        public List<Modification> StaticMods { get; private set; }
-        public List<Modification> TerminiMods { get; private set; }
-        public List<DynamicModification> DynamicMods { get; private set; }
+        /// <summary>
+        /// Dynamic modifications
+        /// </summary>
+        public List<DynamicModification> DynamicMods { get; }
 
-        public FragmentType FragmentType { get => fragmentType;
+        /// <summary>
+        /// Static Modifications
+        /// </summary>
+        public List<Modification> StaticMods { get; }
+
+        /// <summary>
+        /// N- and C- Terminus Modifications
+        /// </summary>
+        public List<Modification> TerminiMods { get; }
+
+        public FragmentType FragmentType
+        {
+            get => fragmentType;
             set
             {
                 fragmentType = value;
@@ -59,8 +72,16 @@ namespace AScore_DLL.Managers
 
         #region ParameterFileManager Constructors
 
+        /// <summary>
+        /// Constructor that accepts an AScore parameter file
+        /// </summary>
+        /// <param name="inputFile"></param>
         public ParameterFileManager(string inputFile)
         {
+            DynamicMods = new List<DynamicModification>();
+            StaticMods = new List<Modification>();
+            TerminiMods = new List<Modification>();
+
             ParseXml(inputFile);
 
             if (MultiDissociationParamFile)
@@ -76,12 +97,27 @@ namespace AScore_DLL.Managers
             }
         }
 
-        public ParameterFileManager(List<Modification> stat, List<Modification> term,
-            List<DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
+        /// <summary>
+        /// Constructor that accepts modification information
+        /// </summary>
+        /// <param name="stat"></param>
+        /// <param name="term"></param>
+        /// <param name="dynam"></param>
+        /// <param name="f"></param>
+        /// <param name="tol"></param>
+        /// <param name="msgfnum"></param>
+        public ParameterFileManager(
+            List<Modification> stat,
+            List<Modification> term,
+            List<DynamicModification> dynam,
+            FragmentType f,
+            double tol,
+            double msgfnum)
         {
-            StaticMods = stat;
-            TerminiMods = term;
-            DynamicMods = dynam;
+            DynamicMods = dynam ?? new List<DynamicModification>();
+            StaticMods = stat ?? new List<Modification>();
+            TerminiMods = term ?? new List<Modification>();
+
             fragmentType = f;
             FragmentMassTolerance = tol;
             MSGFPreFilter = msgfnum;
@@ -94,9 +130,12 @@ namespace AScore_DLL.Managers
         public void InitializeAScoreParameters(List<Modification> stat, List<Modification> term,
             List<DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
         {
-            StaticMods = stat;
-            TerminiMods = term;
-            DynamicMods = dynam;
+            ClearMods();
+
+            DynamicMods.AddRange(dynam);
+            StaticMods.AddRange(stat);
+            TerminiMods.AddRange(term);
+
             fragmentType = f;
             FragmentMassTolerance = tol;
             MSGFPreFilter = msgfnum;
@@ -105,9 +144,10 @@ namespace AScore_DLL.Managers
 
         public void InitializeAScoreParameters(List<Modification> stat, FragmentType f, double tol)
         {
-            StaticMods = stat;
-            TerminiMods = new List<Modification>();
-            //      DynamicMods = new List<Mod.DynamicModification>();
+            ClearMods();
+
+            StaticMods.AddRange(stat);
+
             fragmentType = f;
             FragmentMassTolerance = tol;
             MultiDissociationParamFile = false;
@@ -115,9 +155,8 @@ namespace AScore_DLL.Managers
 
         public void InitializeAScoreParameters(FragmentType f, double tol)
         {
-            StaticMods = new List<Modification>();
-            TerminiMods = new List<Modification>();
-            //      DynamicMods = new List<Mod.DynamicModification>();
+            ClearMods();
+
             fragmentType = f;
             FragmentMassTolerance = tol;
             MultiDissociationParamFile = false;
@@ -305,6 +344,17 @@ namespace AScore_DLL.Managers
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Clear the dynamic, static, and termini mod lists
+        /// </summary>
+        private void ClearMods()
+        {
+            StaticMods.Clear();
+            DynamicMods.Clear();
+            TerminiMods.Clear();
+        }
+
         /// <summary>
         /// Method to get fragment type from xml
         /// </summary>
