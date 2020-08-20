@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AScore_DLL.Mod;
+using System;
 using System.Data;
 using System.IO;
 
@@ -112,5 +113,27 @@ namespace AScore_DLL
                 }
             }
         }
+
+        public static string GetModDescription(string type, Modification mod, string prefix = "    ")
+        {
+            var residues = string.Empty;
+            foreach (var res in mod.PossibleModSites)
+            {
+                residues += res;
+            }
+
+            if (mod.cTerminus)
+            {
+                residues += ">";
+            }
+
+            if (mod.nTerminus)
+            {
+                residues += "<";
+            }
+
+            return prefix + type + mod.MassMonoisotopic + " on " + residues;
+        }
+
     }
 }

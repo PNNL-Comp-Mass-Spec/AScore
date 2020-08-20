@@ -39,6 +39,30 @@ namespace AScore_DLL
             var paramManager = new ParameterFileManager(ascoreOptions.AScoreParamFile);
             RegisterEvents(paramManager);
 
+            Console.WriteLine();
+
+            if (paramManager.DynamicMods.Count > 0 || paramManager.StaticMods.Count > 0)
+            {
+                OnStatusEvent("Loaded modifications from: " + ascoreOptions.AScoreParamFile);
+
+                foreach (var mod in paramManager.StaticMods)
+                {
+                    OnStatusEvent(Utilities.GetModDescription("Static,   ", mod));
+                }
+
+                foreach (var mod in paramManager.DynamicMods)
+                {
+                    OnStatusEvent(Utilities.GetModDescription("Dynamic,  ", mod));
+                }
+
+                foreach (var mod in paramManager.TerminiMods)
+                {
+                    OnStatusEvent(Utilities.GetModDescription("Terminus, ", mod));
+                }
+
+                Console.WriteLine();
+            }
+
             DatasetManager datasetManager;
 
             switch (ascoreOptions.SearchType)

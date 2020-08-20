@@ -54,38 +54,20 @@ namespace AScore_DLL.Managers
 
             foreach (var mod in ascoreParams.StaticMods)
             {
-                WriteMod("Static,   ", mod);
+                OnStatusEvent(Utilities.GetModDescription("Static,   ", mod));
             }
 
             foreach (var mod in ascoreParams.DynamicMods)
             {
-                WriteMod("Dynamic,  ", mod);
+                OnStatusEvent(Utilities.GetModDescription("Dynamic,  ", mod));
             }
 
             foreach (var mod in ascoreParams.TerminiMods)
             {
-                WriteMod("Terminus, ", mod);
+                OnStatusEvent(Utilities.GetModDescription("Terminus, ", mod));
             }
 
             return true;
-        }
-
-        private void WriteMod(string type, Modification mod)
-        {
-            var residues = string.Empty;
-            foreach (var res in mod.PossibleModSites)
-            {
-                residues += res;
-            }
-            if (mod.cTerminus)
-            {
-                residues += ">";
-            }
-            if (mod.nTerminus)
-            {
-                residues += "<";
-            }
-            OnStatusEvent("    " + type + mod.MassMonoisotopic + " on " + residues);
         }
 
         public void ReadModSummary(FileInfo modSummaryFile, ParameterFileManager ascoreParams)
