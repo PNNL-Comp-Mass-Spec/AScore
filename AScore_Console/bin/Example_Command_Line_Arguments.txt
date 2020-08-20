@@ -1,0 +1,5 @@
+_mzML
+-T:msgfplus -F:..\..\Data\MSGFPlus_ITRAQ4plex_mzML\Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt                              -D:..\..\Data\MSGFPlus_ITRAQ4plex_mzML\Dataset_W_S2_Fr_04_2May17.mzML   -P:..\..\Data\MSGFPlus_ITRAQ4plex_mzML\AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml -L:..\..\Data\MSGFPlus_ITRAQ4plex_mzML_Out\LogFile.txt -Fasta:..\..\Data\H_sapiens_M_musculus_RefSeq_Excerpt.fasta -O:..\..\Data\MSGFPlus_ITRAQ4plex_mzML_Out
+
+_dta.txt
+-T:msgfplus -F:..\..\Data\MSGFPlus_ITRAQ4plex_CDTA\CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_msgfplus_fht.txt -D:..\..\CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_dta.txt -P:..\..\Data\MSGFPlus_ITRAQ4plex_CDTA\DynMetOx_DynPhos_stat_4plex_iodo_hcd.xml  -L:..\..\Data\MSGFPlus_ITRAQ4plex_CDTA\LogFile.txt -U:CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_msgfplus_fht_WithAScore.txt -Fasta:..\..\Data\H_sapiens_M_musculus_Trypsin_NCBI_Excerpt.fasta -O:..\..\Data\MSGFPlus_ITRAQ4plex_CDTA_Out
