@@ -9,6 +9,8 @@ namespace AScore_DLL.Managers.SpectraManagers
 {
     class MzMLManager : EventNotifier, ISpectraManager
     {
+        // Ignore Spelling: dta
+
         public const double Proton = 1.00727649;
 
         public static string GetFilePath(string datasetFilePath, string datasetName)
@@ -116,6 +118,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 // Don't reopen the same file.
                 return;
             }
+
             if (m_initialized)
                 ClearCachedData();
 
@@ -130,8 +133,8 @@ namespace AScore_DLL.Managers.SpectraManagers
                 if (string.IsNullOrEmpty(m_datasetName))
                     throw new FileNotFoundException("MzML filename is empty");
 
-                if (m_datasetName.ToLower().EndsWith("_dta"))
-                    m_datasetName = m_datasetName.Substring(0, m_datasetName.Length - 4);
+                m_datasetName = Utilities.TrimEnd(m_datasetName, "_FIXED");
+                m_datasetName = Utilities.TrimEnd(m_datasetName, "_dta");
 
                 Initialize(mzMLPath);
             }
@@ -175,7 +178,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             // Find the desired spectrum
             // Dictionary keys are the header text for each DTA in the _DTA.txt file, for example:
             // MyDataset.0538.0538.3.dta
-            // Note that scans could have one or more leading zeroes, so we may need to check for that
+            // Note that scans could have one or more leading zeros, so we may need to check for that
 
             var entries = new List<ExperimentalSpectraEntry>();
 

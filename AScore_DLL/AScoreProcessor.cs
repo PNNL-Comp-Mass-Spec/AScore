@@ -629,11 +629,13 @@ namespace AScore_DLL
             {
                 if (dataFileName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
                 {
-                    return dataFileName.Substring(0, dataFileName.Length - suffix.Length);
+                    var datasetName = dataFileName.Substring(0, dataFileName.Length - suffix.Length);
+                    return Utilities.TrimEnd(datasetName, "_FIXED");
                 }
             }
 
-            return Path.GetFileNameWithoutExtension(dataFileName);
+            var baseFileName = Path.GetFileNameWithoutExtension(dataFileName);
+            return Utilities.TrimEnd(baseFileName, "_FIXED");
         }
 
         #endregion
