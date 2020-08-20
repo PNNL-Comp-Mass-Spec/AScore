@@ -13,6 +13,8 @@ namespace AScore_DLL
     /// </summary>
     public class PHRPResultsMerger : EventNotifier
     {
+        // Ignore Spelling: phrp
+
         protected string m_MergedFilePath = string.Empty;
         protected clsPHRPReader mPHRPReader;
 

@@ -26,7 +26,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         public bool Initialized => _currentSpectrumManager != null && _currentSpectrumManager.Initialized;
 
         /// <summary>
-        ///
+        /// Determine the input file path, given psmResutlsFielPath
         /// </summary>
         /// <param name="psmResultsFilePath">_fht.txt or _syn.txt file</param>
         /// <param name="datasetName">_dta.txt or .mzML file</param>
@@ -104,6 +104,8 @@ namespace AScore_DLL.Managers.SpectraManagers
                 _currentSpectrumManager = _dtaManager;
             }
             _currentSpectrumFilePath = filePath;
+
+            OnStatusEvent("Opening " + PathUtils.CompactPathString(_currentSpectrumFilePath, 80));
             _currentSpectrumManager.OpenFile(filePath);
         }
 

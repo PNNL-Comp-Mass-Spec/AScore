@@ -39,12 +39,16 @@ namespace AScore_DLL.Managers
         }
 
         /// <summary>
-        ///
+        ///LogA ChooseB
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        private static double LogAChooseB(int a, int b) // 10 choose 2 returns 10.9/1.2
+        /// <remarks>
+        /// 215 choose 5 returns LogFactorial(215) - LogFactorial(5) - LogFactorial(215 - 5) =  9.56
+        /// which is 409.666 - 2.079 - 398.02 = 9.56
+        /// </remarks>
+        private static double LogAChooseB(int a, int b) //
         {
             if (a == 0) return 0.0f;
             if (b == 0) return 0.0f;
@@ -66,11 +70,13 @@ namespace AScore_DLL.Managers
             if (mCachedFactorial.TryGetValue(n, out var value))
                 return value;
 
-            //log n! = 0.5log(2.pi) + 0.5logn + nlog(n/e) + log(1 + 1/(12n))
-            value = 0.5 * (
-                Math.Log10(2 * Math.PI * n))
-                + n * (Math.Log10(n / Math.E))
-                + (Math.Log10(1.0 + 1.0 / (12 * n)));
+            // log n! = 0.5*log(2.pi) + 0.5*log(n) + n*log(n/e) + log(1 + 1/(12n))
+            // log n! = 0.5 * log(2 * pi) + 0.5 * log(n) + n * log(n/e) + log(1 + 1/(12 * n))
+            // log n! = 0.5 * log(2 * pi * n)            + n * log(n/e) + log(1 + 1/(12 * n))
+            value =
+                0.5 * Math.Log10(2 * Math.PI * n) +
+                n * Math.Log10(n / Math.E) +
+                Math.Log10(1.0 + 1.0 / (12 * n));
 
             mCachedFactorial.Add(n, value);
 

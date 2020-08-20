@@ -13,6 +13,8 @@ namespace AScore_DLL
 {
     public class AScoreProcessor : EventNotifier
     {
+        // Ignore Spelling: ascore, fht, dta
+
         public const string MOD_INFO_NO_MODIFIED_RESIDUES = "-";
 
         private const double lowRangeMultiplier = 0.28;
@@ -48,20 +50,20 @@ namespace AScore_DLL
             switch (ascoreOptions.SearchType)
             {
                 case SearchMode.XTandem:
-                    OnStatusEvent("Caching data in " + Path.GetFileName(ascoreOptions.DbSearchResultsFile));
+                    OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
                     datasetManager = new XTandemFHT(ascoreOptions.DbSearchResultsFile);
                     break;
                 case SearchMode.Sequest:
-                    OnStatusEvent("Caching data in " + Path.GetFileName(ascoreOptions.DbSearchResultsFile));
+                    OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
                     datasetManager = new SequestFHT(ascoreOptions.DbSearchResultsFile);
                     break;
                 case SearchMode.Inspect:
-                    OnStatusEvent("Caching data in " + Path.GetFileName(ascoreOptions.DbSearchResultsFile));
+                    OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
                     datasetManager = new InspectFHT(ascoreOptions.DbSearchResultsFile);
                     break;
                 case SearchMode.Msgfdb:
                 case SearchMode.Msgfplus:
-                    OnStatusEvent("Caching data in " + Path.GetFileName(ascoreOptions.DbSearchResultsFile));
+                    OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
                     if (ascoreOptions.SearchResultsType == DbSearchResultsType.Mzid)
                     {
                         if (ascoreOptions.CreateUpdatedDbSearchResultsFile)
@@ -119,7 +121,7 @@ namespace AScore_DLL
                 else if (datasetManager is MsgfMzidFull mzidFull)
                 {
                     mzidFull.WriteToMzidFile(ascoreOptions.UpdatedDbSearchResultsFileName);
-                    OnStatusEvent("Results merged; new file: " + Path.GetFileName(ascoreOptions.UpdatedDbSearchResultsFileName));
+                    OnStatusEvent("Results merged; new file: " + PathUtils.CompactPathString(ascoreOptions.UpdatedDbSearchResultsFileName, 80));
                 }
             }
 
@@ -137,7 +139,7 @@ namespace AScore_DLL
 
             resultsMerger.MergeResults(ascoreOptions.DbSearchResultsFile, ascoreOptions.AScoreResultsFilePath, ascoreOptions.UpdatedDbSearchResultsFileName);
 
-            OnStatusEvent("Results merged; new file: " + Path.GetFileName(resultsMerger.MergedFilePath));
+            OnStatusEvent("Results merged; new file: " + PathUtils.CompactPathString(resultsMerger.MergedFilePath, 80));
         }
 
         /// <summary>
@@ -167,6 +169,8 @@ namespace AScore_DLL
                 "Job",
                 "Dataset"
             };
+
+            OnStatusEvent("Reading Job to Dataset Map File: " + PathUtils.CompactPathString(jobToDatasetMapFile, 80));
 
             // Read the contents of JobToDatasetMapFile
             using (var mapFileReader = new StreamReader(new FileStream(jobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
@@ -216,7 +220,7 @@ namespace AScore_DLL
                 }
             }
 
-            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath,false);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath, false);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -352,12 +356,13 @@ namespace AScore_DLL
                     if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out var datasetName))
                     {
                         var errorMessage = "Input file refers to job " + datasetManager.JobNum +
-                                              " but jobToDatasetNameMap does not contain that job; unable to continue";
+                                           " but jobToDatasetNameMap does not contain that job; unable to continue";
                         OnErrorEvent(errorMessage);
                         throw new Exception(errorMessage);
                     }
 
                     datasetName = GetDatasetName(datasetName);
+                    OnStatusEvent("Dataset name: " + datasetName);
 
                     if (!spectraFileOpened)
                     {
@@ -383,6 +388,8 @@ namespace AScore_DLL
                     {
                         modSummaryManager.ReadModSummary(spectraFile.DatasetName, datasetManager.DatasetFilePath, ascoreParameters);
                     }
+
+                    Console.WriteLine();
 
                     Console.Write("\rPercent Completion " + Math.Round((double)datasetManager.CurrentRowNum / totalRows * 100) + "%");
                 }
@@ -486,7 +493,7 @@ namespace AScore_DLL
 
             Console.WriteLine();
 
-            OnStatusEvent(string.Format("Writing {0:N0} rows to {1}", datasetManager.ResultsCount, Path.GetFileName(outputFilePath)));
+            OnStatusEvent(string.Format("Writing {0:N0} rows to {1}", datasetManager.ResultsCount, PathUtils.CompactPathString(outputFilePath, 80)));
             datasetManager.WriteToFile(outputFilePath);
 
             Console.WriteLine();

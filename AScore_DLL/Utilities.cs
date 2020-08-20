@@ -1,12 +1,10 @@
-﻿//Joshua Aldrich
-
-using System;
+﻿using System;
 using System.Data;
 using System.IO;
 
 namespace AScore_DLL
 {
-    class Utilities
+    internal static class Utilities
     {
         /// <summary>
         /// Generates a DataTable with all entries being a string

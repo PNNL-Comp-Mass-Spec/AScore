@@ -8,7 +8,7 @@ namespace AScore_Console
 
     public class AScoreOptions : IAScoreOptions
     {
-        public const string PROGRAM_DATE = "November 14, 2019";
+        public const string PROGRAM_DATE = "August 20, 2020";
 
         [Option("T", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
@@ -210,7 +210,7 @@ namespace AScore_Console
 
             if (SkipExistingResults && File.Exists(AScoreResultsFilePath))
             {
-                messageReporter("Existing results file found; will not re-create");
+                messageReporter("Existing results file found; will not re-create " + PathUtils.CompactPathString(AScoreResultsFilePath, 80));
                 return false;
             }
 

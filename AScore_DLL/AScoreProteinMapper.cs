@@ -11,6 +11,8 @@ namespace AScore_DLL
 {
     class AScoreProteinMapper
     {
+        //Ignore Spelling: ascore
+
         private const string OutputFilenameAddition = "_ProteinMap";
         private const string PeptideFilenameAddition = "_Peptides";
         private const int MaxMissingPeptidesToShow = 30;
