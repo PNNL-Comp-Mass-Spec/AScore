@@ -11,6 +11,8 @@ namespace AScore_DLL.Managers.DatasetManagers
 {
     public class MsgfMzidFull : DatasetManager
     {
+        // Ignore Spelling: hcd, etd, cid, pre, Ident, namespace, unimod, ascore
+
         /// <summary>
         /// Default modification symbols
         /// </summary>
@@ -250,7 +252,9 @@ namespace AScore_DLL.Managers.DatasetManagers
                     }
                     else
                     {
-                        symbol = '~'; // TODO: if this is ever hit, then it should be more robust; this could be combatted by adding more symbols to DEFAULT_MODIFICATION_SYMBOLS...
+                        // TODO: if this is ever hit, then it should be more robust;
+                        // This could be addressed by adding more symbols to DEFAULT_MODIFICATION_SYMBOLS
+                        symbol = '~';
                     }
 
                     combined = new SearchModificationAndSymbol(mod, symbol);
@@ -516,7 +520,7 @@ namespace AScore_DLL.Managers.DatasetManagers
                     Value = pScore.ToString(CultureInfo.InvariantCulture),
                 });
 
-                var ascoreScore = 1000.0;
+                const double ascoreScore = 1000.0;
                 var modSymbol = modInfo.Last();
                 var modIndex = GetModIndexForModSpec(id, modSymbol, 0, out var modLocation);
 
