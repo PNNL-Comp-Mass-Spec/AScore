@@ -54,23 +54,6 @@ namespace AScore_DLL.Managers
 
             var success = ReadModSummary(modSummaryFile, ascoreParams);
 
-            OnStatusEvent("Loaded modifications from: " + modSummaryFile.Name);
-
-            foreach (var mod in ascoreParams.StaticMods)
-            {
-                OnStatusEvent(Utilities.GetModDescription("Static,   ", mod));
-            }
-
-            foreach (var mod in ascoreParams.DynamicMods)
-            {
-                OnStatusEvent(Utilities.GetModDescription("Dynamic,  ", mod));
-            }
-
-            foreach (var mod in ascoreParams.TerminiMods)
-            {
-                OnStatusEvent(Utilities.GetModDescription("Terminus, ", mod));
-            }
-
             return success;
         }
 
@@ -96,8 +79,6 @@ namespace AScore_DLL.Managers
 
             for (var i = 0; i < mods.Rows.Count; i++)
             {
-                var residues = (string)mods.Rows[i][COL_RESIDUE];
-
                 switch ((string)mods.Rows[i][COL_TYPE])
                 {
                     case "T":
@@ -111,6 +92,25 @@ namespace AScore_DLL.Managers
                         break;
                 }
             }
+
+            OnStatusEvent("Loaded modifications from: " + modSummaryFile.Name);
+
+            foreach (var mod in ascoreParams.StaticMods)
+            {
+                OnStatusEvent(Utilities.GetModDescription("Static,   ", mod));
+            }
+
+            foreach (var mod in ascoreParams.DynamicMods)
+            {
+                OnStatusEvent(Utilities.GetModDescription("Dynamic,  ", mod));
+            }
+
+            foreach (var mod in ascoreParams.TerminiMods)
+            {
+                OnStatusEvent(Utilities.GetModDescription("Terminus, ", mod));
+            }
+
+            return true;
         }
 
         private Modification ParseMod(DataTable mods, int row)
