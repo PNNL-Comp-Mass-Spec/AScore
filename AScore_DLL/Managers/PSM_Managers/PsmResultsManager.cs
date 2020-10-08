@@ -34,7 +34,10 @@ namespace AScore_DLL.Managers.DatasetManagers
         protected int mCurrentRow;
         protected int maxSteps;
         public bool AtEnd { get; set; }
+        
         protected string m_jobNum;
+        protected bool m_JobColumnDefined;
+
         protected string mPSMResultsFilePath;
         protected bool m_MSGFSpecProbColumnPresent;
 
@@ -45,6 +48,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// </summary>
         public string PSMResultsFilePath => mPSMResultsFilePath;
 
+        public bool JobColumnDefined => m_JobColumnDefined;
 
         public string JobNum => m_jobNum;
 
@@ -65,9 +69,15 @@ namespace AScore_DLL.Managers.DatasetManagers
                 mDataTable = Utilities.TextFileToDataTableAssignTypeString(psmResultsFilePath);
 
                 if (mDataTable.Columns.Contains(RESULTS_COL_JOB))
-                    m_jobNum = (string) mDataTable.Rows[0][RESULTS_COL_JOB];
+                {
+                    m_jobNum = (string)mDataTable.Rows[0][RESULTS_COL_JOB];
+                    m_JobColumnDefined = true;
+                }
                 else
+                {
                     m_jobNum = "0";
+                    m_JobColumnDefined = false;
+                }
 
                 m_MSGFSpecProbColumnPresent = mDataTable.Columns.Contains("MSGF_SpecProb");
 
@@ -76,6 +86,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             else
             {
                 m_jobNum = "0";
+                m_JobColumnDefined = false;
             }
 
             AtEnd = false;

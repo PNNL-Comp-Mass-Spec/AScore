@@ -11,7 +11,10 @@
             ref AScore_DLL.Managers.ParameterFileManager ascoreParam)
         {
             if (mDataTable.Columns.Contains(RESULTS_COL_JOB))
+            {
                 m_jobNum = (string)mDataTable.Rows[mCurrentRow][RESULTS_COL_JOB];
+                m_JobColumnDefined = true;
+            }
 
             scanNumber = int.Parse((string)mDataTable.Rows[mCurrentRow]["Scan"]);
             scanCount = 1;
