@@ -5,7 +5,7 @@
     /// </summary>
     public class MsgfdbFHT : DatasetManager
     {
-        public MsgfdbFHT(string fhtFileName) : base(fhtFileName) { }
+        public MsgfdbFHT(string fhtOrSynFilePath) : base(fhtOrSynFilePath) { }
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq,
             ref ParameterFileManager ascoreParam)

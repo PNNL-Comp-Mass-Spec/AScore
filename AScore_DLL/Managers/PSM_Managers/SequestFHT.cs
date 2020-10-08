@@ -5,7 +5,7 @@
     /// </summary>
     public class SequestFHT : DatasetManager
     {
-        public SequestFHT(string fhtFileName) : base(fhtFileName) { }
+        public SequestFHT(string fhtOrSynFilePath) : base(fhtOrSynFilePath) { }
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
             out string peptideSeq, ref AScore_DLL.Managers.ParameterFileManager ascoreParam)

@@ -18,7 +18,7 @@ namespace AScore_DLL.Managers
 
         #region Member Variables
 
-        private FragmentType fragmentType;
+        private FragmentType mFragmentType;
 
         #endregion
 
@@ -41,12 +41,12 @@ namespace AScore_DLL.Managers
 
         public FragmentType FragmentType
         {
-            get => fragmentType;
+            get => mFragmentType;
             set
             {
-                fragmentType = value;
+                mFragmentType = value;
 
-                switch (fragmentType)
+                switch (mFragmentType)
                 {
                     case FragmentType.CID:
                         FragmentMassTolerance = FragmentMassToleranceCID;
@@ -60,7 +60,12 @@ namespace AScore_DLL.Managers
                 }
             }
         }
+
         public double FragmentMassTolerance { get; private set; }
+
+        /// <summary>
+        /// MSGF SpecProb filter
+        /// </summary>
         public double MSGFPreFilter { get; private set; }
 
         public bool MultiDissociationParamFile { get; private set; }
@@ -75,14 +80,14 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Constructor that accepts an AScore parameter file
         /// </summary>
-        /// <param name="inputFile"></param>
-        public ParameterFileManager(string inputFile)
+        /// <param name="ascoreParameterFilePath"></param>
+        public ParameterFileManager(string ascoreParameterFilePath)
         {
             DynamicMods = new List<DynamicModification>();
             StaticMods = new List<Modification>();
             TerminiMods = new List<Modification>();
 
-            ParseXml(inputFile);
+            ParseXml(ascoreParameterFilePath);
 
             if (MultiDissociationParamFile)
             {
@@ -100,65 +105,70 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Constructor that accepts modification information
         /// </summary>
-        /// <param name="stat"></param>
-        /// <param name="term"></param>
-        /// <param name="dynam"></param>
-        /// <param name="f"></param>
-        /// <param name="tol"></param>
-        /// <param name="msgfnum"></param>
+        /// <param name="staticMods"></param>
+        /// <param name="terminiMods"></param>
+        /// <param name="dynamicMods"></param>
+        /// <param name="fragmentType"></param>
+        /// <param name="fragmentMassTolerance"></param>
+        /// <param name="msgfSpecProbFilter"></param>
         public ParameterFileManager(
-            List<Modification> stat,
-            List<Modification> term,
-            List<DynamicModification> dynam,
-            FragmentType f,
-            double tol,
-            double msgfnum)
+            List<Modification> staticMods,
+            List<Modification> terminiMods,
+            List<DynamicModification> dynamicMods,
+            FragmentType fragmentType,
+            double fragmentMassTolerance,
+            double msgfSpecProbFilter)
         {
-            DynamicMods = dynam ?? new List<DynamicModification>();
-            StaticMods = stat ?? new List<Modification>();
-            TerminiMods = term ?? new List<Modification>();
+            DynamicMods = dynamicMods ?? new List<DynamicModification>();
+            StaticMods = staticMods ?? new List<Modification>();
+            TerminiMods = terminiMods ?? new List<Modification>();
 
-            fragmentType = f;
-            FragmentMassTolerance = tol;
-            MSGFPreFilter = msgfnum;
+            mFragmentType = fragmentType;
+            FragmentMassTolerance = fragmentMassTolerance;
+            MSGFPreFilter = msgfSpecProbFilter;
             MultiDissociationParamFile = false;
         }
         #endregion
 
         #region Initializers
 
-        public void InitializeAScoreParameters(List<Modification> stat, List<Modification> term,
-            List<DynamicModification> dynam, FragmentType f, double tol, double msgfnum)
+        public void InitializeAScoreParameters(
+            List<Modification> staticModDefs,
+            List<Modification> terminalModDefs,
+            List<DynamicModification> dynamicModDefs,
+            FragmentType fragmentationMode,
+            double massTolerance,
+            double msgfSpecProbFilterThreshold)
         {
             ClearMods();
 
-            DynamicMods.AddRange(dynam);
-            StaticMods.AddRange(stat);
-            TerminiMods.AddRange(term);
+            DynamicMods.AddRange(dynamicModDefs);
+            StaticMods.AddRange(staticModDefs);
+            TerminiMods.AddRange(terminalModDefs);
 
-            fragmentType = f;
-            FragmentMassTolerance = tol;
-            MSGFPreFilter = msgfnum;
+            mFragmentType = fragmentationMode;
+            FragmentMassTolerance = massTolerance;
+            MSGFPreFilter = msgfSpecProbFilterThreshold;
             MultiDissociationParamFile = false;
         }
 
-        public void InitializeAScoreParameters(List<Modification> stat, FragmentType f, double tol)
+        public void InitializeAScoreParameters(List<Modification> staticModDefs, FragmentType fragmentationMode, double massTolerance)
         {
             ClearMods();
 
-            StaticMods.AddRange(stat);
+            StaticMods.AddRange(staticModDefs);
 
-            fragmentType = f;
-            FragmentMassTolerance = tol;
+            mFragmentType = fragmentationMode;
+            FragmentMassTolerance = massTolerance;
             MultiDissociationParamFile = false;
         }
 
-        public void InitializeAScoreParameters(FragmentType f, double tol)
+        public void InitializeAScoreParameters(FragmentType fragmentationMode, double massTolerance)
         {
             ClearMods();
 
-            fragmentType = f;
-            FragmentMassTolerance = tol;
+            mFragmentType = fragmentationMode;
+            FragmentMassTolerance = massTolerance;
             MultiDissociationParamFile = false;
         }
 
@@ -172,40 +182,58 @@ namespace AScore_DLL.Managers
         ///
         public ParameterFileManager Copy()
         {
-            return new ParameterFileManager(new List<Modification>(StaticMods), new List<Modification>(TerminiMods),
-                new List<DynamicModification>(DynamicMods), fragmentType, FragmentMassTolerance, MSGFPreFilter);
+            return new ParameterFileManager(
+                new List<Modification>(StaticMods),
+                new List<Modification>(TerminiMods),
+                new List<DynamicModification>(DynamicMods),
+                mFragmentType,
+                FragmentMassTolerance,
+                MSGFPreFilter);
         }
 
         /// <summary>
         /// Parses the parameter file for ascore
+        /// This parameter file defines mass tolerances by fragmentation type
         /// </summary>
-        /// <param name="inputFile">name of the xml file</param>
+        /// <param name="ascoreParameterFilePath">Path to the xml file</param>
         /// <returns>ascore parameters object</returns>
-        public void ParseXml(string inputFile)
+        /// <remarks>
+        /// The legacy version of the AScore parameter file has elements "FragmentType" and "MassTolerance" in the "Run" block
+        /// The newer version of the AScore parameter file has elements "CIDMassTolerance", "ETDMassTolerance", and "HCDMassTolerance" in the "Run" block
+        /// </remarks>
+        public void ParseXml(string ascoreParameterFilePath)
         {
             var parameterFile = new XmlDocument();
-            parameterFile.Load(new XmlTextReader(inputFile));
+            parameterFile.Load(new XmlTextReader(ascoreParameterFilePath));
 
+            // First look for legacy element names
             var massToleranceNode = parameterFile.SelectSingleNode("/Run/MassTolerance");
             var fragmentTypeNode = parameterFile.SelectSingleNode("/Run/FragmentType");
+
+            // Both legacy and current AScore parameter files should have a MSGFPreFilter element
             var msgfFilterNode = parameterFile.SelectSingleNode("/Run/MSGFPreFilter");
             if (msgfFilterNode == null)
-                throw new ArgumentOutOfRangeException("The MSGFPreFilter node was not found in XML file " + inputFile);
+                throw new ArgumentOutOfRangeException("The MSGFPreFilter node was not found in XML file " + ascoreParameterFilePath);
 
+            // Now look for newer element names
             var massTolCID = parameterFile.SelectSingleNode("/Run/CIDMassTolerance");
             var massTolETD = parameterFile.SelectSingleNode("/Run/ETDMassTolerance");
             var massTolHCD = parameterFile.SelectSingleNode("/Run/HCDMassTolerance");
 
             if ((fragmentTypeNode == null || massToleranceNode == null) && (massTolCID == null || massTolETD == null || massTolHCD == null))
-                throw new ArgumentOutOfRangeException("The FragmentType and/or MassTolerance nodes were not found in XML file " + inputFile + ", and alternate parameters were not present");
+            {
+                throw new Exception(string.Format(
+                    "The FragmentType and/or MassTolerance nodes were not found in XML file {0}, and alternate parameters were not present",
+                    ascoreParameterFilePath));
+            }
 
-            var f = FragmentType.CID;
-            double massTol;
+            var fragmentationMode = FragmentType.CID;
+            double massTolerance;
             var multiDissociationParams = false;
             if (fragmentTypeNode != null && massToleranceNode != null)
             {
-                f = GetFragmentType(fragmentTypeNode);
-                massTol = double.Parse(massToleranceNode.InnerText);
+                fragmentationMode = GetFragmentType(fragmentTypeNode);
+                massTolerance = double.Parse(massToleranceNode.InnerText);
                 MultiDissociationParamFile = false;
             }
             else
@@ -215,10 +243,10 @@ namespace AScore_DLL.Managers
                 FragmentMassToleranceHCD = double.Parse(massTolHCD.InnerText);
                 MultiDissociationParamFile = true;
                 multiDissociationParams = true;
-                massTol = FragmentMassToleranceCID;
+                massTolerance = FragmentMassToleranceCID;
             }
 
-            var msgfTol = double.Parse(msgfFilterNode.InnerText);
+            var msgfSpecProbFilterThreshold = double.Parse(msgfFilterNode.InnerText);
 
             var uniqueID = 1;
 
@@ -231,7 +259,7 @@ namespace AScore_DLL.Managers
             // Parse the dynamic mods
             var dynamicModDefs = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
 
-            InitializeAScoreParameters(staticModDefs, terminalModDefs, dynamicModDefs, f, massTol, msgfTol);
+            InitializeAScoreParameters(staticModDefs, terminalModDefs, dynamicModDefs, fragmentationMode, massTolerance, msgfSpecProbFilterThreshold);
             MultiDissociationParamFile = multiDissociationParams;
         }
 
@@ -363,6 +391,7 @@ namespace AScore_DLL.Managers
         private FragmentType GetFragmentType(XmlNode fragmentTypeNode)
         {
             var f = FragmentType.CID;
+
             if (Regex.IsMatch(fragmentTypeNode.InnerText, "CID"))
             {
                 f = FragmentType.CID;

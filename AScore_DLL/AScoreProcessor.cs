@@ -628,7 +628,12 @@ namespace AScore_DLL
             OnStatusEvent(string.Format("{0} peptides: {1:N0}", fragTypeText, statsByType[(int)fragmentType]));
         }
 
-        private string GetDatasetName(string dataFilepath)
+        /// <summary>
+        /// Get the dataset name from the data file path or dataset name
+        /// </summary>
+        /// <param name="filePathOrDatasetName"></param>
+        /// <returns></returns>
+        private string GetDatasetName(string filePathOrDatasetName)
         {
             var suffixes = new List<string> {
                 "_dta.txt",
@@ -637,7 +642,7 @@ namespace AScore_DLL
                 ".mzML",
                 ".mzXML"};
 
-            var dataFileName = Path.GetFileName(dataFilepath);
+            var dataFileName = Path.GetFileName(filePathOrDatasetName);
             if (dataFileName == null)
             {
                 throw new Exception("Unable to determine the file name of the data file path in GetDatasetName");

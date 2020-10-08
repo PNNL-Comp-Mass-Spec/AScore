@@ -23,16 +23,16 @@ namespace AScore_DLL.Managers
         /// Look for the mod summary file for the given PSM results file
         /// </summary>
         /// <param name="datasetName"></param>
-        /// <param name="datasetFilePath"></param>
+        /// <param name="psmResultsFilePath"></param>
         /// <param name="ascoreParams"></param>
         /// <returns>True if a mod summary file is found and successfully processed, otherwise false</returns>
         public bool ReadModSummary(
             string datasetName,
-            string datasetFilePath,
+            string psmResultsFilePath,
             ParameterFileManager ascoreParams)
         {
-            var fiDataFile = new FileInfo(datasetFilePath);
-            var workingDirectory = fiDataFile.Directory;
+            var psmResultsFile = new FileInfo(psmResultsFilePath);
+            var workingDirectory = psmResultsFile.Directory;
             if (workingDirectory == null)
                 return false;
 
@@ -52,7 +52,7 @@ namespace AScore_DLL.Managers
 
             var modSummaryFile = modSummaryFiles.First();
 
-            ReadModSummary(modSummaryFile, ascoreParams);
+            var success = ReadModSummary(modSummaryFile, ascoreParams);
 
             OnStatusEvent("Loaded modifications from: " + modSummaryFile.Name);
 
@@ -71,7 +71,7 @@ namespace AScore_DLL.Managers
                 OnStatusEvent(Utilities.GetModDescription("Terminus, ", mod));
             }
 
-            return true;
+            return success;
         }
 
         /// <summary>
@@ -82,17 +82,18 @@ namespace AScore_DLL.Managers
         /// <returns>True if the mod summary file exists, otherwise false</returns>
         public bool ReadModSummary(FileInfo modSummaryFile, ParameterFileManager ascoreParams)
         {
-            if (modSummaryFile == null || !modSummaryFile.Exists)
+            if (!modSummaryFile.Exists)
             {
-                // No file, so do nothing.
-                return;
+                OnWarningEvent("File not found: " + modSummaryFile.FullName);
+                return false;
             }
 
             ascoreParams.DynamicMods.Clear();
             ascoreParams.StaticMods.Clear();
             ascoreParams.TerminiMods.Clear();
 
-            var mods = Utilities.TextFileToDataTableAssignTypeString(modSummaryFile.FullName, false);
+            var mods = Utilities.TextFileToDataTableAssignTypeString(modSummaryFile.FullName);
+
             for (var i = 0; i < mods.Rows.Count; i++)
             {
                 var residues = (string)mods.Rows[i][COL_RESIDUE];

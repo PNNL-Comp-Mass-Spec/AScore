@@ -5,7 +5,7 @@
     /// </summary>
     public class XTandemFHT : DatasetManager
     {
-        public XTandemFHT(string fhtFileName) : base(fhtFileName) { }
+        public XTandemFHT(string fhtOrSynFilePath) : base(fhtOrSynFilePath) { }
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq,
             ref AScore_DLL.Managers.ParameterFileManager ascoreParam)

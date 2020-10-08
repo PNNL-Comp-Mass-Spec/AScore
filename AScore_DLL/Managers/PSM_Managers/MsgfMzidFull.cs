@@ -23,11 +23,11 @@ namespace AScore_DLL.Managers.DatasetManagers
 
         private readonly IdentDataObj identData;
 
-        public MsgfMzidFull(string mzidFileName) : base(mzidFileName, false)
+        public MsgfMzidFull(string mzidFilePath) : base(mzidFilePath, false)
         {
             // load mzid file;
             // obviously won't have a 'Job' number available
-            identData = IdentDataReaderWriter.Read(mzidFileName);
+            identData = IdentDataReaderWriter.Read(mzidFilePath);
             identData.Version = "1.2"; // Instruct the output to use MzIdentML 1.2 schema and namespace
             var ascoreSoftware = new AnalysisSoftwareObj()
                 {

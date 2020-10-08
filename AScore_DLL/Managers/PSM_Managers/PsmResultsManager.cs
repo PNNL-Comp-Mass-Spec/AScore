@@ -35,12 +35,16 @@ namespace AScore_DLL.Managers.DatasetManagers
         protected int maxSteps;
         public bool AtEnd { get; set; }
         protected string m_jobNum;
-        protected string mDatasetFilePath;
+        protected string mPSMResultsFilePath;
         protected bool m_MSGFSpecProbColumnPresent;
 
         #region "Properties"
 
-        public string DatasetFilePath => mDatasetFilePath;
+        /// <summary>
+        /// Path to the PSM results file
+        /// </summary>
+        public string PSMResultsFilePath => mPSMResultsFilePath;
+
 
         public string JobNum => m_jobNum;
 
@@ -51,14 +55,14 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="fhtFileName"></param>
-        /// <param name="isFht"></param>
-        protected DatasetManager(string fhtFileName, bool isFht = true)
+        /// <param name="psmResultsFilePath">_fht.txt, _syn.txt, or .mzid file</param>
+        /// <param name="isFhtOrSyn">True if a _fht.txt or _syn.txt file</param>
+        protected DatasetManager(string psmResultsFilePath, bool isFhtOrSyn = true)
         {
-            mDatasetFilePath = fhtFileName;
-            if (isFht)
+            mPSMResultsFilePath = psmResultsFilePath;
+            if (isFhtOrSyn)
             {
-                mDataTable = Utilities.TextFileToDataTableAssignTypeString(fhtFileName, false);
+                mDataTable = Utilities.TextFileToDataTableAssignTypeString(psmResultsFilePath);
 
                 if (mDataTable.Columns.Contains(RESULTS_COL_JOB))
                     m_jobNum = (string) mDataTable.Rows[0][RESULTS_COL_JOB];

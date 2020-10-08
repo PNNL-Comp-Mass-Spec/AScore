@@ -33,7 +33,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// <param name="psmResultsFilePath">_fht.txt or _syn.txt file</param>
         /// <param name="datasetName">Dataset name</param>
         /// <returns></returns>
-        public string GetFilePath(string psmResultsFilePath, string datasetName)
+        public string GetSpectrumFilePath(string psmResultsFilePath, string datasetName)
         {
             var psmResultsFile = new FileInfo(psmResultsFilePath);
 
@@ -84,7 +84,8 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// <returns></returns>
         public ISpectraManager GetSpectraManagerForFile(string psmResultsFilePath, string datasetName)
         {
-            var spectrumFilePath = GetFilePath(psmResultsFilePath, datasetName);
+            var spectrumFilePath = GetSpectrumFilePath(psmResultsFilePath, datasetName);
+
             if (string.IsNullOrWhiteSpace(spectrumFilePath))
             {
                 var errorMessage = "Could not find spectra file for dataset \"" + datasetName + "\" in path \"" + Path.GetDirectoryName(psmResultsFilePath) + "\"";

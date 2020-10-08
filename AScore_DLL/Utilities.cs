@@ -10,14 +10,13 @@ namespace AScore_DLL
         /// <summary>
         /// Generates a DataTable with all entries being a string
         /// </summary>
-        /// <param name="fileName">input file name</param>
-        /// <param name="addDataSetName">whether to add the dataset name as a column</param>
+        /// <param name="psmResultsFilePath">PSM results file path</param>
         /// <returns></returns>
-        public static DataTable TextFileToDataTableAssignTypeString(string fileName, bool addDataSetName)
+        public static DataTable TextFileToDataTableAssignTypeString(string psmResultsFilePath)
         {
             var dt = new DataTable();
 
-            using (var reader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (var reader = new StreamReader(new FileStream(psmResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 // first line has headers
                 if (!reader.EndOfStream)
@@ -29,7 +28,7 @@ namespace AScore_DLL
                         // it's empty, that's an error
                         throw new ApplicationException(string.Format(
                                                            "The data provided in {0} is not in a valid format (empty header line found by {1})",
-                                                           fileName, "TextFileToDataTableAssignTypeString"));
+                                                           psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
                     }
 
                     var headers = headerLine.Split('\t', ',');
@@ -44,7 +43,7 @@ namespace AScore_DLL
                     // it's empty, that's an error
                     throw new ApplicationException(string.Format(
                                                        "The data provided in {0} is not in a valid format (empty data file found by {1})",
-                                                       fileName, "TextFileToDataTableAssignTypeString"));
+                                                       psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
                 }
 
                 // fill the rest of the table; positional
@@ -73,8 +72,9 @@ namespace AScore_DLL
         /// <summary>
         /// If value ends with suffixToRemove, remove it; otherwise, return value
         /// </summary>
-        /// <param name="textToTrim"></param>
+        /// <param name="value"></param>
         /// <param name="suffixToRemove"></param>
+        /// <param name="caseSensitiveMatch"></param>
         /// <returns></returns>
         public static string TrimEnd(string value, string suffixToRemove, bool caseSensitiveMatch = true)
         {
