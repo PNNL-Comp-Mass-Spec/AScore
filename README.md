@@ -39,7 +39,7 @@ Use [Mage File Processor](https://github.com/PNNL-Comp-Mass-Spec/Mage) to retrie
 * Search datasets by dataset ID: 340332, 340360, 340380, 340369, 340366, 340356, 340336, 340354, 340359, 340371, 340372, 340363
   * Find *_dta.zip
 * Search jobs by dataset ID: 340332, 340360, 340380, 340369, 340366, 340356, 340336, 340354, 340359, 340371, 340372, 340363
-  * Find *_ModSummary.txt  (just need one of them)
+  * Find *_ModSummary.txt (just need one of them)
 
 ## Retrieve PHRP data files (no filter)
 
@@ -87,41 +87,50 @@ Results files will be the input file, but with `_AScore.txt` in the filename, fo
 AScore_Console.exe is a console application, and must be run from the Windows command prompt.
 
 ```
- -T:search_engine
- -F:fht_file_path
- -D:spectra_file_path
- -JM:job_to_dataset_mapfile_path
- -P:parameter_file_path
- -O:output_folder_path
- -L:log_file_path
+ -T:SearchEngineType
+ -F:FhtFilePath
+ -D:SpectrumFilePath
+ -JM:JobToDatasetMapFilePath
+ -MS:ModSummaryFilePath
+ -P:AScoreParameterFilePath
+ -O:OutputDirectoryPath
+ -L:LogFilePath
  -noFM
- -U:updated_fht_file_name
+ -U:UpdatedFhtFileName
  -Skip
- -Fasta:Fasta_file_path
+ -Fasta:FastaFilePath
  -PD
 ```
 
-Use -T to specify the search engine type, for example -T:msgfplus\
-Allowed values for search_engine are: sequest, xtandem, inspect, msgfdb, or msgfplus
+Use -T to specify the search engine type, for example -T:msgfplus
+* Allowed values for search_engine are: sequest, xtandem, inspect, msgfdb, or msgfplus
 
-Use -F to specify the input file (in first hits file / synopsis file format).
+Use -F to specify the input file: first hits file (_fht.txt), synopsis file (_syn.txt), .mzid, or .mzid.gz
 * See [Peptide Hit Results Processor (PHRP)](https://github.com/PNNL-Comp-Mass-Spec/PHRP)
 * Example synopsis file: [QC_Shew_13_05b_HCD_500ng_24Mar14_Tiger_14-03-04_msgfplus_syn.txt](https://raw.githubusercontent.com/PNNL-Comp-Mass-Spec/PHRP/master/Data/MSGFPlus_Example/QC_Shew_13_05b_HCD_500ng_24Mar14_Tiger_14-03-04_msgfplus_syn.txt)
+* This file can optionally include results from multiple datasets
+  * In this case, the header for the first column must be Job
+  * Then, the first column of each row should be the job number for that row's PSM
+  
+Use -D to specify the file with spectra data. 
+* This can be a concatenated DTA file (_dta.txt), a .mzML file, or a .mzML.gz file
 
-Use -D to specify the file with spectra data.  This can be a concatenated DTA file (_dta.txt) or a .mzML file.
-
-If the first hits files specified by -F includes job numbers in the first column, use -JM to specify a job to dataset map file.
-When using -JM, do not use -D.  Columns in the job to dataset map file are Job and Dataset (tab-separated).
+If the first hits file specified by -F includes job numbers in the first column, use -JM to specify a job to dataset map file.
+* When using -JM, do not use -D
+* Columns in the job to dataset map file are Job and Dataset (tab-separated)
+  * List the Dataset name in the second column
 
 Use -P for the AScore parameter file
+* Example file: [AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml](https://github.com/PNNL-Comp-Mass-Spec/AScore/blob/master/AScore_Console/Parameter_Files/AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml)
 
-Optionally use -O to specify the output folder
+Optionally use -O to specify the output directory
 
 Optionally use -L to create a log file
 
-Use -noFM to disable filtering on data in column MSGF_SpecProb. By default, data is filtered
-using the MSGFPreFilter score specified in the AScore parameter file.  For example, to filter on MSGF SpecProb 1E-12 use:
-* `<MSGFPreFilter>1E-12</MSGFPreFilter>`
+Use -noFM to disable filtering on data in column MSGF_SpecProb.
+* By default, data is filtered using the MSGFPreFilter score specified in the AScore parameter file
+* For example, to filter on MSGF SpecProb 1E-12 use:
+  * `<MSGFPreFilter>1E-12</MSGFPreFilter>`
 
 Use -U to create an updated version of the input file, but with AScore columns appended to each row
 
@@ -129,7 +138,7 @@ Use -Skip to not re-run AScore if an existing results file already exists
 
 Optionally use -Fasta to add Protein Data from Fasta_file to the output
 
-When using -fasta, use -PD to include Protein Descriptions in the output
+When using -Fasta, use -PD to include Protein Descriptions in the output
 
 ## Example command line #1
 ```
