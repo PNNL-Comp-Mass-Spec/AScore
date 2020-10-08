@@ -203,22 +203,22 @@ namespace AScore_DLL.Managers
         /// </remarks>
         public void ParseXml(string ascoreParameterFilePath)
         {
-            var parameterFile = new XmlDocument();
-            parameterFile.Load(new XmlTextReader(ascoreParameterFilePath));
+            var xmlNodes = new XmlDocument();
+            xmlNodes.Load(new XmlTextReader(ascoreParameterFilePath));
 
             // First look for legacy element names
-            var massToleranceNode = parameterFile.SelectSingleNode("/Run/MassTolerance");
-            var fragmentTypeNode = parameterFile.SelectSingleNode("/Run/FragmentType");
+            var massToleranceNode = xmlNodes.SelectSingleNode("/Run/MassTolerance");
+            var fragmentTypeNode = xmlNodes.SelectSingleNode("/Run/FragmentType");
 
             // Both legacy and current AScore parameter files should have a MSGFPreFilter element
-            var msgfFilterNode = parameterFile.SelectSingleNode("/Run/MSGFPreFilter");
+            var msgfFilterNode = xmlNodes.SelectSingleNode("/Run/MSGFPreFilter");
             if (msgfFilterNode == null)
                 throw new ArgumentOutOfRangeException("The MSGFPreFilter node was not found in XML file " + ascoreParameterFilePath);
 
             // Now look for newer element names
-            var massTolCID = parameterFile.SelectSingleNode("/Run/CIDMassTolerance");
-            var massTolETD = parameterFile.SelectSingleNode("/Run/ETDMassTolerance");
-            var massTolHCD = parameterFile.SelectSingleNode("/Run/HCDMassTolerance");
+            var massTolCID = xmlNodes.SelectSingleNode("/Run/CIDMassTolerance");
+            var massTolETD = xmlNodes.SelectSingleNode("/Run/ETDMassTolerance");
+            var massTolHCD = xmlNodes.SelectSingleNode("/Run/HCDMassTolerance");
 
             if ((fragmentTypeNode == null || massToleranceNode == null) && (massTolCID == null || massTolETD == null || massTolHCD == null))
             {
@@ -251,23 +251,23 @@ namespace AScore_DLL.Managers
             var uniqueID = 1;
 
             // Parse the static mods
-            var staticModDefs = ParseXmlModInfo(parameterFile, "StaticSeqModifications", ref uniqueID, requireModSites: true);
+            var staticModDefs = ParseXmlModInfo(ascoreParameterFilePath, xmlNodes, "StaticSeqModifications", ref uniqueID, requireModSites: true);
 
             // Parse the N and C terminal mods
-            var terminalModDefs = ParseXmlModInfo(parameterFile, "TerminiModifications", ref uniqueID, requireModSites: false);
+            var terminalModDefs = ParseXmlModInfo(ascoreParameterFilePath, xmlNodes, "TerminiModifications", ref uniqueID, requireModSites: false);
 
             // Parse the dynamic mods
-            var dynamicModDefs = ParseXmlDynamicModInfo(parameterFile, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
+            var dynamicModDefs = ParseXmlDynamicModInfo(ascoreParameterFilePath, xmlNodes, "DynamicModifications", ref uniqueID, requireModSites: true, requireModSymbol: true);
 
             InitializeAScoreParameters(staticModDefs, terminalModDefs, dynamicModDefs, fragmentationMode, massTolerance, msgfSpecProbFilterThreshold);
             MultiDissociationParamFile = multiDissociationParams;
         }
 
-        private List<Modification> ParseXmlModInfo(XmlNode parameterFile, string sectionName, ref int uniqueID, bool requireModSites)
+        private List<Modification> ParseXmlModInfo(string ascoreParameterFilePath, XmlNode xmlNodes, string sectionName, ref int uniqueID, bool requireModSites)
         {
             var modList = new List<Modification>();
 
-            var modsToStore = ParseXmlDynamicModInfo(parameterFile, sectionName, ref uniqueID, requireModSites: requireModSites, requireModSymbol: false);
+            var modsToStore = ParseXmlDynamicModInfo(ascoreParameterFilePath, xmlNodes, sectionName, ref uniqueID, requireModSites: requireModSites, requireModSymbol: false);
 
             foreach (var item in modsToStore)
             {
@@ -278,12 +278,16 @@ namespace AScore_DLL.Managers
             return modList;
         }
 
-        private List<DynamicModification> ParseXmlDynamicModInfo(XmlNode parameterFile, string sectionName, ref int uniqueID, bool requireModSites, bool requireModSymbol)
+        private List<DynamicModification> ParseXmlDynamicModInfo(
+            string ascoreParameterFilePath,
+            XmlNode xmlNodes, string sectionName, ref int uniqueID, bool requireModSites, bool requireModSymbol)
         {
             var modList = new List<DynamicModification>();
             var modNumberInSection = 0;
 
-            var xmlModInfo = parameterFile.SelectNodes("/Run/Modifications/" + sectionName);
+            var xpath = "/Run/Modifications/" + sectionName;
+            var xmlModInfo = xmlNodes.SelectNodes(xpath);
+
 
             foreach (XmlNode mod in xmlModInfo)
             {

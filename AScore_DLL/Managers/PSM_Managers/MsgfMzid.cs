@@ -3,12 +3,12 @@ using System.Linq;
 using AScore_DLL.Mod;
 using PSI_Interface.IdentData;
 
-namespace AScore_DLL.Managers.DatasetManagers
+namespace AScore_DLL.Managers.PSM_Managers
 {
     /// <summary>
     /// Track PSM results from a .mzid file
     /// </summary>
-    public class MsgfMzid : DatasetManager
+    public class MsgfMzid : PsmResultsManager
     {
         // Ignore Spelling: hcd, etd, cid, pre
 
@@ -183,7 +183,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             {
                 var isCTerm = mod.Key > sequence.Length;
                 var isNTerm = mod.Key == 0;
-                var residue = ' ';
+                char residue;
                 if (isNTerm)
                 {
                     residue = sequenceOrig[0];
@@ -253,12 +253,12 @@ namespace AScore_DLL.Managers.DatasetManagers
             return data.Count;
         }
 
-        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, ref ParameterFileManager ascoreParam)
+        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, ref ParameterFileManager ascoreParams)
         {
-            GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out _, ref ascoreParam);
+            GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out _, ref ascoreParams);
         }
 
-        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam)
+        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParams)
         {
             var id = data[mCurrentRow];
             scanNumber = id.ScanNum;
@@ -272,22 +272,22 @@ namespace AScore_DLL.Managers.DatasetManagers
                 switch (fragType.ToLower())
                 {
                     case "hcd":
-                        ascoreParam.FragmentType = FragmentType.HCD;
+                        ascoreParams.FragmentType = FragmentType.HCD;
                         break;
                     case "etd":
-                        ascoreParam.FragmentType = FragmentType.ETD;
+                        ascoreParams.FragmentType = FragmentType.ETD;
                         break;
                     case "cid":
-                        ascoreParam.FragmentType = FragmentType.CID;
+                        ascoreParams.FragmentType = FragmentType.CID;
                         break;
                     default:
-                        ascoreParam.FragmentType = FragmentType.Unspecified;
+                        ascoreParams.FragmentType = FragmentType.Unspecified;
                         break;
                 }
             }
             else
             {
-                ascoreParam.FragmentType = FragmentType.Unspecified;
+                ascoreParams.FragmentType = FragmentType.Unspecified;
             }
         }
     }

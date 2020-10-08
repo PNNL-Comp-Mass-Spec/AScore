@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AScore_DLL.Managers.DatasetManagers;
+using AScore_DLL.Managers.PSM_Managers;
 using PHRPReader;
 using PRISM;
 
@@ -56,45 +56,45 @@ namespace AScore_DLL
         {
             try
             {
-                var fiInputFile = new FileInfo(phrpDataFilePath);
-                if (!fiInputFile.Exists)
+                var phrpDataFile = new FileInfo(phrpDataFilePath);
+                if (!phrpDataFile.Exists)
                 {
-                    OnErrorEvent("PHRP Data File not found: " + fiInputFile.FullName);
+                    OnErrorEvent("PHRP Data File not found: " + phrpDataFile.FullName);
                     return false;
                 }
 
-                var fiAScoreResultsFile = new FileInfo(ascoreResultsFilePath);
-                if (!fiAScoreResultsFile.Exists)
+                var ascoreResultsFile = new FileInfo(ascoreResultsFilePath);
+                if (!ascoreResultsFile.Exists)
                 {
-                    OnErrorEvent("AScore results file not found: " + fiAScoreResultsFile.FullName);
+                    OnErrorEvent("AScore results file not found: " + ascoreResultsFile.FullName);
                     return false;
                 }
 
                 // Initialize the PHRPReader
-                var success = InitializeReader(fiInputFile);
+                var success = InitializeReader(phrpDataFile);
                 if (!success)
                     return false;
 
                 if (string.IsNullOrEmpty(mergedPhrpDataFileName))
                 {
                     // Auto-define mergedPhrpDataFileName
-                    mergedPhrpDataFileName = Path.GetFileNameWithoutExtension(fiInputFile.Name) + "_WithAScore" + fiInputFile.Extension;
+                    mergedPhrpDataFileName = Path.GetFileNameWithoutExtension(phrpDataFile.Name) + "_WithAScore" + phrpDataFile.Extension;
                 }
 
-                if (fiAScoreResultsFile.DirectoryName == null)
+                if (ascoreResultsFile.DirectoryName == null)
                     m_MergedFilePath = mergedPhrpDataFileName;
                 else
-                    m_MergedFilePath = Path.Combine(fiAScoreResultsFile.DirectoryName, Path.GetFileName(mergedPhrpDataFileName));
+                    m_MergedFilePath = Path.Combine(ascoreResultsFile.DirectoryName, Path.GetFileName(mergedPhrpDataFileName));
 
                 var fiOutputFilePath = new FileInfo(m_MergedFilePath);
 
-                if (FilePathsMatch(fiInputFile, fiOutputFilePath))
+                if (FilePathsMatch(phrpDataFile, fiOutputFilePath))
                 {
                     OnErrorEvent("Input PHRP file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
                     return false;
                 }
 
-                if (FilePathsMatch(fiAScoreResultsFile, fiOutputFilePath))
+                if (FilePathsMatch(ascoreResultsFile, fiOutputFilePath))
                 {
                     OnErrorEvent("AScore results file has the same name as the specified updated PHRP file; unable to create merged file: " + fiOutputFilePath.FullName);
                     return false;
@@ -107,7 +107,7 @@ namespace AScore_DLL
                 if (!success)
                     return false;
 
-                MakeUpdatedPHRPFile(fiInputFile, fiOutputFilePath, mPHRPReader, cachedAscoreResults);
+                MakeUpdatedPHRPFile(phrpDataFile, fiOutputFilePath, mPHRPReader, cachedAscoreResults);
             }
             catch (Exception ex)
             {
@@ -134,16 +134,16 @@ namespace AScore_DLL
                 }
 
                 // Define the default column mapping
-                columnHeaders.Add(DatasetManager.RESULTS_COL_JOB, 0);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_SCAN, 1);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_ORIGINAL_SEQUENCE, 2);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_BEST_SEQUENCE, 3);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_PEPTIDE_SCORE, 4);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_ASCORE, 5);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_NUM_SITE_IONS_POSS, 6);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_NUM_SITE_IONS_MATCHED, 7);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_SECOND_SEQUENCE, 8);
-                columnHeaders.Add(DatasetManager.RESULTS_COL_MOD_INFO, 9);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_JOB, 0);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_SCAN, 1);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_ORIGINAL_SEQUENCE, 2);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_BEST_SEQUENCE, 3);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE, 4);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_ASCORE, 5);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_POSS, 6);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_MATCHED, 7);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_SECOND_SEQUENCE, 8);
+                columnHeaders.Add(PsmResultsManager.RESULTS_COL_MOD_INFO, 9);
 
                 using (var resultsFileReader = new StreamReader(new FileStream(ascoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 {
@@ -162,19 +162,19 @@ namespace AScore_DLL
                             continue;
                         }
 
-                        var scanNumber = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_SCAN, columnHeaders, -1);
-                        var originalPeptide = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ORIGINAL_SEQUENCE, columnHeaders, string.Empty);
-                        var bestSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_BEST_SEQUENCE, columnHeaders, string.Empty);
-                        var peptideScore = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_PEPTIDE_SCORE, columnHeaders, 0.0);
-                        var ascoreValue = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
+                        var scanNumber = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SCAN, columnHeaders, -1);
+                        var originalPeptide = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ORIGINAL_SEQUENCE, columnHeaders, string.Empty);
+                        var bestSequence = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_BEST_SEQUENCE, columnHeaders, string.Empty);
+                        var peptideScore = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE, columnHeaders, 0.0);
+                        var ascoreValue = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
 
                         // ReSharper disable CommentTypo
-                        //int numSiteIonsPossible = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_NUM_SITE_IONS_POSS, columnHeaders, 0);
-                        //int numSitIonsMatched = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_NUM_SITE_IONS_MATCHED, columnHeaders, 0);
-                        //string secondSequence = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_SECOND_SEQUENCE, columnHeaders, string.Empty);
+                        //int numSiteIonsPossible = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_POSS, columnHeaders, 0);
+                        //int numSitIonsMatched = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_MATCHED, columnHeaders, 0);
+                        //string secondSequence = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SECOND_SEQUENCE, columnHeaders, string.Empty);
                         // ReSharper restore CommentTypo
 
-                        var modInfo = clsPHRPReader.LookupColumnValue(splitLine, DatasetManager.RESULTS_COL_MOD_INFO, columnHeaders, string.Empty);
+                        var modInfo = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_MOD_INFO, columnHeaders, string.Empty);
 
                         var scanPeptideKey = ConstructScanPeptideKey(scanNumber, originalPeptide);
 
@@ -291,7 +291,7 @@ namespace AScore_DLL
 
                     // Write the header line
                     outLine.Append(outputHeaderLine);
-                    outLine.Append("\t" + DatasetManager.RESULTS_COL_PEPTIDE_SCORE);
+                    outLine.Append("\t" + PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE);
                     outLine.Append("\t" + "Modified_Residues");
 
                     foreach (var modInfoName in modInfoNames)

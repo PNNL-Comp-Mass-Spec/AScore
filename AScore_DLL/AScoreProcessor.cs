@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AScore_DLL.Managers;
-using AScore_DLL.Managers.DatasetManagers;
+using AScore_DLL.Managers.PSM_Managers;
 using AScore_DLL.Managers.SpectraManagers;
 using AScore_DLL.Mod;
 using PHRPReader;
@@ -63,22 +63,25 @@ namespace AScore_DLL
                 Console.WriteLine();
             }
 
-            DatasetManager datasetManager;
+            PsmResultsManager psmResultsManager;
 
             switch (ascoreOptions.SearchType)
             {
                 case SearchMode.XTandem:
                     OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
-                    datasetManager = new XTandemFHT(ascoreOptions.DbSearchResultsFile);
+                    psmResultsManager = new XTandemFHT(ascoreOptions.DbSearchResultsFile);
                     break;
+
                 case SearchMode.Sequest:
                     OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
-                    datasetManager = new SequestFHT(ascoreOptions.DbSearchResultsFile);
+                    psmResultsManager = new SequestFHT(ascoreOptions.DbSearchResultsFile);
                     break;
+
                 case SearchMode.Inspect:
                     OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
-                    datasetManager = new InspectFHT(ascoreOptions.DbSearchResultsFile);
+                    psmResultsManager = new InspectFHT(ascoreOptions.DbSearchResultsFile);
                     break;
+
                 case SearchMode.Msgfdb:
                 case SearchMode.Msgfplus:
                     OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
@@ -86,18 +89,19 @@ namespace AScore_DLL
                     {
                         if (ascoreOptions.CreateUpdatedDbSearchResultsFile)
                         {
-                            datasetManager = new MsgfMzidFull(ascoreOptions.DbSearchResultsFile);
+                            psmResultsManager = new MsgfMzidFull(ascoreOptions.DbSearchResultsFile);
                         }
                         else
                         {
-                            datasetManager = new MsgfMzid(ascoreOptions.DbSearchResultsFile);
+                            psmResultsManager = new MsgfMzid(ascoreOptions.DbSearchResultsFile);
                         }
                     }
                     else
                     {
-                        datasetManager = new MsgfdbFHT(ascoreOptions.DbSearchResultsFile);
+                        psmResultsManager = new MsgfdbFHT(ascoreOptions.DbSearchResultsFile);
                     }
                     break;
+
                 default:
                     OnErrorEvent("Incorrect search type: " + ascoreOptions.SearchType + " , supported values are " + string.Join(", ", Enum.GetNames(typeof(SearchMode))));
                     return -13;
@@ -119,13 +123,13 @@ namespace AScore_DLL
             // Run the algorithm
             if (ascoreOptions.MultiJobMode)
             {
-                RunAScoreWithMappingFile(ascoreOptions.JobToDatasetMapFile, spectraManager, datasetManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
+                RunAScoreWithMappingFile(ascoreOptions.JobToDatasetMapFile, spectraManager, psmResultsManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
             }
             else
             {
                 spectraManager.OpenFile(ascoreOptions.MassSpecFile, ascoreOptions.ModSummaryFile);
 
-                RunAScoreOnSingleFile(spectraManager, datasetManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
+                RunAScoreOnSingleFile(spectraManager, psmResultsManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
             }
 
             OnStatusEvent("AScore Complete");
@@ -136,7 +140,7 @@ namespace AScore_DLL
                 {
                     CreateUpdatedFirstHitsFile(ascoreOptions);
                 }
-                else if (datasetManager is MsgfMzidFull mzidFull)
+                else if (psmResultsManager is MsgfMzidFull mzidFull)
                 {
                     mzidFull.WriteToMzidFile(ascoreOptions.UpdatedDbSearchResultsFileName);
                     OnStatusEvent("Results merged; new file: " + PathUtils.CompactPathString(ascoreOptions.UpdatedDbSearchResultsFileName, 80));
@@ -165,21 +169,21 @@ namespace AScore_DLL
         /// </summary>
         /// <param name="jobToDatasetMapFile"></param>
         /// <param name="spectraManager"></param>
-        /// <param name="datasetManager"></param>
-        /// <param name="ascoreParameters"></param>
+        /// <param name="psmResultsManager"></param>
         /// <param name="outputFilePath">Name of the output file</param>
         /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
+        /// <param name="ascoreParams"></param>
         public void RunAScoreWithMappingFile(
             string jobToDatasetMapFile,
             SpectraManagerCache spectraManager,
-            DatasetManager datasetManager,
-            ParameterFileManager ascoreParameters,
+            PsmResultsManager psmResultsManager,
             string outputFilePath,
             string fastaFilePath = "",
             bool outputDescriptions = false)
+            ParameterFileManager ascoreParams)
         {
-            var jobToDatasetNameMap = new Dictionary<string, string>();
+            var jobToDatasetNameMap = new Dictionary<string, DatasetFileInfo>();
 
             var columnMap = new Dictionary<string, int>();
             var requiredColumns = new List<string>
@@ -232,13 +236,13 @@ namespace AScore_DLL
                     }
 
                     var job = dataColumns[columnMap["Job"]];
-                    var dataset = dataColumns[columnMap["Dataset"]];
+                    var spectrumFilePath = dataColumns[columnMap["Dataset"]];
 
-                    jobToDatasetNameMap.Add(job, dataset);
+                    jobToDatasetNameMap.Add(job, new DatasetFileInfo(spectrumFilePath));
                 }
             }
 
-            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath, false);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, psmResultsManager, ascoreParameters, outputFilePath, false);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -247,15 +251,15 @@ namespace AScore_DLL
         /// Configure and run the AScore algorithm, optionally can add protein mapping information
         /// </summary>
         /// <param name="spectraManager"></param>
-        /// <param name="datasetManager"></param>
-        /// <param name="ascoreParameters"></param>
+        /// <param name="psmResultsManager"></param>
+        /// <param name="ascoreParams"></param>
         /// <param name="outputFilePath">Name of the output file</param>
         /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
         /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
         public void RunAScoreOnSingleFile(
             SpectraManagerCache spectraManager,
-            DatasetManager datasetManager,
-            ParameterFileManager ascoreParameters,
+            PsmResultsManager psmResultsManager,
+            ParameterFileManager ascoreParams,
             string outputFilePath,
             string fastaFilePath = "",
             bool outputDescriptions = false)
@@ -272,7 +276,7 @@ namespace AScore_DLL
                 throw new Exception(
                     "spectraManager must be instantiated and initialized before calling RunAScoreOnSingleFile for a single source file");
 
-            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, datasetManager, ascoreParameters, outputFilePath, true);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, psmResultsManager, ascoreParameters, outputFilePath, true);
 
             ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
         }
@@ -291,19 +295,17 @@ namespace AScore_DLL
         /// </summary>
         /// <param name="jobToDatasetNameMap">Keys are job numbers (stored as strings); values are Dataset Names or the path to the _dta.txt file</param>
         /// <param name="spectraManager">Manager for reading _dta.txt or .mzML files; must have already been initialized by the calling class</param>
-        /// <param name="datasetManager"></param>
-        /// <param name="ascoreParameters"></param>
+        /// <param name="psmResultsManager"></param>
         /// <param name="outputFilePath"></param>
         /// <param name="spectraFileOpened">Set to true if processing a single dataset, and spectraManager.OpenFile() has already been called</param>
         private void RunAScoreOnPreparedData(
-            IReadOnlyDictionary<string, string> jobToDatasetNameMap,
+            IReadOnlyDictionary<string, DatasetFileInfo> jobToDatasetNameMap,
             SpectraManagerCache spectraManager,
-            DatasetManager datasetManager,
-            ParameterFileManager ascoreParameters,
+            PsmResultsManager psmResultsManager,
             string outputFilePath,
             bool spectraFileOpened)
         {
-            var totalRows = datasetManager.GetRowLength();
+            var totalRows = psmResultsManager.GetRowLength();
             var dctPeptidesProcessed = new Dictionary<string, int>();
 
             if (jobToDatasetNameMap == null || jobToDatasetNameMap.Count == 0)
@@ -323,7 +325,7 @@ namespace AScore_DLL
 
             if (FilterOnMSGFScore)
             {
-                OnStatusEvent("Filtering using MSGF_SpecProb <= " + ascoreParameters.MSGFPreFilter.ToString("0.0E+00"));
+                OnStatusEvent("Filtering using MSGF_SpecProb <= " + ascoreParams.MSGFPreFilter.ToString("0.0E+00"));
             }
             Console.WriteLine();
 
@@ -331,13 +333,13 @@ namespace AScore_DLL
             var ascoreAlgorithm = new AScoreAlgorithm();
             RegisterEvents(ascoreAlgorithm);
 
-            while (datasetManager.CurrentRowNum < totalRows)
+            while (psmResultsManager.CurrentRowNum < totalRows)
             {
                 //  Console.Clear();
 
-                if (datasetManager.CurrentRowNum % 100 == 0)
+                if (psmResultsManager.CurrentRowNum % 100 == 0)
                 {
-                    Console.Write("\rPercent Completion " + Math.Round((double)datasetManager.CurrentRowNum / totalRows * 100) + "%");
+                    Console.Write("\rPercent Completion " + Math.Round((double)psmResultsManager.CurrentRowNum / totalRows * 100) + "%");
                 }
 
                 int scanNumber;
@@ -347,14 +349,16 @@ namespace AScore_DLL
                 double msgfScore;
 
                 if (FilterOnMSGFScore)
-                    datasetManager.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out msgfScore, ref ascoreParameters);
+                {
+                    psmResultsManager.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out msgfScore, ref ascoreParams);
+                }
                 else
                 {
-                    datasetManager.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParameters);
+                    psmResultsManager.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParams);
                     msgfScore = 1;
                 }
 
-                switch (ascoreParameters.FragmentType)
+                switch (ascoreParams.FragmentType)
                 {
                     case FragmentType.CID:
                         statsByType[(int)FragmentType.CID]++;
@@ -370,19 +374,26 @@ namespace AScore_DLL
                         break;
                 }
 
-                if (string.IsNullOrEmpty(spectraManagerCurrentJob) || !string.Equals(spectraManagerCurrentJob, datasetManager.JobNum))
+                if (string.IsNullOrEmpty(spectraManagerCurrentJob) || !string.Equals(spectraManagerCurrentJob, psmResultsManager.JobNum))
                 {
                     // New dataset
-                    // Get the correct dta file for the match
-                    if (!jobToDatasetNameMap.TryGetValue(datasetManager.JobNum, out var datasetName))
+                    // Get the correct spectrum file for the match
+                    if (!jobToDatasetNameMap.TryGetValue(psmResultsManager.JobNum, out var datasetInfo))
                     {
-                        var errorMessage = "Input file refers to job " + datasetManager.JobNum +
+                        var errorMessage = "Input file refers to job " + psmResultsManager.JobNum +
                                            " but jobToDatasetNameMap does not contain that job; unable to continue";
-                        OnErrorEvent(errorMessage);
+                        OnWarningEvent(errorMessage);
+
+                        if (!psmResultsManager.JobColumnDefined)
+                        {
+                            OnWarningEvent(
+                                "If the input file includes results from multiple jobs, the first column must be job number with Job as the column heading");
+                        }
+
                         throw new Exception(errorMessage);
                     }
 
-                    datasetName = GetDatasetName(datasetName);
+                    var datasetName = GetDatasetName(datasetInfo.SpectrumFilePath);
                     OnStatusEvent("Dataset name: " + datasetName);
 
                     if (!spectraFileOpened)
@@ -399,33 +410,33 @@ namespace AScore_DLL
                         spectraFile = spectraManager.GetCurrentSpectrumManager();
                     }
 
-                    spectraManagerCurrentJob = string.Copy(datasetManager.JobNum);
+                    spectraManagerCurrentJob = string.Copy(psmResultsManager.JobNum);
                     Console.Write("\r");
 
-                    if (datasetManager is MsgfMzid mzid)
+                    if (psmResultsManager is MsgfMzid mzid)
                     {
-                        mzid.SetModifications(ascoreParameters);
+                        mzid.SetModifications(ascoreParams);
                     }
-                    else if (datasetManager is MsgfMzidFull mzidFull)
+                    else if (psmResultsManager is MsgfMzidFull mzidFull)
                     {
-                        mzidFull.SetModifications(ascoreParameters);
+                        mzidFull.SetModifications(ascoreParams);
                     }
                     else
                     {
                         if (string.IsNullOrEmpty(datasetInfo.ModSummaryFilePath))
                         {
-                            modSummaryManager.ReadModSummary(spectraFile.DatasetName, psmResultsManager.PSMResultsFilePath, ascoreParameters);
+                            modSummaryManager.ReadModSummary(spectraFile.DatasetName, psmResultsManager.PSMResultsFilePath, ascoreParams);
                         }
                         else
                         {
                             var modSummaryFile = new FileInfo(datasetInfo.ModSummaryFilePath);
-                            modSummaryManager.ReadModSummary(modSummaryFile, ascoreParameters);
+                            modSummaryManager.ReadModSummary(modSummaryFile, ascoreParams);
                         }
                     }
 
                     Console.WriteLine();
 
-                    Console.Write("\rPercent Completion " + Math.Round((double)datasetManager.CurrentRowNum / totalRows * 100) + "%");
+                    Console.Write("\rPercent Completion " + Math.Round((double)psmResultsManager.CurrentRowNum / totalRows * 100) + "%");
                 }
 
                 // perform work on the match
@@ -447,19 +458,23 @@ namespace AScore_DLL
                     back = "?";
                 }
 
-                var sequenceClean = GetCleanSequence(sequenceWithoutSuffixOrPrefix, ref ascoreParameters);
-                var skipPSM = FilterOnMSGFScore && msgfScore > ascoreParameters.MSGFPreFilter;
+                var sequenceClean = GetCleanSequence(sequenceWithoutSuffixOrPrefix, ref ascoreParams);
+                var skipPSM = FilterOnMSGFScore && msgfScore > ascoreParams.MSGFPreFilter;
 
                 var scanChargePeptide = scanNumber + "_" + chargeState + "_" + sequenceWithoutSuffixOrPrefix;
                 if (dctPeptidesProcessed.ContainsKey(scanChargePeptide))
+                {
                     // We have already processed this PSM
                     skipPSM = true;
+                }
                 else
+                {
                     dctPeptidesProcessed.Add(scanChargePeptide, 0);
+                }
 
                 if (skipPSM)
                 {
-                    datasetManager.IncrementRow();
+                    psmResultsManager.IncrementRow();
                     continue;
                 }
 
@@ -476,7 +491,7 @@ namespace AScore_DLL
                 if (expSpec == null)
                 {
                     OnWarningEvent("Scan " + scanNumber + " not found in spectra file for peptide " + peptideSeq);
-                    datasetManager.IncrementRow();
+                    psmResultsManager.IncrementRow();
                     continue;
                 }
 
@@ -490,21 +505,21 @@ namespace AScore_DLL
                 var mzMax = maxRange;
                 var mzMin = precursorMZ * lowRangeMultiplier;
 
-                if (ascoreParameters.FragmentType != FragmentType.CID)
+                if (ascoreParams.FragmentType != FragmentType.CID)
                 {
                     mzMax = maxRange;
                     mzMin = minRange;
                 }
 
                 //Generate all combination mixtures
-                var modMixture = new Combinatorics.ModMixtureCombo(ascoreParameters.DynamicMods, sequenceClean);
+                var modMixture = new Combinatorics.ModMixtureCombo(ascoreParams.DynamicMods, sequenceClean);
 
                 var myPositionsList = GetMyPositionList(sequenceClean, modMixture);
 
                 //If I have more than 1 modifiable site proceed to calculation
                 if (myPositionsList.Count > 1)
                 {
-                    ascoreAlgorithm.ComputeAScore(datasetManager, ascoreParameters, scanNumber, chargeState,
+                    ascoreAlgorithm.ComputeAScore(psmResultsManager, ascoreParams, scanNumber, chargeState,
                                                   peptideSeq, front, back, sequenceClean, expSpec,
                                                   mzMax, mzMin, myPositionsList);
                 }
@@ -513,22 +528,22 @@ namespace AScore_DLL
                     // Either one or no modifiable sites
                     var uniqueID = myPositionsList[0].Max();
                     if (uniqueID == 0)
-                        datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], MOD_INFO_NO_MODIFIED_RESIDUES);
+                        psmResultsManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], MOD_INFO_NO_MODIFIED_RESIDUES);
                     else
-                        datasetManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], LookupModInfoByID(uniqueID, ascoreParameters.DynamicMods));
+                        psmResultsManager.WriteToTable(peptideSeq, scanNumber, 0, myPositionsList[0], LookupModInfoByID(uniqueID, ascoreParams.DynamicMods));
                 }
                 else
                 {
                     // No modifiable sites
-                    datasetManager.WriteToTable(peptideSeq, scanNumber, 0, new int[0], MOD_INFO_NO_MODIFIED_RESIDUES);
+                    psmResultsManager.WriteToTable(peptideSeq, scanNumber, 0, new int[0], MOD_INFO_NO_MODIFIED_RESIDUES);
                 }
-                datasetManager.IncrementRow();
+                psmResultsManager.IncrementRow();
             }
 
             Console.WriteLine();
 
-            OnStatusEvent(string.Format("Writing {0:N0} rows to {1}", datasetManager.ResultsCount, PathUtils.CompactPathString(outputFilePath, 80)));
-            datasetManager.WriteToFile(outputFilePath);
+            OnStatusEvent(string.Format("Writing {0:N0} rows to {1}", psmResultsManager.ResultsCount, PathUtils.CompactPathString(outputFilePath, 80)));
+            psmResultsManager.WriteToFile(outputFilePath);
 
             Console.WriteLine();
 
@@ -555,11 +570,11 @@ namespace AScore_DLL
         /// Gets a clean sequence initializes dynamic modifications
         /// </summary>
         /// <param name="seq">input protein sequence including mod characters, but without the prefix or suffix residues</param>
-        /// <param name="ascoreParameters">ascore parameters reference</param>
-        /// <returns>protein sequence without mods as well as changing ascoreParameters</returns>
-        private string GetCleanSequence(string seq, ref ParameterFileManager ascoreParameters)
+        /// <param name="ascoreParams">ascore parameters reference</param>
+        /// <returns>protein sequence without mods as well as changing ascoreParams</returns>
+        private string GetCleanSequence(string seq, ref ParameterFileManager ascoreParams)
         {
-            foreach (var dynamicMod in ascoreParameters.DynamicMods)
+            foreach (var dynamicMod in ascoreParams.DynamicMods)
             {
                 var newSeq = seq.Replace(dynamicMod.ModSymbol.ToString(), string.Empty);
                 dynamicMod.Count = seq.Length - newSeq.Length;

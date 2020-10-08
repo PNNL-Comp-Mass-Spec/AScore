@@ -1,14 +1,16 @@
-﻿namespace AScore_DLL.Managers.DatasetManagers
+﻿namespace AScore_DLL.Managers.PSM_Managers
 {
     /// <summary>
     /// Track X!Tandem PSM results from a _fht.txt or _syn.txt file
     /// </summary>
-    public class XTandemFHT : DatasetManager
+    public class XTandemFHT : PsmResultsManager
     {
         public XTandemFHT(string fhtOrSynFilePath) : base(fhtOrSynFilePath) { }
 
-        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq,
-            ref AScore_DLL.Managers.ParameterFileManager ascoreParam)
+        public override void GetNextRow(
+            out int scanNumber, out int scanCount, out int chargeState,
+            out string peptideSeq,
+            ref ParameterFileManager ascoreParams)
         {
             if (mDataTable.Columns.Contains(RESULTS_COL_JOB))
             {
@@ -22,11 +24,11 @@
             peptideSeq = (string)mDataTable.Rows[mCurrentRow]["Peptide_Sequence"];
         }
 
-        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam)
+        public override void GetNextRow(
+            out int scanNumber, out int scanCount, out int chargeState,
+            out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParams)
         {
-            this.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParam);
-
-            msgfScore = 0;
+            GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParams);
             double.TryParse((string)mDataTable.Rows[mCurrentRow]["MSGF_SpecProb"], out msgfScore);
         }
     }

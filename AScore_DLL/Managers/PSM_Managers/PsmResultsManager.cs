@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using System.Data;
+﻿using System.Data;
+using System.Linq;
 
-namespace AScore_DLL.Managers.DatasetManagers
+namespace AScore_DLL.Managers.PSM_Managers
 {
     /// <summary>
     /// Base class for classes that track PSM results for a dataset
     /// </summary>
-    public abstract class DatasetManager
+    public abstract class PsmResultsManager
     {
         // Ignore Spelling: ascore
 
@@ -61,7 +61,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// </summary>
         /// <param name="psmResultsFilePath">_fht.txt, _syn.txt, or .mzid file</param>
         /// <param name="isFhtOrSyn">True if a _fht.txt or _syn.txt file</param>
-        protected DatasetManager(string psmResultsFilePath, bool isFhtOrSyn = true)
+        protected PsmResultsManager(string psmResultsFilePath, bool isFhtOrSyn = true)
         {
             mPSMResultsFilePath = psmResultsFilePath;
             if (isFhtOrSyn)
@@ -125,12 +125,12 @@ namespace AScore_DLL.Managers.DatasetManagers
         /// <param name="scanCount">number of scans, usually 1</param>
         /// <param name="chargeState">charge state</param>
         /// <param name="peptideSeq">peptide sequence</param>
-        /// <param name="ascoreParam">Parameter file manager</param>
+        /// <param name="ascoreParams">Parameter file manager</param>
         public abstract void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
-            out string peptideSeq, ref ParameterFileManager ascoreParam);
+            out string peptideSeq, ref ParameterFileManager ascoreParams);
 
         public abstract void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
-            out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam);
+            out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParams);
 
         /// <summary>
         /// Resets the counter to the beginning

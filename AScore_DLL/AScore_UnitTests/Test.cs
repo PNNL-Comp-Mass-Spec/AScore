@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using AScore_DLL.Managers;
-using AScore_DLL.Managers.DatasetManagers;
+using AScore_DLL.Managers.PSM_Managers;
 using AScore_DLL.Managers.SpectraManagers;
 using NUnit.Framework;
 
@@ -32,7 +32,7 @@ namespace AScore_UnitTests
                 var myFht = Path.Combine(fhtPath, a);
                 var myDta = Path.Combine(dtapath, a.Substring(0, a.Length - 8) + "_dta.txt");
                 var outFile = Path.Combine(fhtPath, a.Substring(0, a.Length - 8) + "_AScore.txt");
-                DatasetManager datasetMan = new SequestFHT(myFht);
+                PsmResultsManager datasetMan = new SequestFHT(myFht);
                 //DtaManager dtaManager = new DtaManager(myDta);
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(myDta);
@@ -54,7 +54,7 @@ namespace AScore_UnitTests
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
 
-            DatasetManager dataman = new XTandemFHT(myfht);
+            PsmResultsManager dataman = new XTandemFHT(myfht);
             //DtaManager dta = new DtaManager(mydta);
             var spectraCache = new SpectraManagerCache(peptideMassCalculator);
             spectraCache.OpenFile(mydta);
@@ -104,7 +104,7 @@ namespace AScore_UnitTests
                 var outFile = Path.Combine(
                     Path.GetDirectoryName(datasetname[i]),
                     Path.GetFileNameWithoutExtension(datasetname[i]) + "_AScore.txt");
-                DatasetManager datasetMan = new MsgfdbFHT(datasetname[i]);
+                PsmResultsManager datasetMan = new MsgfdbFHT(datasetname[i]);
                 //DtaManager dtaManager = new DtaManager(dtaname[i]);
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(dtaname[i]);
@@ -148,7 +148,7 @@ namespace AScore_UnitTests
             for (var i = 0; i < dtaname.Length; i++)
             {
                 var outFile = datasetname[i].Substring(0, datasetname[i].Length - 8) + "_AScoreNoN2.txt";
-                DatasetManager datasetMan = new SequestFHT(datasetname[i]);
+                PsmResultsManager datasetMan = new SequestFHT(datasetname[i]);
                 //DtaManager dtaManager = new DtaManager(dtaname[i]);
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(dtaname[i]);
@@ -177,7 +177,7 @@ namespace AScore_UnitTests
             for (var i = 0; i < dtaname.Length; i++)
             {
                 var outFile = datasetname[i].Substring(0, datasetname[i].Length - 8) + "_AScoreTry.txt";
-                DatasetManager datasetMan = new SequestFHT(datasetname[i]);
+                PsmResultsManager datasetMan = new SequestFHT(datasetname[i]);
                 //DtaManager dtaManager = new DtaManager(dtaname[i]);
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(dtaname[i]);
@@ -206,7 +206,7 @@ namespace AScore_UnitTests
             for (var i = 0; i < dtaname.Length; i++)
             {
                 var outFile = datasetname[i].Substring(0, datasetname[i].Length - 8) + "_AScoreTry.txt";
-                DatasetManager datasetMan = new SequestFHT(datasetname[i]);
+                PsmResultsManager datasetMan = new SequestFHT(datasetname[i]);
                 //DtaManager dtaManager = new DtaManager(dtaname[i]);
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(dtaname[i]);
@@ -308,7 +308,7 @@ namespace AScore_UnitTests
                 var ascP = Path.Combine(direct, ascoreP);
                 var tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
 
-                DatasetManager dsman = new MsgfdbFHT(tempfht);
+                PsmResultsManager dsman = new MsgfdbFHT(tempfht);
                 //DtaManager dtman = new DtaManager(tempdta);
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(tempdta);
@@ -360,7 +360,7 @@ namespace AScore_UnitTests
                 var ascP = Path.Combine(direct, ascoreP);
                 var tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore2.txt");
 
-                DatasetManager dsman = new SequestFHT(tempfht);
+                PsmResultsManager dsman = new SequestFHT(tempfht);
                 //DtaManager dtman = new DtaManager(tempdta);
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(tempdta);
@@ -383,7 +383,7 @@ namespace AScore_UnitTests
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
 
-            DatasetManager dfht = new SequestFHT(fht);
+            PsmResultsManager dfht = new SequestFHT(fht);
             var pfile = new ParameterFileManager(param);
 
             var spectraCache = new SpectraManagerCache(peptideMassCalculator);
@@ -410,7 +410,7 @@ namespace AScore_UnitTests
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
 
-            DatasetManager dfht = new MsgfdbFHT(fht);
+            PsmResultsManager dfht = new MsgfdbFHT(fht);
             var pfile = new ParameterFileManager(param);
 
             var spectraCache = new SpectraManagerCache(peptideMassCalculator);
@@ -489,7 +489,7 @@ namespace AScore_UnitTests
                     var ascP = Path.Combine(direct, ascoreP);
                     var tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
 
-                    DatasetManager dsman = new SequestFHT(tempfht);
+                    PsmResultsManager dsman = new SequestFHT(tempfht);
                     //DtaManager dtman = new DtaManager(tempdta);
                     var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                     spectraCache.OpenFile(tempdta);
@@ -556,7 +556,7 @@ namespace AScore_UnitTests
                     var tempdta = Path.Combine(direct2, dtaFiles[i]);
                     var ascP = Path.Combine(direct2, ascoreP);
                     var tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
-                    DatasetManager dsman = null;
+                    PsmResultsManager dsman = null;
                     if (j == 0)
                     {
                          dsman = new SequestFHT(tempfht);

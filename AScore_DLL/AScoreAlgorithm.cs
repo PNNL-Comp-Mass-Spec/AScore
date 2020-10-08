@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using AScore_DLL.Managers;
-using AScore_DLL.Managers.DatasetManagers;
+using AScore_DLL.Managers.PSM_Managers;
 using AScore_DLL.Mod;
 using PRISM;
 
@@ -19,7 +19,8 @@ namespace AScore_DLL
 
         #region Public Method
 
-        public void ComputeAScore(DatasetManager datasetManager, ParameterFileManager ascoreParameters, int scanNumber,
+        public void ComputeAScore(
+            PsmResultsManager psmResultsManager, ParameterFileManager ascoreParams, int scanNumber,
             int chargeState, string peptideSeq, string front, string back, string sequenceClean, ExperimentalSpectra expSpec,
             double mzMax, double mzMin, IReadOnlyList<int[]> myPositionsList)
         {
@@ -35,9 +36,9 @@ namespace AScore_DLL
 
             try
             {
-                var theoreticalMonoMassSpectra = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState, new List<DynamicModification>(), MassType.Monoisotopic);
-                var theoreticalAverageMassSpectra = new TheoreticalSpectra(sequenceClean, ascoreParameters, chargeState, new List<DynamicModification>(), MassType.Average);
-                var peptideMassTheoretical = theoreticalMonoMassSpectra.PeptideNeutralMassWithStaticMods + GetModMassTotal(peptideSeq, ascoreParameters.DynamicMods);
+                var theoreticalMonoMassSpectra = new TheoreticalSpectra(sequenceClean, ascoreParams, chargeState, MassType.Monoisotopic);
+                var theoreticalAverageMassSpectra = new TheoreticalSpectra(sequenceClean, ascoreParams, chargeState, MassType.Average);
+                var peptideMassTheoretical = theoreticalMonoMassSpectra.PeptideNeutralMassWithStaticMods + GetModMassTotal(peptideSeq, ascoreParams.DynamicMods);
 
                 if (Math.Abs(peptideMassTheoretical - expSpec.PrecursorNeutralMass) > 20)
                 {
@@ -87,7 +88,7 @@ namespace AScore_DLL
                 foreach (var myPositions in myPositionsList)
                 {
                     //Generate spectra for a modification combination
-                    var myIons = GetChargeList(ascoreParameters, mzMax, mzMin, theoreticalMonoMassSpectra, theoreticalAverageMassSpectra, myPositions);
+                    var myIons = GetChargeList(ascoreParams, mzMax, mzMin, theoreticalMonoMassSpectra, theoreticalAverageMassSpectra, myPositions);
                     peptideScores.Add(new List<double>());
                     weightedScores.Add(new List<double>());
 
@@ -96,11 +97,11 @@ namespace AScore_DLL
                         var peakDepthSpectra = expSpec.GetPeakDepthSpectra(peakDepth);
                         peakDepthSpectra.Sort();
 
-                        var matchedIons = GetMatchedMZ(ascoreParameters.FragmentMassTolerance, myIons, peakDepthSpectra);
+                        var matchedIons = GetMatchedMZ(ascoreParams.FragmentMassTolerance, myIons, peakDepthSpectra);
 
                         //Adjusted peptide score to score based on tolerance window.
                         var score = PeptideScoresManager.GetPeptideScore(
-                            peakDepth * ascoreParameters.FragmentMassTolerance * 2 / 100.0, myIons.Count, matchedIons.Count);
+                            peakDepth * ascoreParams.FragmentMassTolerance * 2 / 100.0, myIons.Count, matchedIons.Count);
 
                         // Check if there were any negative scores
                         peptideScores[modNumber].Add(score);
@@ -126,20 +127,20 @@ namespace AScore_DLL
                 // Need the phosphorylation sites for the top peptide
                 var topPeptidePTMSites = myPositionsList[sortedSumScore[0].Index];
 
-                var ascoreResults = CalculateAScoreForSite(ascoreParameters, expSpec, mzMax, mzMin, myPositionsList, topPeptidePTMSites, peptideScores, theoreticalMonoMassSpectra,
+                var ascoreResults = CalculateAScoreForSite(ascoreParams, expSpec, mzMax, mzMin, myPositionsList, topPeptidePTMSites, peptideScores, theoreticalMonoMassSpectra,
                     theoreticalAverageMassSpectra, sortedSumScore);
 
                 foreach (var ascoreResult in ascoreResults)
                 {
                     ascoreResult.SecondSequence = front + "." +
-                        GenerateFinalSequences(sequenceClean, ascoreParameters, ascoreResult.PeptideMods) + "." + back;
+                        GenerateFinalSequences(sequenceClean, ascoreParams, ascoreResult.PeptideMods) + "." + back;
                 }
 
                 //Put scores into our table
-                var bestSeq = front + "." + GenerateFinalSequences(sequenceClean, ascoreParameters, topPeptidePTMSites) + "." + back;
+                var bestSeq = front + "." + GenerateFinalSequences(sequenceClean, ascoreParams, topPeptidePTMSites) + "." + back;
                 foreach (var ascoreResult in ascoreResults)
                 {
-                    datasetManager.WriteToTable(peptideSeq, bestSeq, scanNumber, topPeptideScore, ascoreResult);
+                    psmResultsManager.WriteToTable(peptideSeq, bestSeq, scanNumber, topPeptideScore, ascoreResult);
                 }
             }
             catch (Exception ex)
@@ -156,7 +157,7 @@ namespace AScore_DLL
         /// <summary>
         /// Calculate the AScore for the given site information
         /// </summary>
-        /// <param name="ascoreParameters"></param>
+        /// <param name="ascoreParams"></param>
         /// <param name="expSpec"></param>
         /// <param name="mzMax"></param>
         /// <param name="mzMin"></param>
@@ -167,7 +168,7 @@ namespace AScore_DLL
         /// <param name="theoreticalAverageMassSpectra"></param>
         /// <param name="sortedSumScore"></param>
         /// <returns></returns>
-        private List<AScoreResult> CalculateAScoreForSite(ParameterFileManager ascoreParameters, ExperimentalSpectra expSpec,
+        private List<AScoreResult> CalculateAScoreForSite(ParameterFileManager ascoreParams, ExperimentalSpectra expSpec,
                                                           double mzMax, double mzMin,
                                                           IReadOnlyList<int[]> myPositionsList,
                                                           int[] topPeptidePTMSites,
@@ -182,14 +183,14 @@ namespace AScore_DLL
             var siteInfo = GetSiteDict(topPeptidePTMSites);
 
             // Get the top sequence theoretical spectra
-            var topTheoreticalIons = GetChargeList(ascoreParameters, mzMax, mzMin, theoreticalMonoMassSpectra, theoreticalAverageMassSpectra, topPeptidePTMSites);
+            var topTheoreticalIons = GetChargeList(ascoreParams, mzMax, mzMin, theoreticalMonoMassSpectra, theoreticalAverageMassSpectra, topPeptidePTMSites);
 
             for (var indSite = 0; indSite < siteInfo.Count; ++indSite)
             {
                 var ascoreResult = new AScoreResult();
                 lstResults.Add(ascoreResult);
 
-                ascoreResult.ModInfo = LookupModInfoByID(siteInfo.Values[indSite], ascoreParameters.DynamicMods);
+                ascoreResult.ModInfo = LookupModInfoByID(siteInfo.Values[indSite], ascoreParams.DynamicMods);
 
                 int secondPeptide;
                 for (secondPeptide = 0; secondPeptide < sortedSumScore.Count; ++secondPeptide)
@@ -233,7 +234,7 @@ namespace AScore_DLL
                 var secondTopPeptidePTMSites = myPositionsList[sortedSumScore[secondPeptide].Index];
                 // Get the second best scoring spectra
 
-                var secondTopTheoreticalIons = GetChargeList(ascoreParameters,
+                var secondTopTheoreticalIons = GetChargeList(ascoreParams,
                                                              mzMax, mzMin,
                                                              theoreticalMonoMassSpectra,
                                                              theoreticalAverageMassSpectra,
@@ -264,14 +265,14 @@ namespace AScore_DLL
                 var peakDepthSpectraFinal = expSpec.GetPeakDepthSpectra(peakDepthForAScore);
                 peakDepthSpectraFinal.Sort();
 
-                var bestDeterminingCount = GetMatchedMZ(ascoreParameters.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal).Count;
+                var bestDeterminingCount = GetMatchedMZ(ascoreParams.FragmentMassTolerance, siteIons1, peakDepthSpectraFinal).Count;
 
-                var secondBestDeterminingCount = GetMatchedMZ(ascoreParameters.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal).Count;
+                var secondBestDeterminingCount = GetMatchedMZ(ascoreParams.FragmentMassTolerance, siteIons2, peakDepthSpectraFinal).Count;
 
-                var a1 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2 / 100,
+                var a1 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParams.FragmentMassTolerance * 2 / 100,
                     siteIons1.Count, bestDeterminingCount);
 
-                var a2 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParameters.FragmentMassTolerance * 2 / 100,
+                var a2 = PeptideScoresManager.GetPeptideScore(peakDepthForAScore * ascoreParams.FragmentMassTolerance * 2 / 100,
                     siteIons2.Count, secondBestDeterminingCount);
 
                 // Add the results to the list
@@ -498,14 +499,14 @@ namespace AScore_DLL
         /// <summary>
         /// Gets a list of ions for matching
         /// </summary>
-        /// <param name="ascoreParameters">parameters for </param>
+        /// <param name="ascoreParams">AScore parameters</param>
         /// <param name="mzMax"></param>
         /// <param name="mzMin"></param>
         /// <param name="theoreticalMonoMassSpectra"></param>
         /// <param name="theoreticalAverageMassSpectra"></param>
         /// <param name="myPositions"></param>
         /// <returns></returns>
-        private List<double> GetChargeList(ParameterFileManager ascoreParameters, double mzMax, double mzMin,
+        private List<double> GetChargeList(ParameterFileManager ascoreParams, double mzMax, double mzMin,
                                            TheoreticalSpectra theoreticalMonoMassSpectra,
                                            TheoreticalSpectra theoreticalAverageMassSpectra,
                                            int[] myPositions)
@@ -513,14 +514,14 @@ namespace AScore_DLL
             const double FRAGMENT_MASS_TOLERANCE = 0.0501;
 
             var mySpectraMono = theoreticalMonoMassSpectra.GetTempSpectra(myPositions,
-                                  ascoreParameters.DynamicMods, MassType.Monoisotopic);
+                ascoreParams.DynamicMods, MassType.Monoisotopic);
 
             var mySpectra = new Dictionary<int, ChargeStateIons>();
 
-            if (ascoreParameters.FragmentMassTolerance <= FRAGMENT_MASS_TOLERANCE)
+            if (ascoreParams.FragmentMassTolerance <= FRAGMENT_MASS_TOLERANCE)
             {
                 var mySpectraAverage = theoreticalAverageMassSpectra.GetTempSpectra(myPositions,
-                    ascoreParameters.DynamicMods, MassType.Average);
+                    ascoreParams.DynamicMods, MassType.Average);
 
                 //Get ions within m/z range
                 mySpectra.Add(1, mySpectraMono[1]);

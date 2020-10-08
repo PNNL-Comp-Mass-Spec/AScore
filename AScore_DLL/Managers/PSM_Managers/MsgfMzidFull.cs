@@ -7,14 +7,14 @@ using PSI_Interface.CV;
 using PSI_Interface.IdentData;
 using PSI_Interface.IdentData.IdentDataObjs;
 
-namespace AScore_DLL.Managers.DatasetManagers
+namespace AScore_DLL.Managers.PSM_Managers
 {
     /// <summary>
     /// Track PSM results from a .mzid file
     /// </summary>
-    public class MsgfMzidFull : DatasetManager
+    public class MsgfMzidFull : PsmResultsManager
     {
-        // Ignore Spelling: hcd, etd, cid, pre, Ident, namespace, unimod, ascore
+        // Ignore Spelling: hcd, etd, cid, pre, Ident, namespace, UniMod, ascore
 
         /// <summary>
         /// Default modification symbols
@@ -175,18 +175,21 @@ namespace AScore_DLL.Managers.DatasetManagers
 
         private bool AreModificationsSimilar(SearchModificationObj sm1, SearchModificationObj sm2)
         {
-            return sm1.FixedMod == sm2.FixedMod && sm1.MassDelta.Equals(sm2.MassDelta) && GetModName(sm1.CVParams).Equals(GetModName(sm2.CVParams)) &&
-                   GetIsNTerm(sm1) == GetIsNTerm(sm2) && GetIsCTerm(sm1) == GetIsCTerm(sm2);
+            return sm1.FixedMod == sm2.FixedMod &&
+                   sm1.MassDelta.Equals(sm2.MassDelta) &&
+                   GetModName(sm1.CVParams).Equals(GetModName(sm2.CVParams)) &&
+                   GetIsNTerm(sm1) == GetIsNTerm(sm2) &&
+                   GetIsCTerm(sm1) == GetIsCTerm(sm2);
         }
 
-        private static string GetModName(IEnumerable<CVParamObj> cvps)
+        private static string GetModName(IEnumerable<CVParamObj> cvParams)
         {
-            foreach (var cvp in cvps)
+            foreach (var cvParam in cvParams)
             {
-                if (cvp.Accession.IndexOf("unimod", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    cvp.Cvid == CV.CVID.MS_unknown_modification)
+                if (cvParam.Accession.IndexOf("UniMod", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    cvParam.Cvid == CV.CVID.MS_unknown_modification)
                 {
-                    return cvp.Name;
+                    return cvParam.Name;
                 }
             }
 
@@ -290,7 +293,7 @@ namespace AScore_DLL.Managers.DatasetManagers
             {
                 var isCTerm = mod.Location > sequence.Length;
                 var isNTerm = mod.Location == 0;
-                var residue = ' ';
+                char residue;
                 if (isNTerm)
                 {
                     residue = sequenceOrig[0];
@@ -360,12 +363,12 @@ namespace AScore_DLL.Managers.DatasetManagers
             return data.Count;
         }
 
-        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, ref ParameterFileManager ascoreParam)
+        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, ref ParameterFileManager ascoreParams)
         {
-            GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out _, ref ascoreParam);
+            GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, out _, ref ascoreParams);
         }
 
-        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParam)
+        public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParams)
         {
             var id = data[mCurrentRow];
             ascoreResultsCount = 0;
@@ -395,26 +398,26 @@ namespace AScore_DLL.Managers.DatasetManagers
                 switch (fragMatches[0].Value.ToLower())
                 {
                     case "hcd":
-                        ascoreParam.FragmentType = FragmentType.HCD;
+                        ascoreParams.FragmentType = FragmentType.HCD;
                         break;
                     case "etd":
-                        ascoreParam.FragmentType = FragmentType.ETD;
+                        ascoreParams.FragmentType = FragmentType.ETD;
                         break;
                     case "cid":
-                        ascoreParam.FragmentType = FragmentType.CID;
+                        ascoreParams.FragmentType = FragmentType.CID;
                         break;
                     default:
-                        ascoreParam.FragmentType = FragmentType.Unspecified;
+                        ascoreParams.FragmentType = FragmentType.Unspecified;
                         break;
                 }
             }
             else
             {
-                ascoreParam.FragmentType = FragmentType.Unspecified;
+                ascoreParams.FragmentType = FragmentType.Unspecified;
             }
         }
 
-        private int ascoreResultsCount = 0;
+        private int ascoreResultsCount;
 
         /// <summary>
         /// Writes ascore information to table

@@ -30,7 +30,7 @@ namespace AScore_DLL.Managers
         /// Creates the theoretical mass spectrum for the given peptide
         /// </summary>
         /// <param name="sequenceClean">Clean sequence (no mod symbols)</param>
-        /// <param name="ascoreParameters"></param>
+        /// <param name="ascoreParams"></param>
         /// <param name="chargeS"></param>
         /// <param name="moveMod"></param>
         /// <param name="massType"></param>
@@ -40,7 +40,7 @@ namespace AScore_DLL.Managers
         {
             chargeState = chargeS;
             this.peptideSequence = sequenceClean;
-            Calculate(chargeState, ascoreParameters, massType);
+            Calculate(chargeState, ascoreParams, massType);
         }
 
         /// <summary>
@@ -142,29 +142,29 @@ namespace AScore_DLL.Managers
         /// Adjusts for etd fragmentation
         /// </summary>
         /// <param name="charge">charge, do i need this?</param>
-        /// <param name="ascoreParameters">ascore parameters</param>
+        /// <param name="ascoreParams">AScore parameters</param>
         /// <param name="massType"></param>
-        private void Calculate(int charge, ParameterFileManager ascoreParameters, MassType massType)
+        private void Calculate(int charge, ParameterFileManager ascoreParams, MassType massType)
         {
             chargeState = charge;
 
             AminoAcidMass.MassType = massType;
             MolecularWeights.MassType = massType;
-            foreach (var sm in ascoreParameters.StaticMods)
+            foreach (var sm in ascoreParams.StaticMods)
             {
                 sm.ModMassType = massType;
             }
-            foreach (var tm in ascoreParameters.TerminiMods)
+            foreach (var tm in ascoreParams.TerminiMods)
             {
                 tm.ModMassType = massType;
             }
 
             // First thing to do is generate the base ion masses
-            peptideMassWithStaticMods = GenerateIonMasses(ascoreParameters.StaticMods, ascoreParameters.TerminiMods);
+            PeptideNeutralMassWithStaticMods = GenerateIonMasses(ascoreParams.StaticMods, ascoreParams.TerminiMods);
 
             // If the fragment type is ETD, we need to convert the B and Y ions
             // into C and Z ions
-            if (ascoreParameters.FragmentType == FragmentType.ETD)
+            if (ascoreParams.FragmentType == FragmentType.ETD)
             {
                 for (var i = 0; i < yIonsMass.Count; ++i)
                 {
