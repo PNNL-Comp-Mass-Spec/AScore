@@ -57,7 +57,7 @@ namespace AScore_DLL.Combinatorics
         /// ie R.RFLPSCTK.M would have possiblePositions[0] = {4,6} if phosphorylation were the first
         /// mod in dynamic mods
         /// </summary>
-        /// <param name="dynMods">Dynamic modification list from ascore parameters</param>
+        /// <param name="dynMods">Dynamic modification list from AScore parameters</param>
         /// <param name="sequence">peptide sequence</param>
         /// <returns>list of lists of possible modification sites</returns>
         public List<List<int>> GetSiteLocation(List<Mod.DynamicModification> dynMods, string sequence)

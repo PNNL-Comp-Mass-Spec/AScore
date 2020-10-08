@@ -28,10 +28,10 @@ namespace AScore_DLL.Managers.SpectraManagers
         public bool Initialized => _currentSpectrumManager != null && _currentSpectrumManager.Initialized;
 
         /// <summary>
-        /// Determine the input file path, given psmResultsFilePath
+        /// Determine the input spectrum file path, given psmResultsFilePath
         /// </summary>
         /// <param name="psmResultsFilePath">_fht.txt or _syn.txt file</param>
-        /// <param name="datasetName">_dta.txt or .mzML file</param>
+        /// <param name="datasetName">Dataset name</param>
         /// <returns></returns>
         public string GetFilePath(string psmResultsFilePath, string datasetName)
         {
@@ -77,10 +77,10 @@ namespace AScore_DLL.Managers.SpectraManagers
         }
 
         /// <summary>
-        ///Open the .mzML or _dta.txt file that corresponds to the _fht.txt or _syn.txt file specified by psmResultsFilePath
+        /// Open the .mzML or _dta.txt file that corresponds to the _fht.txt or _syn.txt file specified by psmResultsFilePath
         /// </summary>
         /// <param name="psmResultsFilePath">_fht.txt or _syn.txt file</param>
-        /// <param name="datasetName">dataset name</param>
+        /// <param name="datasetName">Dataset name</param>
         /// <returns></returns>
         public ISpectraManager GetSpectraManagerForFile(string psmResultsFilePath, string datasetName)
         {

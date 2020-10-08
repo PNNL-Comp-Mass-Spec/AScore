@@ -9,6 +9,9 @@ using PSI_Interface.IdentData.IdentDataObjs;
 
 namespace AScore_DLL.Managers.DatasetManagers
 {
+    /// <summary>
+    /// Track PSM results from a .mzid file
+    /// </summary>
     public class MsgfMzidFull : DatasetManager
     {
         // Ignore Spelling: hcd, etd, cid, pre, Ident, namespace, unimod, ascore

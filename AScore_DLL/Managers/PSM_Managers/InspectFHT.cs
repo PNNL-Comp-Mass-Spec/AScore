@@ -1,5 +1,8 @@
 ﻿namespace AScore_DLL.Managers.DatasetManagers
 {
+    /// <summary>
+    /// Track Inspect PSM results from a _fht.txt file
+    /// </summary>
     public class InspectFHT : DatasetManager
     {
         public InspectFHT(string fhtFileName) : base(fhtFileName) { }

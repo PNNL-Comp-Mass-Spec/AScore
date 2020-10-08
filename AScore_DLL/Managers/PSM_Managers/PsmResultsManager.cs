@@ -3,6 +3,9 @@ using System.Data;
 
 namespace AScore_DLL.Managers.DatasetManagers
 {
+    /// <summary>
+    /// Base class for classes that track PSM results for a dataset
+    /// </summary>
     public abstract class DatasetManager
     {
         // Ignore Spelling: ascore
@@ -22,7 +25,11 @@ namespace AScore_DLL.Managers.DatasetManagers
 
         #endregion
 
+        /// <summary>
+        /// Data read from the _fht.txt, _syn.txt, or .mzid file
+        /// </summary>
         protected DataTable mDataTable;
+
         protected DataTable mAScoresTable;
         protected int mCurrentRow;
         protected int maxSteps;
@@ -87,6 +94,10 @@ namespace AScore_DLL.Managers.DatasetManagers
             mAScoresTable.Columns.Add(RESULTS_COL_MOD_INFO, typeof(string));
         }
 
+        /// <summary>
+        /// Number of PSMs loaded from the results file
+        /// </summary>
+        /// <returns></returns>
         public virtual int GetRowLength()
         {
             return mDataTable.Rows.Count;
@@ -119,7 +130,7 @@ namespace AScore_DLL.Managers.DatasetManagers
         public int ResultsCount => mAScoresTable.Rows.Count;
 
         /// <summary>
-        /// Writes ascore information to table
+        /// Writes AScore information to table
         /// </summary>
         /// <param name="peptideSeq"></param>
         /// <param name="bestSeq"></param>

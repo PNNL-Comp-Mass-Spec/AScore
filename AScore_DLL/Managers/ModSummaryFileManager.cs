@@ -20,7 +20,7 @@ namespace AScore_DLL.Managers
         private const string COL_COUNT = "Occurrence_Count";
 
         /// <summary>
-        /// Look for the mod summary file for the given data file
+        /// Look for the mod summary file for the given PSM results file
         /// </summary>
         /// <param name="datasetName"></param>
         /// <param name="datasetFilePath"></param>
@@ -74,7 +74,13 @@ namespace AScore_DLL.Managers
             return true;
         }
 
-        public void ReadModSummary(FileInfo modSummaryFile, ParameterFileManager ascoreParams)
+        /// <summary>
+        /// Read mod information from the specified mod summary file
+        /// </summary>
+        /// <param name="modSummaryFile"></param>
+        /// <param name="ascoreParams"></param>
+        /// <returns>True if the mod summary file exists, otherwise false</returns>
+        public bool ReadModSummary(FileInfo modSummaryFile, ParameterFileManager ascoreParams)
         {
             if (modSummaryFile == null || !modSummaryFile.Exists)
             {

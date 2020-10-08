@@ -4,16 +4,37 @@ namespace AScore_DLL
 {
     public enum SearchMode
     {
+        /// <summary>
+        /// SEQUEST
+        /// </summary>
         Sequest,
+        /// <summary>
+        /// X!Tandem
+        /// </summary>
         XTandem,
+        /// <summary>
+        /// Inspect
+        /// </summary>
         Inspect,
+        /// <summary>
+        /// Old name for MS-GF+
+        /// </summary>
         Msgfdb,
+        /// <summary>
+        /// MS-GF+
+        /// </summary>
         Msgfplus
     }
 
     public enum DbSearchResultsType
     {
+        /// <summary>
+        /// PHRP First Hits file or Synopsis file
+        /// </summary>
         Fht,
+        /// <summary>
+        /// .mzid file
+        /// </summary>
         Mzid,
     }
 

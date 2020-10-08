@@ -1,5 +1,8 @@
 ﻿namespace AScore_DLL.Managers.DatasetManagers
 {
+    /// <summary>
+    /// Track SEQUEST PSM results from a _fht.txt or _syn.txt file
+    /// </summary>
     public class SequestFHT : DatasetManager
     {
         public SequestFHT(string fhtFileName) : base(fhtFileName) { }

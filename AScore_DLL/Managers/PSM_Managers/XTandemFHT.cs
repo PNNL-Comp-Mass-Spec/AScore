@@ -1,5 +1,8 @@
 ﻿namespace AScore_DLL.Managers.DatasetManagers
 {
+    /// <summary>
+    /// Track X!Tandem PSM results from a _fht.txt or _syn.txt file
+    /// </summary>
     public class XTandemFHT : DatasetManager
     {
         public XTandemFHT(string fhtFileName) : base(fhtFileName) { }

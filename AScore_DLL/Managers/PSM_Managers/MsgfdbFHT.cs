@@ -1,5 +1,8 @@
 ﻿namespace AScore_DLL.Managers.DatasetManagers
 {
+    /// <summary>
+    /// Track MS-GF+ PSM results from a _fht.txt or _syn.txt file
+    /// </summary>
     public class MsgfdbFHT : DatasetManager
     {
         public MsgfdbFHT(string fhtFileName) : base(fhtFileName) { }
