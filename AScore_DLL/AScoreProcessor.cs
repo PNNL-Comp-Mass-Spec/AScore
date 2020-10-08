@@ -656,7 +656,9 @@ namespace AScore_DLL
                 "_syn.txt",
                 "_fht.txt",
                 ".mzML",
-                ".mzXML"};
+                ".mzXML",
+                ".mzid"
+            };
 
             var dataFileName = Path.GetFileName(filePathOrDatasetName);
             if (dataFileName == null)
@@ -673,6 +675,7 @@ namespace AScore_DLL
                 }
             }
 
+            // No match to any of the standard suffixes
             var baseFileName = Path.GetFileNameWithoutExtension(dataFileName);
             return Utilities.TrimEnd(baseFileName, "_FIXED");
         }

@@ -27,11 +27,12 @@ namespace AScore_DLL.Managers.SpectraManagers
 
             try
             {
-                var datasetName  = Path.GetFileNameWithoutExtension(mzXmlPath);
-
                 // Note: prior to October 2017 the dataset name was determined by removing the last 4 characters from datasetName
                 // That logic seemed flawed and has thus been removed
-                DatasetName = datasetName;
+                if (mzXmlPath.EndsWith(".gz", StringComparison.OrdinalIgnoreCase))
+                    DatasetName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(mzXmlPath));
+                else
+                    DatasetName = Path.GetFileNameWithoutExtension(mzXmlPath);
 
                 mzAccessor = new clsMzXMLFileAccessor();
                 mzAccessor.OpenFile(mzXmlPath);
