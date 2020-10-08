@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using AScore_DLL;
 using PRISM;
+using PRISM.Logging;
 
 namespace AScore_Console
 {
@@ -175,7 +176,7 @@ namespace AScore_Console
         /// Attaches the Error, Warning, and Message events to the local event handler
         /// </summary>
         /// <param name="oClass"></param>
-        private static void AttachEvents(EventNotifier oClass)
+        private static void AttachEvents(IEventNotifier oClass)
         {
             oClass.ErrorEvent += ShowError;
             oClass.WarningEvent += ShowWarning;
