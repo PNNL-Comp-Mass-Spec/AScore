@@ -12,7 +12,6 @@ namespace AScore_DLL.Managers.SpectraManagers
         private readonly MzMLManager _mzMLManager;
         private readonly DtaManager _dtaManager;
         private ISpectraManager _currentSpectrumManager;
-        private string _currentSpectrumFilePath;
 
         /// <summary>
         /// Constructor
@@ -81,8 +80,9 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// </summary>
         /// <param name="psmResultsFilePath">_fht.txt or _syn.txt file</param>
         /// <param name="datasetName">Dataset name</param>
+        /// <param name="modSummaryFilePath">_ModSummary.txt file path, or an empty string to have AScore auto-find it</param>
         /// <returns></returns>
-        public ISpectraManager GetSpectraManagerForFile(string psmResultsFilePath, string datasetName)
+        public ISpectraManager GetSpectraManagerForFile(string psmResultsFilePath, string datasetName, string modSummaryFilePath)
         {
             var spectrumFilePath = GetSpectrumFilePath(psmResultsFilePath, datasetName);
 
@@ -92,13 +92,18 @@ namespace AScore_DLL.Managers.SpectraManagers
                 OnErrorEvent(errorMessage);
                 throw new Exception(errorMessage);
             }
-            OpenFile(spectrumFilePath);
+
+            OpenFile(spectrumFilePath, modSummaryFilePath);
+
             return _currentSpectrumManager;
         }
 
-        public void OpenFile(string filePath)
+        public void OpenFile(string spectrumFilePath, string modSummaryFilePath = "")
         {
-            if (filePath.EndsWith(".mzML", StringComparison.OrdinalIgnoreCase) || filePath.EndsWith(".mzML.gz", StringComparison.OrdinalIgnoreCase))
+            ModSummaryFilePath = modSummaryFilePath;
+
+            if (spectrumFilePath.EndsWith(".mzML", StringComparison.OrdinalIgnoreCase) ||
+                spectrumFilePath.EndsWith(".mzML.gz", StringComparison.OrdinalIgnoreCase))
             {
                 _currentSpectrumManager = _mzMLManager;
             }
@@ -106,12 +111,19 @@ namespace AScore_DLL.Managers.SpectraManagers
             {
                 _currentSpectrumManager = _dtaManager;
             }
-            _currentSpectrumFilePath = filePath;
+            SpectrumFilePath = spectrumFilePath;
 
-            OnStatusEvent("Opening " + PathUtils.CompactPathString(_currentSpectrumFilePath, 80));
-            _currentSpectrumManager.OpenFile(filePath);
+            OnStatusEvent("Opening " + PathUtils.CompactPathString(SpectrumFilePath, 80));
+            _currentSpectrumManager.OpenFile(spectrumFilePath);
         }
 
-        public string SpectrumFilePath => _currentSpectrumFilePath;
+        public string ModSummaryFilePath { get; private set; }
+
+        public string SpectrumFilePath { get; private set; }
+
+        public override string ToString()
+        {
+            return SpectrumFilePath ?? string.Empty;
+        }
     }
 }

@@ -123,7 +123,7 @@ namespace AScore_DLL
             }
             else
             {
-                spectraManager.OpenFile(ascoreOptions.MassSpecFile);
+                spectraManager.OpenFile(ascoreOptions.MassSpecFile, ascoreOptions.ModSummaryFile);
 
                 RunAScoreOnSingleFile(spectraManager, datasetManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
             }
@@ -260,9 +260,12 @@ namespace AScore_DLL
             string fastaFilePath = "",
             bool outputDescriptions = false)
         {
-            var jobToDatasetNameMap = new Dictionary<string, string>
+            var jobToDatasetNameMap = new Dictionary<string, DatasetFileInfo>
             {
-                {datasetManager.JobNum, spectraManager.SpectrumFilePath}
+                {
+                    psmResultsManager.JobNum,
+                    new DatasetFileInfo(spectraManager.SpectrumFilePath, spectraManager.ModSummaryFilePath)
+                }
             };
 
             if (spectraManager == null || !spectraManager.Initialized)
@@ -384,7 +387,12 @@ namespace AScore_DLL
 
                     if (!spectraFileOpened)
                     {
-                        spectraFile = spectraManager.GetSpectraManagerForFile(datasetManager.DatasetFilePath, datasetName);
+                        // This method was called from RunAScoreWithMappingFile
+                        // Open the spectrum file for this dataset
+                        spectraFile = spectraManager.GetSpectraManagerForFile(
+                            psmResultsManager.PSMResultsFilePath,
+                            datasetName,
+                            datasetInfo.ModSummaryFilePath);
                     }
                     else
                     {
@@ -404,7 +412,15 @@ namespace AScore_DLL
                     }
                     else
                     {
-                        modSummaryManager.ReadModSummary(spectraFile.DatasetName, datasetManager.DatasetFilePath, ascoreParameters);
+                        if (string.IsNullOrEmpty(datasetInfo.ModSummaryFilePath))
+                        {
+                            modSummaryManager.ReadModSummary(spectraFile.DatasetName, psmResultsManager.PSMResultsFilePath, ascoreParameters);
+                        }
+                        else
+                        {
+                            var modSummaryFile = new FileInfo(datasetInfo.ModSummaryFilePath);
+                            modSummaryManager.ReadModSummary(modSummaryFile, ascoreParameters);
+                        }
                     }
 
                     Console.WriteLine();

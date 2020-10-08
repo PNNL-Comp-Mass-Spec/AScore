@@ -48,6 +48,8 @@ namespace AScore_DLL
 
         string JobToDatasetMapFile { get; }
 
+        string ModSummaryFile { get; }
+
         string AScoreParamFile { get; }
 
         string OutputDirectoryPath { get; }

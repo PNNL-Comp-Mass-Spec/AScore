@@ -21,6 +21,9 @@ namespace AScore_Console
         [Option("JM", "JobToDatasetMapFile", HelpText = "Job-to-dataset map file path (this or -D is required). Use this instead of -D if the input FHT or Syn file has results from multiple jobs; the map file should have job numbers and dataset names, using columns named Job and Dataset.", HelpShowsDefault = false)]
         public string JobToDatasetMapFile { get; set; }
 
+        [Option("MS", "ModSummaryFile", HelpText = "_ModSummary file path; required for PHRP synopsis or first-hits files; ignored for .mzid files", HelpShowsDefault = false)]
+        public string ModSummaryFile { get; set; }
+
         [Option("P", "AScoreParamFile", Required = true, HelpText = "AScore-specific parameter file, specifying HCDMassTolerance and MSGFPreFilter (an example file is at https://github.com/PNNL-Comp-Mass-Spec/AScore/blob/master/AScore_Console/Parameter_Files/AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml)", HelpShowsDefault = false)]
         public string AScoreParamFile { get; set; }
 
@@ -69,6 +72,7 @@ namespace AScore_Console
             DbSearchResultsFile = string.Empty;
             MassSpecFile = string.Empty;
             JobToDatasetMapFile = string.Empty;
+            ModSummaryFile = string.Empty;
             AScoreParamFile = string.Empty;
             OutputDirectoryPath = ".";
             DoNotFilterOnMSGFScore = false;
