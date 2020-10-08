@@ -7,27 +7,27 @@ namespace AScore_Console
 {
     public class AScoreOptions : IAScoreOptions
     {
-        public const string PROGRAM_DATE = "August 20, 2020";
+        public const string PROGRAM_DATE = "October 8, 2020";
 
-        [Option("T", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
+        [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
 
-        [Option("F", Required = true, HelpText = "Path to first-hits file (or mzid file, for MSGF+)", HelpShowsDefault = false)]
+        [Option("F", "PSMResultsFile", Required = true, HelpText = "Path to PHRP first-hits file, PHRP synopsis file, or .mzid file", HelpShowsDefault = false)]
         public string DbSearchResultsFile { get; set; }
 
-        [Option("D", HelpText = "Spectra file path (this or -JM is required)", HelpShowsDefault = false)]
+        [Option("D", "DatasetFile", "SpectrumFile", HelpText = "Spectrum file path (.mzML, .mzML.gz, or _dta.txt); either -D or -JM must be provided", HelpShowsDefault = false)]
         public string MassSpecFile { get; set; }
 
-        [Option("JM", HelpText = "Job-to-dataset map file path (this or -D is required). Use this instead of -D if the FHT file has results from multiple jobs; the map file should have job numbers and dataset names, using columns names Job and Dataset.", HelpShowsDefault = false)]
+        [Option("JM", "JobToDatasetMapFile", HelpText = "Job-to-dataset map file path (this or -D is required). Use this instead of -D if the input FHT or Syn file has results from multiple jobs; the map file should have job numbers and dataset names, using columns named Job and Dataset.", HelpShowsDefault = false)]
         public string JobToDatasetMapFile { get; set; }
 
-        [Option("P", Required = true, HelpText = "Parameter file path", HelpShowsDefault = false)]
+        [Option("P", "AScoreParamFile", Required = true, HelpText = "AScore-specific parameter file, specifying HCDMassTolerance and MSGFPreFilter (an example file is at https://github.com/PNNL-Comp-Mass-Spec/AScore/blob/master/AScore_Console/Parameter_Files/AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml)", HelpShowsDefault = false)]
         public string AScoreParamFile { get; set; }
 
-        [Option("O", HelpText = "Output directory path")]
+        [Option("O", "OutputDirectory", HelpText = "Output directory path")]
         public string OutputDirectoryPath { get; set; }
 
-        [Option("L", HelpText = "Log file path")]
+        [Option("L", "LogFile", HelpText = "Log file path")]
         public string LogFilePath { get; set; }
 
         [Option("FM", Hidden = true, HelpText = "Old parameter - versions prior to February 17, 2017 required the user to specify this to filter on MSGF Score, and the new default is true")]
@@ -37,21 +37,21 @@ namespace AScore_Console
             set => DoNotFilterOnMSGFScore = !value;
         }
 
-        [Option("noFM", HelpText = "If specified, filtering on data in column MSGF_SpecProb/MSGF_SpecEValue is disabled")]
+        [Option("noFM", "DoNotFilterOnMSGFScore", HelpText = "If specified, filtering on data in column MSGF_SpecProb/MSGF_SpecEValue is disabled")]
         public bool DoNotFilterOnMSGFScore { get; set; }
 
-        [Option("U", HelpText = "Output FHT file name; if set, a copy of the FHT file with updated peptide sequences and additional AScore-related columns will be created")]
+        [Option("U", HelpText = "Output FHT or Syn  file name; if set, a copy of the input FHT or Syn  file with updated peptide sequences and additional AScore-related columns will be created")]
         public string UpdatedDbSearchResultsFileName { get; set; }
 
         public bool CreateUpdatedDbSearchResultsFile { get; private set; }
 
-        [Option("Skip", HelpText = "If specified, will not re-run AScore if a results file already exists")]
+        [Option("Skip", "SkipExistingResults", HelpText = "If specified, will not re-run AScore if a results file already exists")]
         public bool SkipExistingResults { get; set; }
 
-        [Option("Fasta", HelpText = "Fasta file path; if set, Protein Data from the Fasta file will be included in the output")]
+        [Option("Fasta", "FastaFile", HelpText = "Fasta file path; if set, Protein Data from the Fasta file will be included in the output")]
         public string FastaFilePath { get; set; }
 
-        [Option("PD", HelpText = "If specified, the Protein Description from the Fasta file will also be included in the output. REQUIRES -Fasta")]
+        [Option("PD", "OutputProteinDescriptions", HelpText = "If specified, the Protein Description from the Fasta file will also be included in the output. REQUIRES -Fasta")]
         public bool OutputProteinDescriptions { get; set; }
 
         public bool MultiJobMode { get; private set; }
