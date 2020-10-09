@@ -21,38 +21,24 @@ namespace AScore_DLL.Managers
     /// </summary>
     public class ChargeStateIons
     {
-        #region Class Members
-
-        #region Variables
-
-        private int chargeState = -1;
-
-        // No phosphorylation ions
-        private readonly List<double> bIonsOut = new List<double>();
-        private readonly List<double> yIonsOut = new List<double>();
-
-        #endregion // Variables
-
         #region Properties
 
         /// <summary>
         /// Gets the charge state this fragment ion represents
         /// </summary>
-        public int ChargeState => chargeState;
+        public int ChargeState { get; private set; } = -1;
 
         /// <summary>
         /// Gets the bIons with no phosphorylation
         /// </summary>
-        public List<double> BIons => bIonsOut;
+        public List<double> BIons { get; } = new List<double>();
 
         /// <summary>
         /// Gets the yIons with no phosphorylation
         /// </summary>
-        public List<double> YIons => yIonsOut;
+        public List<double> YIons { get; } = new List<double>();
 
         #endregion // Properties
-
-        #endregion // Class Members
 
         #region Constructor
 
@@ -97,7 +83,7 @@ namespace AScore_DLL.Managers
             {
                 fragIon = new ChargeStateIons
                 {
-                    chargeState = chargeState
+                    ChargeState = chargeState
                 };
 
                 // Set the charge state of the fragment ion
@@ -119,8 +105,8 @@ namespace AScore_DLL.Managers
                                 sumOfModsY += mod.MassMonoisotopic;
                             }
                         }
-                        fragIon.bIonsOut.Add(bIons[i] + sumOfModsB);
-                        fragIon.yIonsOut.Add(yIons[i] + sumOfModsY);
+                        fragIon.BIons.Add(bIons[i] + sumOfModsB);
+                        fragIon.YIons.Add(yIons[i] + sumOfModsY);
                     }
                 }
             }
@@ -130,7 +116,7 @@ namespace AScore_DLL.Managers
                 sumOfModsY = sumOfModsB;
                 fragIon = new ChargeStateIons
                 {
-                    chargeState = chargeState
+                    ChargeState = chargeState
                 };
 
                 // Set the charge state of the fragment ion
@@ -154,8 +140,8 @@ namespace AScore_DLL.Managers
                                 sumOfModsY += mod.MassMonoisotopic;
                             }
                         }
-                        fragIon.bIonsOut.Add((bIons[i] + sumOfModsB /*+temp*/) / chargeState);
-                        fragIon.yIonsOut.Add((yIons[i] + sumOfModsY /*+temp*/) / chargeState);
+                        fragIon.BIons.Add((bIons[i] + sumOfModsB /*+temp*/) / chargeState);
+                        fragIon.YIons.Add((yIons[i] + sumOfModsY /*+temp*/) / chargeState);
                     }
                 }
             }

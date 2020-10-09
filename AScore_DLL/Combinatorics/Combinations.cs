@@ -258,7 +258,7 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// The type of Combinations set that is generated.
         /// </summary>
-        public GenerateOption Type => myMetaCollectionType;
+        public GenerateOption Type { get; private set; }
 
         /// <summary>
         /// The upper index of the meta-collection, equal to the number of items in the initial set.
@@ -299,7 +299,7 @@ namespace AScore_DLL.Combinatorics
         /// </remarks>
         private void Initialize(ICollection<T> values, int lowerIndex, GenerateOption type)
         {
-            myMetaCollectionType = type;
+            Type = type;
             myLowerIndex = lowerIndex;
             myValues = new List<T>();
             myValues.AddRange(values);
@@ -345,11 +345,6 @@ namespace AScore_DLL.Combinatorics
         /// Permutations object that handles permutations on booleans for combination inclusion.
         /// </summary>
         private Permutations<bool> myPermutations;
-
-        /// <summary>
-        /// The type of the combination collection.
-        /// </summary>
-        private GenerateOption myMetaCollectionType;
 
         /// <summary>
         /// The lower index defined in the constructor.

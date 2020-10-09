@@ -42,21 +42,18 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         #region Variables
 
-        private string m_datasetName;
         private StreamReader m_masterDta;
         private readonly Dictionary<string, long> dtaEntries = new Dictionary<string, long>();
 
         private readonly PHRPReader.clsPeptideMassCalculator m_PeptideMassCalculator;
 
-        private bool m_initialized;
-
         #endregion // Variables
 
         #region Properties
 
-        public string DatasetName => m_datasetName;
+        public string DatasetName { get; private set; }
 
-        public bool Initialized => m_initialized;
+        public bool Initialized { get; private set; }
 
         #endregion // Properties
 
@@ -71,7 +68,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         public DtaManager(PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
         {
             m_PeptideMassCalculator = peptideMassCalculator;
-            m_initialized = false;
+            Initialized = false;
         }
 
         /// <summary>
@@ -96,7 +93,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         ~DtaManager()
         {
             ClearCachedData();
-            m_initialized =false;
+            Initialized =false;
         }
 
         #endregion // Destructor
@@ -105,22 +102,22 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         public void OpenFile(string filePath)
         {
-            if (string.Equals(filePath, m_datasetName))
+            if (string.Equals(filePath, DatasetName))
             {
                 // Don't reopen the same file.
                 return;
             }
 
-            if (m_initialized)
+            if (Initialized)
                 ClearCachedData();
 
             try
             {
-                m_datasetName = Path.GetFileNameWithoutExtension(filePath);
-                if (string.IsNullOrEmpty(m_datasetName))
+                DatasetName = Path.GetFileNameWithoutExtension(filePath);
+                if (string.IsNullOrEmpty(DatasetName))
                     throw new FileNotFoundException("Master Dta filename is empty");
 
-                m_datasetName = Utilities.TrimEnd(m_datasetName, "_dta");
+                DatasetName = Utilities.TrimEnd(DatasetName, "_dta");
 
                 Initialize(filePath);
             }
@@ -150,7 +147,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         public string GetDtaFileName(int scanNumber, int scanCount, int chargeState, string scanPrefixPad)
         {
-            if (!m_initialized)
+            if (!Initialized)
                 throw new Exception("Class has not yet been initialized; call OpenCDTAFile() before calling this function");
 
             if (string.IsNullOrWhiteSpace(scanPrefixPad))
@@ -160,7 +157,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             var scanEnd = scanPrefixPad + (scanNumber + scanCount - 1);
 
             return string.Format("{0}.{1}.{2}.{3}.dta",
-                m_datasetName, scanStart,
+                DatasetName, scanStart,
                 scanEnd, chargeState);
         }
 
@@ -171,7 +168,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// spectra name exists, null if it does not.</returns>
         public ExperimentalSpectra GetExperimentalSpectra(int scanNumber, int scanCount, int psmChargeState)
         {
-            if (!m_initialized)
+            if (!Initialized)
                 throw new Exception("Class has not yet been initialized; call OpenCDTAFile() before calling this function");
 
             var dtaChargeState = psmChargeState;
@@ -385,7 +382,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 throw new Exception("Error initializing the DtaManager using " + m_masterDta + ": " + ex.Message);
             }
 
-            m_initialized = true;
+            Initialized = true;
         }
 
         #endregion // Private Methods

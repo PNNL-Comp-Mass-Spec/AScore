@@ -59,9 +59,6 @@ namespace AScore_DLL
         #region Variables
 
         // This controls the mass numbers that are returned
-        private static MassType massType =
-            MassType.Monoisotopic;
-
         #endregion // Variables
 
         #region Properties
@@ -69,11 +66,7 @@ namespace AScore_DLL
         /// <summary>
         /// Gets or sets the current mass type
         /// </summary>
-        public static MassType MassType
-        {
-            get => massType;
-            set => massType = value;
-        }
+        public static MassType MassType { get; set; } = MassType.Monoisotopic;
 
         #endregion // Properties
 
@@ -129,7 +122,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 71.0779;
                     case MassType.Monoisotopic: return 71.037114;
@@ -145,7 +138,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 156.1857;
                     case MassType.Monoisotopic: return 156.10111;
@@ -161,7 +154,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 114.1026;
                     case MassType.Monoisotopic: return 114.04293;
@@ -177,7 +170,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 115.0874;
                     case MassType.Monoisotopic: return 115.02694;
@@ -193,7 +186,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 103.1429;
                     case MassType.Monoisotopic: return 103.00919;
@@ -209,7 +202,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 129.11400;
                     case MassType.Monoisotopic: return 129.04259;
@@ -225,7 +218,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 128.12920;
                     case MassType.Monoisotopic: return 128.05858;
@@ -241,7 +234,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 57.05130;
                     case MassType.Monoisotopic: return 57.021464;
@@ -257,7 +250,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 137.13930;
                     case MassType.Monoisotopic: return 137.05891;
@@ -273,7 +266,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 113.15760;
                     case MassType.Monoisotopic: return 113.08406;
@@ -289,7 +282,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 113.1576;
                     case MassType.Monoisotopic: return 113.08406;
@@ -305,7 +298,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 128.1723;
                     case MassType.Monoisotopic: return 128.09496;
@@ -321,7 +314,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 131.1961;
                     case MassType.Monoisotopic: return 131.04048;
@@ -337,7 +330,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 147.1739;
                     case MassType.Monoisotopic: return 147.06841;
@@ -353,7 +346,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 97.1152;
                     case MassType.Monoisotopic: return 97.052764;
@@ -369,7 +362,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 87.0773;
                     case MassType.Monoisotopic: return 87.032029;
@@ -385,7 +378,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 101.1039;
                     case MassType.Monoisotopic: return 101.04768;
@@ -401,7 +394,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 186.2099;
                     case MassType.Monoisotopic: return 186.07931;
@@ -417,7 +410,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 163.1733;
                     case MassType.Monoisotopic: return 163.06333;
@@ -433,7 +426,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 99.13110;
                     case MassType.Monoisotopic: return 99.068414;
@@ -452,9 +445,6 @@ namespace AScore_DLL
         #region Variables
 
         // This controls the mass numbers that are returned
-        private static MassType massType =
-            MassType.Monoisotopic;
-
         #endregion // Variables
 
         #region Properties
@@ -462,11 +452,7 @@ namespace AScore_DLL
         /// <summary>
         /// Gets or sets the current mass type
         /// </summary>
-        public static MassType MassType
-        {
-            get => massType;
-            set => massType = value;
-        }
+        public static MassType MassType { get; set; } = MassType.Monoisotopic;
 
         #endregion // Properties
 
@@ -481,7 +467,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 1.0072765;
                     case MassType.Monoisotopic: return 1.0072765;
@@ -497,7 +483,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 18.0153214;
                     case MassType.Monoisotopic: return 18.0105633;
@@ -513,7 +499,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 17.03065;
                     case MassType.Monoisotopic: return 17.026547;
@@ -529,7 +515,7 @@ namespace AScore_DLL
         {
             get
             {
-                switch (massType)
+                switch (MassType)
                 {
                     case MassType.Average: return 16.02267;
                     case MassType.Monoisotopic: return 16.0187224;

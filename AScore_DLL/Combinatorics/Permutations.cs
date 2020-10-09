@@ -328,7 +328,7 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// The type of Permutations set that is generated.
         /// </summary>
-        public GenerateOption Type => myMetaCollectionType;
+        public GenerateOption Type { get; private set; }
 
         /// <summary>
         /// The upper index of the meta-collection, equal to the number of items in the initial set.
@@ -369,7 +369,7 @@ namespace AScore_DLL.Combinatorics
         /// </remarks>
         private void Initialize(ICollection<T> values, GenerateOption type, IComparer<T> comparer)
         {
-            myMetaCollectionType = type;
+            Type = type;
             myValues = new List<T>(values.Count);
             myValues.AddRange(values);
             myLexicographicOrders = new int[values.Count];
@@ -465,11 +465,6 @@ namespace AScore_DLL.Combinatorics
                 return ((IComparable<TU>)x).CompareTo(y);
             }
         }
-
-        /// <summary>
-        /// The type of Permutations that this was initialized from.
-        /// </summary>
-        private GenerateOption myMetaCollectionType;
 
         #endregion
     }
