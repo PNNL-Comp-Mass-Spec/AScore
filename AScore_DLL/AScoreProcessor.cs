@@ -103,7 +103,11 @@ namespace AScore_DLL
                     break;
 
                 default:
-                    OnErrorEvent("Incorrect search type: " + ascoreOptions.SearchType + " , supported values are " + string.Join(", ", Enum.GetNames(typeof(SearchMode))));
+                    OnErrorEvent(string.Format(
+                        "Incorrect search type: {0} , supported values are {1}",
+                        ascoreOptions.SearchType,
+                        string.Join(", ", Enum.GetNames(typeof(AScoreOptions.SearchMode)))
+                        ));
                     return -13;
             }
             var peptideMassCalculator = new clsPeptideMassCalculator();
