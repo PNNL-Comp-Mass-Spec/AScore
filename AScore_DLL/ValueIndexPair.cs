@@ -18,7 +18,7 @@ namespace AScore_DLL
     /// Stores a value and a specified index associated with the value. Default sort orders by Value (descending), then by Index
     /// </summary>
     /// <typeparam name="T">The type of value to store.</typeparam>
-    public struct ValueIndexPair<T> : IComparable<ValueIndexPair<T>>
+    public readonly struct ValueIndexPair<T> : IComparable<ValueIndexPair<T>>
         where T : IComparable
     {
         /// <summary>
