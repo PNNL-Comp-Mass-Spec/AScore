@@ -38,8 +38,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             return GetFilePath(datasetFilePath, datasetName);
         }
 
-        #region Class Members
-
         #region Variables
 
         private StreamReader m_masterDta;
@@ -56,8 +54,6 @@ namespace AScore_DLL.Managers.SpectraManagers
         public bool Initialized { get; private set; }
 
         #endregion // Properties
-
-        #endregion // Class Members
 
         #region Constructor
 

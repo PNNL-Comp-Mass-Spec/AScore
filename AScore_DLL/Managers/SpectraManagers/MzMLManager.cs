@@ -41,8 +41,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             return GetFilePath(datasetFilePath, datasetName);
         }
 
-        #region Class Members
-
         #region Variables
 
         private SimpleMzMLReader m_MzMLReader;
@@ -53,8 +51,6 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         private readonly PHRPReader.clsPeptideMassCalculator m_PeptideMassCalculator;
         #endregion // Variables
-
-        #endregion // Class Members
 
         #region Constructor
 

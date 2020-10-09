@@ -54,8 +54,6 @@ namespace AScore_DLL
     /// </summary>
     public static class AminoAcidMass
     {
-        #region Class Members
-
         #region Variables
 
         // This controls the mass numbers that are returned
@@ -69,8 +67,6 @@ namespace AScore_DLL
         public static MassType MassType { get; set; } = MassType.Monoisotopic;
 
         #endregion // Properties
-
-        #endregion // Class Members
 
         #region Public Methods
 
@@ -440,8 +436,6 @@ namespace AScore_DLL
 
     public static class MolecularWeights
     {
-        #region Class Members
-
         #region Variables
 
         // This controls the mass numbers that are returned
@@ -455,8 +449,6 @@ namespace AScore_DLL
         public static MassType MassType { get; set; } = MassType.Monoisotopic;
 
         #endregion // Properties
-
-        #endregion // Class Members
 
         #region Molecular Weights
 
