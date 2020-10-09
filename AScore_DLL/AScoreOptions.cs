@@ -1,12 +1,47 @@
 ﻿using System;
 using System.IO;
-using AScore_DLL;
 using PRISM;
 
-namespace AScore_Console
+namespace AScore_DLL
 {
-    public class AScoreOptions : IAScoreOptions
+    public class AScoreOptions
     {
+        public enum SearchMode
+        {
+            /// <summary>
+            /// SEQUEST
+            /// </summary>
+            Sequest,
+            /// <summary>
+            /// X!Tandem
+            /// </summary>
+            XTandem,
+            /// <summary>
+            /// Inspect
+            /// </summary>
+            Inspect,
+            /// <summary>
+            /// Old name for MS-GF+
+            /// </summary>
+            Msgfdb,
+            /// <summary>
+            /// MS-GF+
+            /// </summary>
+            Msgfplus
+        }
+
+        public enum DbSearchResultsType
+        {
+            /// <summary>
+            /// PHRP First Hits file or Synopsis file
+            /// </summary>
+            Fht,
+            /// <summary>
+            /// .mzid file
+            /// </summary>
+            Mzid,
+        }
+
         public const string PROGRAM_DATE = "October 8, 2020";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
@@ -61,6 +96,9 @@ namespace AScore_Console
 
         public DbSearchResultsType SearchResultsType { get; private set; }
 
+        /// <summary>
+        /// Name of the output file (auto-defined)
+        /// </summary>
         public string AScoreResultsFilePath { get; private set; }
 
         public DirectoryInfo OutputDirectoryInfo { get; private set; }
@@ -85,6 +123,15 @@ namespace AScore_Console
             OutputProteinDescriptions = false;
             MultiJobMode = false;
             AScoreResultsFilePath = string.Empty;
+        }
+
+        /// <summary>
+        /// Override the auto-defined results file path
+        /// </summary>
+        /// <param name="resultsFilePath"></param>
+        public void SetAScoreResultsFilePath(string resultsFilePath)
+        {
+            AScoreResultsFilePath = resultsFilePath;
         }
 
         public bool Validate(out string errorMessage)

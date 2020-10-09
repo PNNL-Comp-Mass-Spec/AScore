@@ -59,11 +59,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AScoreAlgorithm.cs" />
+    <Compile Include="AScoreOptions.cs" />
     <Compile Include="AScoreProcessor.cs" />
     <Compile Include="AScoreProteinMapper.cs" />
     <Compile Include="AScoreResult.cs" />
     <Compile Include="DatasetFileInfo.cs" />
-    <Compile Include="IAScoreOptions.cs" />
     <Compile Include="Managers\ModSummaryFileManager.cs" />
     <Compile Include="Managers\PSM_Managers\PsmResultsManager.cs" />
     <Compile Include="Managers\PSM_Managers\InspectFHT.cs" />

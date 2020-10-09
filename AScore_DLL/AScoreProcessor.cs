@@ -34,7 +34,7 @@ namespace AScore_DLL
         /// </summary>
         /// <param name="ascoreOptions"></param>
         /// <returns></returns>
-        public int RunAScore(IAScoreOptions ascoreOptions)
+        public int RunAScore(AScoreOptions ascoreOptions)
         {
             var paramManager = new ParameterFileManager(ascoreOptions.AScoreParamFile);
             RegisterEvents(paramManager);
@@ -67,25 +67,25 @@ namespace AScore_DLL
 
             switch (ascoreOptions.SearchType)
             {
-                case SearchMode.XTandem:
+                case AScoreOptions.SearchMode.XTandem:
                     OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
                     psmResultsManager = new XTandemFHT(ascoreOptions.DbSearchResultsFile);
                     break;
 
-                case SearchMode.Sequest:
+                case AScoreOptions.SearchMode.Sequest:
                     OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
                     psmResultsManager = new SequestFHT(ascoreOptions.DbSearchResultsFile);
                     break;
 
-                case SearchMode.Inspect:
+                case AScoreOptions.SearchMode.Inspect:
                     OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
                     psmResultsManager = new InspectFHT(ascoreOptions.DbSearchResultsFile);
                     break;
 
-                case SearchMode.Msgfdb:
-                case SearchMode.Msgfplus:
+                case AScoreOptions.SearchMode.Msgfdb:
+                case AScoreOptions.SearchMode.Msgfplus:
                     OnStatusEvent("Caching data in " + PathUtils.CompactPathString(ascoreOptions.DbSearchResultsFile, 80));
-                    if (ascoreOptions.SearchResultsType == DbSearchResultsType.Mzid)
+                    if (ascoreOptions.SearchResultsType == AScoreOptions.DbSearchResultsType.Mzid)
                     {
                         if (ascoreOptions.CreateUpdatedDbSearchResultsFile)
                         {
@@ -154,7 +154,7 @@ namespace AScore_DLL
         /// Reads the ascore results and merges them into the FHT file
         /// </summary>
         /// <param name="ascoreOptions"></param>
-        public void CreateUpdatedFirstHitsFile(IAScoreOptions ascoreOptions)
+        public void CreateUpdatedFirstHitsFile(AScoreOptions ascoreOptions)
         {
             var resultsMerger = new PHRPResultsMerger();
             RegisterEvents(resultsMerger);

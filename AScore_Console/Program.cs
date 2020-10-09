@@ -163,7 +163,7 @@ namespace AScore_Console
             {
                 ShowMessage("Existing results file found; will not re-create");
 
-                if (ascoreOptions.CreateUpdatedDbSearchResultsFile && ascoreOptions.SearchResultsType == DbSearchResultsType.Fht)
+                if (ascoreOptions.CreateUpdatedDbSearchResultsFile && ascoreOptions.SearchResultsType == AScoreOptions.DbSearchResultsType.Fht)
                 {
                     processor.CreateUpdatedFirstHitsFile(ascoreOptions);
                 }
