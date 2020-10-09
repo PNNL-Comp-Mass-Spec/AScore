@@ -433,6 +433,11 @@ namespace AScore_DLL
                     spectraManagerCurrentJob = string.Copy(psmResultsManager.JobNum);
                     Console.Write("\r");
 
+                    if (string.IsNullOrWhiteSpace(datasetInfo.ModSummaryFilePath) && !string.IsNullOrWhiteSpace(ascoreOptions.ModSummaryFile))
+                    {
+                        datasetInfo.ModSummaryFilePath = ascoreOptions.ModSummaryFile;
+                    }
+
                     if (psmResultsManager is MsgfMzid mzid)
                     {
                         mzid.SetModifications(ascoreParams);

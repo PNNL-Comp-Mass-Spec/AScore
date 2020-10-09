@@ -12,7 +12,7 @@ namespace AScore_DLL
         /// </remarks>
         public string SpectrumFilePath { get; }
 
-        public string ModSummaryFilePath { get; }
+        public string ModSummaryFilePath { get; set; }
 
         /// <summary>
         /// Constructor
