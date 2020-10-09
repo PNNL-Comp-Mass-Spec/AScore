@@ -1,6 +1,4 @@
-﻿//Joshua Aldrich
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Xml;
 using AScore_DLL.Mod;
@@ -14,7 +12,7 @@ namespace AScore_DLL.Managers
     /// </summary>
     public class ParameterFileManager : EventNotifier
     {
-        // Ignore Spelling: ascore, Da, pre, pos, nterm, cterm
+        // Ignore Spelling: ascore, Da, pre, pos, Nterm, Cterm
 
         #region Member Variables
 
@@ -195,7 +193,7 @@ namespace AScore_DLL.Managers
         /// Parses the parameter file for ascore
         /// This parameter file defines mass tolerances by fragmentation type
         /// </summary>
-        /// <param name="ascoreParameterFilePath">Path to the xml file</param>
+        /// <param name="ascoreParameterFilePath">Path to the AScore Params xml file</param>
         /// <returns>ascore parameters object</returns>
         /// <remarks>
         /// The legacy version of the AScore parameter file has elements "FragmentType" and "MassTolerance" in the "Run" block

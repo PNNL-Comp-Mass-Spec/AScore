@@ -1,6 +1,4 @@
-﻿//Joshua Aldrich
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AScore_DLL.Mod;
 using System.Collections;
 
@@ -9,7 +7,7 @@ namespace AScore_DLL.Managers
     /// <summary>
     /// An object which holds the b and y ion uncharged masses
     /// </summary>
-    public class TheoreticalSpectra:IEnumerable
+    public class TheoreticalSpectra : IEnumerable
     {
         private int chargeState;
         private readonly List<double> bIonsMass = new List<double>();
@@ -136,7 +134,7 @@ namespace AScore_DLL.Managers
 
         /// <summary>
         /// Makes the call to generate the ion masses
-        /// Adjusts for etd fragmentation
+        /// Adjusts for ETD fragmentation
         /// </summary>
         /// <param name="charge">charge, do i need this?</param>
         /// <param name="ascoreParams">AScore parameters</param>
@@ -177,11 +175,11 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Generates a theoretical spectra based on a modification list and positions for those modifications
         /// </summary>
-        /// <param name="positions">int array has modifications at indice in which they occur in the sequence</param>
+        /// <param name="positions">int array has modifications at indices in which they occur in the sequence</param>
         /// <param name="myMods">dynamic modification list</param>
         /// <param name="massType"></param>
         /// <returns>Dictionary of theoretical ions organized by charge</returns>
-        public Dictionary<int,ChargeStateIons> GetTempSpectra(int[] positions, List<DynamicModification> myMods,MassType massType)
+        public Dictionary<int, ChargeStateIons> GetTempSpectra(int[] positions, List<DynamicModification> myMods, MassType massType)
         {
             var tempFragIons = new Dictionary<int, ChargeStateIons>();
             for (var i = 1; i < chargeState; ++i)

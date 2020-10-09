@@ -1,6 +1,4 @@
-﻿//Joshua Aldrich
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace AScore_DLL.Mod
 {

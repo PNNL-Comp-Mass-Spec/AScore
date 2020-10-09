@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-// The DLL is required for execution of the PeptideToProteinMapper
 using PeptideToProteinMapEngine;
 using PHRPReader;
 using PRISM;

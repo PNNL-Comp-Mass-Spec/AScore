@@ -11,6 +11,8 @@
 
 namespace AScore_DLL
 {
+    // Ignore Spelling: Rehkop, Aspartic, Glutamic
+
     public enum MassType
     {
         /// <summary>

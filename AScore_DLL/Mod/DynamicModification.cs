@@ -1,6 +1,4 @@
-﻿//Joshua Aldrich
-
-namespace AScore_DLL.Mod
+﻿namespace AScore_DLL.Mod
 {
     /// <summary>
     /// Dynamic modification object

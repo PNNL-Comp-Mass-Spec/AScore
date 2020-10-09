@@ -1,6 +1,4 @@
-﻿//Joshua Aldrich
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace AScore_DLL.Combinatorics
@@ -54,7 +52,7 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// Creates a set lists ordered by the dynamic modification list order.
         /// Each list contains the indices within the sequence for possible sites of modification
-        /// ie R.RFLPSCTK.M would have possiblePositions[0] = {4,6} if phosphorylation were the first
+        /// i.e. R.RFLPSCTK.M would have possiblePositions[0] = {4,6} if phosphorylation were the first
         /// mod in dynamic mods
         /// </summary>
         /// <param name="dynMods">Dynamic modification list from AScore parameters</param>
@@ -160,7 +158,7 @@ namespace AScore_DLL.Combinatorics
         /// Creates a list of modification types each having a list of positional combinations which are themselves int lists
         /// </summary>
         /// <param name="sitePositions">list of site position lists</param>
-        /// <param name="myMods">dynamic modifications from ascore parameters</param>
+        /// <param name="myMods">dynamic modifications from AScore parameters</param>
         /// <returns></returns>
         public static List<List<List<int>>> GenerateCombosToCheck(List<List<int>> sitePositions, List<Mod.DynamicModification> myMods)
         {
