@@ -458,11 +458,11 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// Inner class that wraps an IComparer around a type T when it is IComparable
         /// </summary>
-        private class SelfComparer<U> : IComparer<U>
+        private class SelfComparer<TU> : IComparer<TU>
         {
-            public int Compare(U x, U y)
+            public int Compare(TU x, TU y)
             {
-                return ((IComparable<U>)x).CompareTo(y);
+                return ((IComparable<TU>)x).CompareTo(y);
             }
         }
 

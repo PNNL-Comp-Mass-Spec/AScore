@@ -75,7 +75,7 @@ namespace AScore_DLL.Managers
         /// <param name="chargeState">Desired charge state for the fragment ion.
         /// Must be greater than 0.</param>
         /// <param name="massType">Mass type.</param>
-        /// <param name="dynamMods">Dynamic mods</param>
+        /// <param name="dynamicMods">Dynamic mods</param>
         /// <param name="positions">Mod positions</param>
         /// <param name="bIons">The bIons to use corresponding to the mass type.</param>
         /// <param name="yIons">The yIons to use corresponding to the mass type.</param>
@@ -84,76 +84,78 @@ namespace AScore_DLL.Managers
         /// <returns>A newly constructed FragmentIon upon success, null if any
         /// errors occurred during construction.</returns>
         public static ChargeStateIons GenerateFragmentIon(int chargeState,
-            MassType massType, List<Mod.DynamicModification> dynamMods, int[] positions,
+            MassType massType, List<Mod.DynamicModification> dynamicMods, int[] positions,
             List<double> bIons, List<double> yIons, int peptideLength)
         {
             ChargeStateIons fragIon = null;
             MolecularWeights.MassType = massType;
-            var sumofModsB = 0.0;
-            var sumofModsY = 0.0;
+            var sumOfModsB = 0.0;
+            var sumOfModsY = 0.0;
 
             // If the charge state is one, create the
             if (chargeState == 1)
             {
-                fragIon = new ChargeStateIons {
+                fragIon = new ChargeStateIons
+                {
                     chargeState = chargeState
                 };
 
                 // Set the charge state of the fragment ion
 
                 // There is a phosphorylation site
-                if (dynamMods.Count > 0)
+                if (dynamicMods.Count > 0)
                 {
                     // bIons
                     for (var i = 0; i < bIons.Count; ++i)
                     {
-                        foreach (var mod in dynamMods)
+                        foreach (var mod in dynamicMods)
                         {
                             if (mod.UniqueID == positions[i])
                             {
-                                sumofModsB += mod.MassMonoisotopic;
+                                sumOfModsB += mod.MassMonoisotopic;
                             }
                             if (mod.UniqueID == positions[peptideLength - 1 - i])
                             {
-                                sumofModsY += mod.MassMonoisotopic;
+                                sumOfModsY += mod.MassMonoisotopic;
                             }
                         }
-                            fragIon.bIonsOut.Add(bIons[i] + sumofModsB);
-                            fragIon.yIonsOut.Add(yIons[i] + sumofModsY);
+                        fragIon.bIonsOut.Add(bIons[i] + sumOfModsB);
+                        fragIon.yIonsOut.Add(yIons[i] + sumOfModsY);
                     }
                 }
             }
             else if (chargeState > 1)
             {
-                sumofModsB = (chargeState - 1) * MolecularWeights.Hydrogen;
-                sumofModsY = sumofModsB;
-                fragIon = new ChargeStateIons {
+                sumOfModsB = (chargeState - 1) * MolecularWeights.Hydrogen;
+                sumOfModsY = sumOfModsB;
+                fragIon = new ChargeStateIons
+                {
                     chargeState = chargeState
                 };
 
-                // Set the charge state of the frag ion
+                // Set the charge state of the fragment ion
 
                 // The value to add to each ion
                 //  double temp = (chargeState - 1) * MolecularWeights.Hydrogen;
 
                 // There is a phosphorylation site
-                if(dynamMods.Count > 0)
+                if (dynamicMods.Count > 0)
                 {
                     for (var i = 0; i < bIons.Count; ++i)
                     {
-                        foreach (var mod in dynamMods)
+                        foreach (var mod in dynamicMods)
                         {
                             if (mod.UniqueID == positions[i])
                             {
-                                sumofModsB += mod.MassMonoisotopic;
+                                sumOfModsB += mod.MassMonoisotopic;
                             }
                             if (mod.UniqueID == positions[peptideLength - 1 - i])
                             {
-                                sumofModsY += mod.MassMonoisotopic;
+                                sumOfModsY += mod.MassMonoisotopic;
                             }
                         }
-                        fragIon.bIonsOut.Add((bIons[i] + sumofModsB /*+temp*/)/chargeState);
-                        fragIon.yIonsOut.Add((yIons[i] + sumofModsY/*+temp*/) / chargeState);
+                        fragIon.bIonsOut.Add((bIons[i] + sumOfModsB /*+temp*/) / chargeState);
+                        fragIon.yIonsOut.Add((yIons[i] + sumOfModsY /*+temp*/) / chargeState);
                     }
                 }
             }

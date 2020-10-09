@@ -173,12 +173,13 @@ namespace AScore_DLL.Managers
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Make a copy of this class
         /// </summary>
         /// <returns></returns>
         ///
-        public ParameterFileManager Copy()
+        public ParameterFileManager Clone()
         {
             return new ParameterFileManager(
                 new List<Modification>(StaticMods),
