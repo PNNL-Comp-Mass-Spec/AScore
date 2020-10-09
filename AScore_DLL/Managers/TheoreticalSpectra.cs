@@ -12,19 +12,18 @@ namespace AScore_DLL.Managers
     public class TheoreticalSpectra:IEnumerable
     {
         private int chargeState;
-        private int count;
-        private double peptideMassWithStaticMods;
+        private readonly List<double> bIonsMass = new List<double>();
+        private readonly List<double> yIonsMass = new List<double>();
 
-        readonly List<double> bIonsMass= new List<double>();
-        readonly List<double> yIonsMass = new List<double>();
-        readonly string peptideSequence;                         // Peptide sequence, without any mods
-
-        public int Count => count;
+        /// <summary>
+        /// Peptide sequence, without any mods
+        /// </summary>
+        private readonly string peptideSequence;
 
         /// <summary>
         /// Computed, theoretical mass of the peptide, including static mods but not including dynamic mods
         /// </summary>
-        public double PeptideNeutralMassWithStaticMods => peptideMassWithStaticMods;
+        public double PeptideNeutralMassWithStaticMods { get; private set; }
 
         /// <summary>
         /// Creates the theoretical mass spectrum for the given peptide
@@ -32,11 +31,9 @@ namespace AScore_DLL.Managers
         /// <param name="sequenceClean">Clean sequence (no mod symbols)</param>
         /// <param name="ascoreParams"></param>
         /// <param name="chargeS"></param>
-        /// <param name="moveMod"></param>
         /// <param name="massType"></param>
         /// <remarks>The theoretical mass spectrum takes into account static mods and static N-terminal mods.  It does not include dynamic mods</remarks>
-        public TheoreticalSpectra(string sequenceClean, ParameterFileManager ascoreParameters, int chargeS,
-            List<Mod.DynamicModification> moveMod, MassType massType)
+        public TheoreticalSpectra(string sequenceClean, ParameterFileManager ascoreParams, int chargeS, MassType massType)
         {
             chargeState = chargeS;
             this.peptideSequence = sequenceClean;
@@ -50,7 +47,7 @@ namespace AScore_DLL.Managers
         /// <param name="terminiMods"></param>
         /// <returns>The peptide mass, including static modifications</returns>
         private double GenerateIonMasses(IReadOnlyCollection<Modification> staticMods,
-            List<Modification> terminiMods)
+            IReadOnlyCollection<Modification> terminiMods)
         {
             // Need to iterate through each amino acid in the peptide to
             // generate the ion masses
@@ -113,7 +110,7 @@ namespace AScore_DLL.Managers
         /// <param name="aAcid">current sequence position amino acid letter</param>
         /// <param name="leftSide">true for n-terminus false for c-terminus</param>
         /// <returns>modified mass</returns>
-        private static double EdgeCase(double mass, List<Modification> terminiMods, char aAcid, bool leftSide)
+        private static double EdgeCase(double mass, IEnumerable<Modification> terminiMods, char aAcid, bool leftSide)
         {
             foreach (var t in terminiMods)
             {
