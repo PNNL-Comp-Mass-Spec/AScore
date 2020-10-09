@@ -696,8 +696,10 @@ namespace AScore_DLL
                 "_syn.txt",
                 "_fht.txt",
                 ".mzML",
+                ".mzML.gz",
                 ".mzXML",
-                ".mzid"
+                ".mzid",
+                ".mzid.gz"
             };
 
             var dataFileName = Path.GetFileName(filePathOrDatasetName);
