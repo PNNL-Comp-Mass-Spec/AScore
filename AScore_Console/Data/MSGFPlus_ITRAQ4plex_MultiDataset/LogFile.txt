@@ -1,0 +1,45 @@
+2020-10-08 05:18:39 PM	Caching data in Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt
+2020-10-08 05:18:39 PM	Output directory: F:\Documents\Projects\JoshAldrich\AScore\AScore_Console\Data\MSGFPlus_ITRAQ4plex_MultiDataset
+2020-10-08 05:18:39 PM	Reading Job to Dataset Map File: DatasetsToProcess.txt
+2020-10-08 05:18:39 PM	Filtering using MSGF_SpecProb <= 1.0E-07
+2020-10-08 05:18:39 PM	Dataset name: CPTAC3_Harmonization_PNNL_W_S2_Fr_02_2May17_Samwise_REP-17-04-01
+2020-10-08 05:18:39 PM	Opening F:\...\M..\CPTAC3_Harmonization_PNNL_W_S2_Fr_02_2May17_Samwise_REP-17-04-01.mzML
+2020-10-08 05:18:40 PM	Loaded modifications from: Dataset_W_S2_msgfplus_syn_ModSummary.txt
+2020-10-08 05:18:40 PM	    Static,   57.021465 on C
+2020-10-08 05:18:40 PM	    Dynamic,  15.994915 on M
+2020-10-08 05:18:40 PM	    Dynamic,  229.162933 on KY<
+2020-10-08 05:18:47 PM	Dataset name: CPTAC3_Harmonization_PNNL_W_S2_Fr_03_2May17_Samwise_REP-17-04-01
+2020-10-08 05:18:47 PM	Opening F:\...\M..\CPTAC3_Harmonization_PNNL_W_S2_Fr_03_2May17_Samwise_REP-17-04-01.mzML
+2020-10-08 05:18:47 PM	Loaded modifications from: Dataset_W_S2_msgfplus_syn_ModSummary.txt
+2020-10-08 05:18:47 PM	    Static,   57.021465 on C
+2020-10-08 05:18:47 PM	    Dynamic,  15.994915 on M
+2020-10-08 05:18:47 PM	    Dynamic,  229.162933 on KY<
+2020-10-08 05:18:57 PM	Dataset name: Dataset_W_S2_Fr_04_2May17
+2020-10-08 05:18:57 PM	Opening F:\...\AS..\Data\MSGFPlus_ITRAQ4plex_MultiDataset\Dataset_W_S2_Fr_04_2May17.mzML
+2020-10-08 05:18:57 PM	Loaded modifications from: Dataset_W_S2_msgfplus_syn_ModSummary.txt
+2020-10-08 05:18:57 PM	    Static,   57.021465 on C
+2020-10-08 05:18:57 PM	    Dynamic,  15.994915 on M
+2020-10-08 05:18:57 PM	    Dynamic,  229.162933 on KY<
+2020-10-08 05:18:57 PM	Warning: Scan 29988: Observed precursor mass of 4381.1 Da is more than 20 Da away from the computed mass of 3694.5 Da; DeltaMass = 686.5 Da
+2020-10-08 05:18:57 PM	Warning: Scan 29364: Observed precursor mass of 2354.1 Da is more than 20 Da away from the computed mass of 1895.8 Da; DeltaMass = 458.3 Da
+2020-10-08 05:18:57 PM	Warning: Scan 29709: Observed precursor mass of 2235.1 Da is more than 20 Da away from the computed mass of 2006.0 Da; DeltaMass = 229.2 Da
+2020-10-08 05:18:57 PM	Warning: Scan 29370: Observed precursor mass of 2355.1 Da is more than 20 Da away from the computed mass of 1895.8 Da; DeltaMass = 459.3 Da
+2020-10-08 05:18:58 PM	Warning: Scan 29827: Observed precursor mass of 3321.5 Da is more than 20 Da away from the computed mass of 3092.3 Da; DeltaMass = 229.2 Da
+2020-10-08 05:18:58 PM	Warning: Scan 29479: Observed precursor mass of 1839.0 Da is more than 20 Da away from the computed mass of 1380.7 Da; DeltaMass = 458.3 Da
+2020-10-08 05:18:59 PM	Warning: Scan 29243: Observed precursor mass of 5200.4 Da is more than 20 Da away from the computed mass of 4741.0 Da; DeltaMass = 459.3 Da
+2020-10-08 05:18:59 PM	Warning: Scan 29598: Observed precursor mass of 4382.0 Da is more than 20 Da away from the computed mass of 3694.5 Da; DeltaMass = 687.5 Da
+2020-10-08 05:19:00 PM	Warning: Scan 29582: Observed precursor mass of 4381.0 Da is more than 20 Da away from the computed mass of 3694.5 Da; DeltaMass = 686.5 Da
+2020-10-08 05:19:00 PM	Warning: Scan 29582: Observed precursor mass of 4381.0 Da is more than 20 Da away from the computed mass of 3694.5 Da; DeltaMass = 686.5 Da
+2020-10-08 05:19:00 PM	Warning: Scan 29550: Observed precursor mass of 3105.5 Da is more than 20 Da away from the computed mass of 2877.3 Da; DeltaMass = 228.2 Da
+2020-10-08 05:19:01 PM	Warning: Scan 29278: Observed precursor mass of 1429.8 Da is more than 20 Da away from the computed mass of 971.5 Da; DeltaMass = 458.3 Da
+2020-10-08 05:19:01 PM	Warning: Scan 29033: Observed precursor mass of 2672.4 Da is more than 20 Da away from the computed mass of 2213.1 Da; DeltaMass = 459.3 Da
+2020-10-08 05:19:01 PM	Warning: Scan 29084: Observed precursor mass of 5199.4 Da is more than 20 Da away from the computed mass of 4741.0 Da; DeltaMass = 458.3 Da
+2020-10-08 05:19:01 PM	Warning: Scan 29683: Observed precursor mass of 4383.1 Da is more than 20 Da away from the computed mass of 3694.5 Da; DeltaMass = 688.5 Da
+2020-10-08 05:19:01 PM	Warning: Scan 29683: Observed precursor mass of 4383.1 Da is more than 20 Da away from the computed mass of 3694.5 Da; DeltaMass = 688.5 Da
+2020-10-08 05:19:01 PM	Warning: Scan 29683: Observed precursor mass of 4383.1 Da is more than 20 Da away from the computed mass of 3694.5 Da; DeltaMass = 688.5 Da
+2020-10-08 05:19:01 PM	Writing 2,114 rows to F:\...\MSGFPlus_ITRAQ4plex_M..\Dataset_W_S2_Fr_04_2May17_msgfplus_syn_ascore.txt
+2020-10-08 05:19:01 PM	Stats by fragmentation ion type:
+2020-10-08 05:19:01 PM	  CID peptides: 0
+2020-10-08 05:19:01 PM	  ETD peptides: 0
+2020-10-08 05:19:01 PM	  HCD peptides: 2,101
+2020-10-08 05:19:04 PM	AScore Complete

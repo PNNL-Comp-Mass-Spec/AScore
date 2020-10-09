@@ -1,0 +1,6 @@
+Modification_Symbol	Modification_Mass	Target_Residues	Modification_Type	Mass_Correction_Tag	Occurrence_Count
+-	57.021465	C	S	IodoAcet	9613
+-	229.162933	K	S	TMT6Tag	31937
+-	229.162933	<	T	TMT6Tag	30800
+*	15.994915	M	D	Plus1Oxy	6129
+#	42.010567	K	D	Acetyl	0

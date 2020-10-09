@@ -11,7 +11,7 @@ goto Done
 
 :DoWork
 echo.
-echo Procesing with %ExePath%
+echo Processing with %ExePath%
 echo.
 
 rem Parameter file DynMetOx_DynPhos_stat_4plex_iodo_hcd.xml tracks STY Phos and Oxidized M, but not Q Pyro Glu

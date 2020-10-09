@@ -14,7 +14,7 @@ echo.
 echo Processing with %ExePath%
 echo.
 
-%ExePath% -T:msgfplus -F:Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt -D:Dataset_W_S2_Fr_04_2May17.mzML -P:AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml -U:Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt -L:LogFile.txt -Fasta:..\H_sapiens_M_musculus_RefSeq_Excerpt.fasta
+%ExePath% -T:msgfplus -F:..\MSGFPlus_ITRAQ4plex_mzML\Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt -D:..\MSGFPlus_ITRAQ4plex_mzML\Dataset_W_S2_Fr_04_2May17.mzML -P:AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml -U:Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt -L:LogFile.txt -Fasta:..\H_sapiens_M_musculus_RefSeq_Excerpt.fasta -MS:Addnl\Msgfplus_syn_ModSummary.txt
 
 rem On Linux, use
 rem mono ../../AScore_Console.exe -T:msgfplus -F:Dataset_W_S2_Fr_04_2May17_msgfplus_syn.txt -D:Dataset_W_S2_Fr_04_2May17.mzML -P:AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml -U:Dataset_W_S2_Fr_04_2May17_msgfplus_syn_plus_ascore.txt -L:LogFile.txt -Fasta:../H_sapiens_M_musculus_RefSeq_Excerpt.fasta
