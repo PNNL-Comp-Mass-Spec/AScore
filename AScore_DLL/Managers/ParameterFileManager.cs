@@ -286,6 +286,11 @@ namespace AScore_DLL.Managers
             var xpath = "/Run/Modifications/" + sectionName;
             var xmlModInfo = xmlNodes.SelectNodes(xpath);
 
+            if (xmlModInfo == null)
+            {
+                OnErrorEvent(string.Format("Section {0} not found in AScore parameter file {1}", xpath, ascoreParameterFilePath));
+                return modList;
+            }
 
             foreach (XmlNode mod in xmlModInfo)
             {
