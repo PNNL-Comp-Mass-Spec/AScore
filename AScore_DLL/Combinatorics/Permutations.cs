@@ -401,7 +401,7 @@ namespace AScore_DLL.Combinatorics
                     myLexicographicOrders[i] = j;
                 }
             }
-            myCount = GetCount();
+            Count = GetCount();
         }
 
         /// <summary>
@@ -467,12 +467,7 @@ namespace AScore_DLL.Combinatorics
         }
 
         /// <summary>
-        /// The count of all permutations.  Calculated at Initialization and returned by Count property.
-        /// </summary>
-        private long myCount;
-
-        /// <summary>
-        /// The type of Permutations that this was intialized from.
+        /// The type of Permutations that this was initialized from.
         /// </summary>
         private GenerateOption myMetaCollectionType;
 

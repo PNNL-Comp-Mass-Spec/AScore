@@ -5,10 +5,8 @@ namespace AScore_DLL.Combinatorics
 {
     public class ModMixtureCombo
     {
-        readonly List<List<int>> finalCombos = new List<List<int>>();
-        readonly List<List<int>> sitePositions;
-        readonly List<List<List<int>>> combinationSets;
-        readonly List<int> allSites = new List<int>(); //List of all modifiable sites for all modifications
+        private readonly List<List<int>> sitePositions;
+        private readonly List<List<List<int>>> combinationSets;
 
         /// <summary>
         /// Generates all combination mixtures
@@ -25,13 +23,13 @@ namespace AScore_DLL.Combinatorics
             {
                 foreach (var s in sites)
                 {
-                    if (!allSites.Contains(s))
+                    if (!AllSite.Contains(s))
                     {
-                        allSites.Add(s);
+                        AllSite.Add(s);
                     }
                 }
             }
-            allSites.Sort();
+            AllSite.Sort();
             CalculateCombos(0, new List<List<int>>());
         }
 
@@ -40,12 +38,12 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// Final Combination sets
         /// </summary>
-        public List<List<int>> FinalCombos => finalCombos;
+        public List<List<int>> FinalCombos { get; } = new List<List<int>>();
 
         /// <summary>
         /// List of all modifiable sites for all modifications
         /// </summary>
-        public List<int> AllSite => allSites;
+        public List<int> AllSite { get; } = new List<int>();
 
         #endregion
 
@@ -104,7 +102,7 @@ namespace AScore_DLL.Combinatorics
             {
                 var aFinalCombo = new List<int>();
                 //Ensure no overlap between modification combination site positions
-                foreach (var s in allSites)
+                foreach (var s in AllSite)
                 {
                     var count = 0;
                     //int countAtSameSite = 0;
@@ -139,7 +137,7 @@ namespace AScore_DLL.Combinatorics
                         return;
                     }
                 }
-                finalCombos.Add(aFinalCombo);
+                FinalCombos.Add(aFinalCombo);
                 if (currentList.Count > 0)
                     currentList.RemoveAt(currentList.Count - 1);
             }
@@ -189,8 +187,8 @@ namespace AScore_DLL.Combinatorics
             foreach (var combo in comboTemplate)
             {
                 var allCombos = new List<List<int>>();
-                var modCombos = new Combinatorics.Permutations<int>(combo);
-                foreach (IList<int> combination in modCombos)
+
+                foreach (IList<int> combination in new Permutations<int>(combo))
                 {
                     allCombos.Add(new List<int>(combination));
                 }
