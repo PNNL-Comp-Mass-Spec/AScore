@@ -114,7 +114,7 @@ namespace AScore_DLL
 
             OnStatusEvent("Output directory: " + ascoreOptions.OutputDirectoryInfo.FullName);
 
-            var ascoreEngine = new AScore_DLL.AScoreAlgorithm();
+            var ascoreEngine = new AScoreAlgorithm();
             RegisterEvents(ascoreEngine);
 
             // Initialize the options
@@ -123,20 +123,20 @@ namespace AScore_DLL
             // Run the algorithm
             if (ascoreOptions.MultiJobMode)
             {
-                RunAScoreWithMappingFile(ascoreOptions.JobToDatasetMapFile, spectraManager, psmResultsManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
+                RunAScoreWithMappingFile(ascoreOptions, spectraManager, psmResultsManager, paramManager);
             }
             else
             {
                 spectraManager.OpenFile(ascoreOptions.MassSpecFile, ascoreOptions.ModSummaryFile);
 
-                RunAScoreOnSingleFile(spectraManager, psmResultsManager, paramManager, ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
+                RunAScoreOnSingleFile(ascoreOptions, spectraManager, psmResultsManager, paramManager);
             }
 
             OnStatusEvent("AScore Complete");
 
             if (ascoreOptions.CreateUpdatedDbSearchResultsFile)
             {
-                if (ascoreOptions.SearchResultsType == DbSearchResultsType.Fht)
+                if (ascoreOptions.SearchResultsType == AScoreOptions.DbSearchResultsType.Fht)
                 {
                     CreateUpdatedFirstHitsFile(ascoreOptions);
                 }
@@ -159,7 +159,7 @@ namespace AScore_DLL
             var resultsMerger = new PHRPResultsMerger();
             RegisterEvents(resultsMerger);
 
-            resultsMerger.MergeResults(ascoreOptions.DbSearchResultsFile, ascoreOptions.AScoreResultsFilePath, ascoreOptions.UpdatedDbSearchResultsFileName);
+            resultsMerger.MergeResults(ascoreOptions);
 
             OnStatusEvent("Results merged; new file: " + PathUtils.CompactPathString(resultsMerger.MergedFilePath, 80));
         }
@@ -167,20 +167,14 @@ namespace AScore_DLL
         /// <summary>
         /// Configure and run the AScore algorithm, optionally can add protein mapping information
         /// </summary>
-        /// <param name="jobToDatasetMapFile"></param>
+        /// <param name="ascoreOptions"></param>
         /// <param name="spectraManager"></param>
         /// <param name="psmResultsManager"></param>
-        /// <param name="outputFilePath">Name of the output file</param>
-        /// <param name="fastaFilePath">Path to FASTA file. If this is empty/null, protein mapping will not occur</param>
-        /// <param name="outputDescriptions">Whether to include protein description line in output or not.</param>
         /// <param name="ascoreParams"></param>
         public void RunAScoreWithMappingFile(
-            string jobToDatasetMapFile,
+            AScoreOptions ascoreOptions,
             SpectraManagerCache spectraManager,
             PsmResultsManager psmResultsManager,
-            string outputFilePath,
-            string fastaFilePath = "",
-            bool outputDescriptions = false)
             ParameterFileManager ascoreParams)
         {
             var jobToDatasetNameMap = new Dictionary<string, DatasetFileInfo>();
@@ -192,10 +186,10 @@ namespace AScore_DLL
                 "Dataset"
             };
 
-            OnStatusEvent("Reading Job to Dataset Map File: " + PathUtils.CompactPathString(jobToDatasetMapFile, 80));
+            OnStatusEvent("Reading Job to Dataset Map File: " + PathUtils.CompactPathString(ascoreOptions.JobToDatasetMapFile, 80));
 
             // Read the contents of JobToDatasetMapFile
-            using (var mapFileReader = new StreamReader(new FileStream(jobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var mapFileReader = new StreamReader(new FileStream(ascoreOptions.JobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
                 var rowNumber = 0;
                 var requiredColumnCount = 0;
@@ -242,9 +236,9 @@ namespace AScore_DLL
                 }
             }
 
-            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, psmResultsManager, ascoreParameters, outputFilePath, false);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, psmResultsManager, ascoreParams, ascoreOptions, false);
 
-            ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
+            ProteinMapperTestRun(ascoreOptions);
         }
 
         /// <summary>
@@ -262,7 +256,31 @@ namespace AScore_DLL
             ParameterFileManager ascoreParams,
             string outputFilePath,
             string fastaFilePath = "",
-            bool outputDescriptions = false)
+            bool outputDescriptions = false
+            )
+        {
+            var ascoreOptions = new AScoreOptions
+            {
+                FastaFilePath = fastaFilePath,
+                OutputProteinDescriptions = outputDescriptions
+            };
+            ascoreOptions.SetAScoreResultsFilePath(outputFilePath);
+
+            RunAScoreOnSingleFile(ascoreOptions, spectraManager, psmResultsManager, ascoreParams);
+        }
+
+        /// <summary>
+        /// Configure and run the AScore algorithm, optionally can add protein mapping information
+        /// </summary>
+        /// <param name="ascoreOptions"></param>
+        /// <param name="spectraManager"></param>
+        /// <param name="psmResultsManager"></param>
+        /// <param name="ascoreParams"></param>
+        public void RunAScoreOnSingleFile(
+            AScoreOptions ascoreOptions,
+            SpectraManagerCache spectraManager,
+            PsmResultsManager psmResultsManager,
+            ParameterFileManager ascoreParams)
         {
             var jobToDatasetNameMap = new Dictionary<string, DatasetFileInfo>
             {
@@ -276,18 +294,18 @@ namespace AScore_DLL
                 throw new Exception(
                     "spectraManager must be instantiated and initialized before calling RunAScoreOnSingleFile for a single source file");
 
-            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, psmResultsManager, ascoreParameters, outputFilePath, true);
+            RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, psmResultsManager, ascoreParams, ascoreOptions, true);
 
-            ProteinMapperTestRun(outputFilePath, fastaFilePath, outputDescriptions);
+            ProteinMapperTestRun(ascoreOptions);
         }
 
-        private void ProteinMapperTestRun(string outputFilePath, string fastaFilePath, bool outputDescriptions)
+        private void ProteinMapperTestRun(AScoreOptions ascoreOptions)
         {
-            if (!string.IsNullOrWhiteSpace(fastaFilePath))
-            {
-                var mapProteins = new AScoreProteinMapper(outputFilePath, fastaFilePath, outputDescriptions);
-                mapProteins.Run();
-            }
+            if (string.IsNullOrWhiteSpace(ascoreOptions.FastaFilePath))
+                return;
+
+            var proteinMapper = new AScoreProteinMapper(ascoreOptions.AScoreResultsFilePath, ascoreOptions.FastaFilePath, ascoreOptions.OutputProteinDescriptions);
+            proteinMapper.Run();
         }
 
         /// <summary>
@@ -296,13 +314,15 @@ namespace AScore_DLL
         /// <param name="jobToDatasetNameMap">Keys are job numbers (stored as strings); values are Dataset Names or the path to the _dta.txt file</param>
         /// <param name="spectraManager">Manager for reading _dta.txt or .mzML files; must have already been initialized by the calling class</param>
         /// <param name="psmResultsManager"></param>
-        /// <param name="outputFilePath"></param>
+        /// <param name="ascoreParams"></param>
+        /// <param name="ascoreOptions"></param>
         /// <param name="spectraFileOpened">Set to true if processing a single dataset, and spectraManager.OpenFile() has already been called</param>
         private void RunAScoreOnPreparedData(
             IReadOnlyDictionary<string, DatasetFileInfo> jobToDatasetNameMap,
             SpectraManagerCache spectraManager,
             PsmResultsManager psmResultsManager,
-            string outputFilePath,
+            ParameterFileManager ascoreParams,
+            AScoreOptions ascoreOptions,
             bool spectraFileOpened)
         {
             var totalRows = psmResultsManager.GetRowLength();
@@ -542,8 +562,8 @@ namespace AScore_DLL
 
             Console.WriteLine();
 
-            OnStatusEvent(string.Format("Writing {0:N0} rows to {1}", psmResultsManager.ResultsCount, PathUtils.CompactPathString(outputFilePath, 80)));
-            psmResultsManager.WriteToFile(outputFilePath);
+            OnStatusEvent(string.Format("Writing {0:N0} rows to {1}", psmResultsManager.ResultsCount, PathUtils.CompactPathString(ascoreOptions.AScoreResultsFilePath, 80)));
+            psmResultsManager.WriteToFile(ascoreOptions.AScoreResultsFilePath);
 
             Console.WriteLine();
 

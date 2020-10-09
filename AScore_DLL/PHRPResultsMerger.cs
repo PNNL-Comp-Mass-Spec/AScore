@@ -47,9 +47,12 @@ namespace AScore_DLL
         }
         #endregion
 
-        public bool MergeResults(string phrpDataFilePath, string ascoreResultsFilePath)
+        public bool MergeResults(AScoreOptions ascoreOptions)
         {
-            return MergeResults(phrpDataFilePath, ascoreResultsFilePath, string.Empty);
+            return MergeResults(
+                ascoreOptions.DbSearchResultsFile,
+                ascoreOptions.AScoreResultsFilePath,
+                ascoreOptions.UpdatedDbSearchResultsFileName);
         }
 
         public bool MergeResults(string phrpDataFilePath, string ascoreResultsFilePath, string mergedPhrpDataFileName)
