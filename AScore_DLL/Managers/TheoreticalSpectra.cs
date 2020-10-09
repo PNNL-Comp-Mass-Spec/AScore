@@ -204,21 +204,5 @@ namespace AScore_DLL.Managers
                 yield return yIon;
         }
 
-        /// <summary>
-        /// Sets the spectra range... unused at this point can probably remove
-        /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        public void SetSpectraRange(double min, double max)
-        {
-            // Set the range variables
-
-            // Update the count to reflect the new range
-            count = 0;
-            foreach (double unused in this)
-            {
-                ++count;
-            }
-        }
     }
 }
