@@ -226,10 +226,10 @@ namespace AScore_DLL
                 {
                     // Unmodified peptides will have a ModInfo key of "-"
                     // Skip these entries
-                    if (modInfoEntry.Key != AScoreProcessor.MOD_INFO_NO_MODIFIED_RESIDUES)
+                    if (modInfoEntry.Key != AScoreProcessor.MOD_INFO_NO_MODIFIED_RESIDUES &&
+                        !modInfoNames.Contains(modInfoEntry.Key))
                     {
-                        if (!modInfoNames.Contains(modInfoEntry.Key))
-                            modInfoNames.Add(modInfoEntry.Key);
+                        modInfoNames.Add(modInfoEntry.Key);
                     }
                 }
             }
