@@ -12,6 +12,8 @@ using System;
 
 namespace AScore_DLL
 {
+    // Ignore Spelling: Rehkop
+
     /// <summary>
     /// Stores a value and a specified index associated with the value. Default sort orders by Value (descending), then by Index
     /// </summary>

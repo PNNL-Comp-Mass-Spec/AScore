@@ -162,9 +162,9 @@ namespace AScore_DLL.Combinatorics
         /// <returns></returns>
         public static List<List<List<int>>> GenerateCombosToCheck(List<List<int>> sitePositions, List<Mod.DynamicModification> myMods)
         {
-            //first loop is to create the template for each of the combination sets
-            //example: say 2 mods if mod1 has three sites in the sequence and mod2 has 2 mods at 4 sites
-            //we have template = {{mod1, 0, 0}, {mod2, mod2, 0, 0}}
+            // The first loop is to create the template for each of the combination sets
+            // For example: given 2 mods, where mod1 has three sites in the sequence and mod2 has 2 mods at 4 sites,
+            // create template = {{mod1, 0, 0}, {mod2, mod2, 0, 0}}
 
             var comboTemplate = new List<List<int>>();
             var siteCount = 0;

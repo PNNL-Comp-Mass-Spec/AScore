@@ -13,6 +13,8 @@ using System.Collections.Generic;
 
 namespace AScore_DLL.Managers
 {
+    // Ignore Spelling: Rehkop
+
     /// <summary>
     /// Represents the bIons and yIons of a specific charge state of a
     /// TheoreticalSpectra.
@@ -80,7 +82,7 @@ namespace AScore_DLL.Managers
         /// <param name="peptideLength">The length of the trimmed peptide without
         /// phosphorylation sites.</param>
         /// <returns>A newly constructed FragmentIon upon success, null if any
-        /// errors occured during construction.</returns>
+        /// errors occurred during construction.</returns>
         public static ChargeStateIons GenerateFragmentIon(int chargeState,
             MassType massType, List<Mod.DynamicModification> dynamMods, int[] positions,
             List<double> bIons, List<double> yIons, int peptideLength)
@@ -97,7 +99,7 @@ namespace AScore_DLL.Managers
                     chargeState = chargeState
                 };
 
-                // Set the charge state of the frag ion
+                // Set the charge state of the fragment ion
 
                 // There is a phosphorylation site
                 if (dynamMods.Count > 0)

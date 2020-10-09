@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 namespace AScore_DLL.Combinatorics
 {
+    // Ignore Spelling: Akison, foreach
+
     /// <summary>
     /// Permutations defines a meta-collection, typically a list of lists, of all
     /// possible orderings of a set of values.  This list is enumerable and allows
@@ -25,7 +27,7 @@ namespace AScore_DLL.Combinatorics
     /// ordering of the lists based on the provided Comparer.
     /// If no comparer is provided, then T must be IComparable on T.
     ///
-    /// When generating repetition sets, no comparisions are performed and therefore
+    /// When generating repetition sets, no comparisons are performed and therefore
     /// no comparer is required and T does not need to be IComparable.
     /// </remarks>
     /// <typeparam name="T">The type of the values within the list.</typeparam>
@@ -36,6 +38,7 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// No default constructor, must at least provided a list of values.
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         protected Permutations()
         {
         }
@@ -43,7 +46,7 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// Create a permutation set from the provided list of values.
         /// The values (T) must implement IComparable.
-        /// If T does not implement IComparable use a constructor with an explict IComparer.
+        /// If T does not implement IComparable use a constructor with an explicit IComparer.
         /// The repetition type defaults to MetaCollectionType.WithholdRepetitionSets
         /// </summary>
         /// <param name="values">List of values to permute.</param>
@@ -55,7 +58,7 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// Create a permutation set from the provided list of values.
         /// If type is MetaCollectionType.WithholdRepetitionSets, then values (T) must implement IComparable.
-        /// If T does not implement IComparable use a constructor with an explict IComparer.
+        /// If T does not implement IComparable use a constructor with an explicit IComparer.
         /// </summary>
         /// <param name="values">List of values to permute.</param>
         /// <param name="type">The type of permutation set to calculate.</param>
@@ -70,7 +73,7 @@ namespace AScore_DLL.Combinatorics
         /// The repetition type defaults to MetaCollectionType.WithholdRepetitionSets
         /// </summary>
         /// <param name="values">List of values to permute.</param>
-        /// <param name="comparer">Comparer used for defining the lexigraphic order.</param>
+        /// <param name="comparer">Comparer used for defining the sort order.</param>
         public Permutations(ICollection<T> values, IComparer<T> comparer)
         {
             Initialize(values, GenerateOption.WithoutRepetition, comparer);
@@ -140,7 +143,7 @@ namespace AScore_DLL.Combinatorics
             /// <returns>True if successfully moved to next permutation, False if no more permutations exist.</returns>
             /// <remarks>
             /// Continuation was tried (i.e. yield return) by was not nearly as efficient.
-            /// Performance is further increased by using value types and removing generics, that is, the LexicographicOrder parellel array.
+            /// Performance is further increased by using value types and removing generics, that is, the LexicographicOrder parallel array.
             /// This is a issue with the .NET CLR not optimizing as well as it could in this infrequently used scenario.
             /// </remarks>
             public bool MoveNext()
@@ -281,7 +284,7 @@ namespace AScore_DLL.Combinatorics
             private Position myPosition = Position.BeforeFirst;
 
             /// <summary>
-            /// Parrellel array of integers that represent the location of items in the myValues array.
+            /// Parallel array of integers that represent the location of items in the myValues array.
             /// This is generated at Initialization and is used as a performance speed up rather that
             /// comparing T each time, much faster to let the CLR optimize around integers.
             /// </summary>
@@ -293,12 +296,12 @@ namespace AScore_DLL.Combinatorics
             private List<T> myValues;
 
             /// <summary>
-            /// The set of permuations that this enumerator enumerates.
+            /// The set of permutations that this enumerator enumerates.
             /// </summary>
             private readonly Permutations<T> myParent;
 
             /// <summary>
-            /// Internal position type for tracking enumertor position.
+            /// Internal position type for tracking enumerator position.
             /// </summary>
             private enum Position
             {
@@ -320,7 +323,7 @@ namespace AScore_DLL.Combinatorics
         /// I.e. count of permutations of "AAB" will be 3 instead of 6.
         /// If type is MetaCollectionType.WithRepetition, then this is all combinations and is therefore N!, where N is the number of values.
         /// </summary>
-        public long Count => myCount;
+        public long Count { get; private set; }
 
         /// <summary>
         /// The type of Permutations set that is generated.
@@ -343,10 +346,10 @@ namespace AScore_DLL.Combinatorics
         #region Heavy Lifting Members
 
         /// <summary>
-        /// Common intializer used by the multiple flavors of constructors.
+        /// Common initializer used by the multiple flavors of constructors.
         /// </summary>
         /// <remarks>
-        /// Copies information provided and then creates a parellel int array of lexicographic
+        /// Copies information provided and then creates a parallel int array of lexicographic
         /// orders that will be used for the actual permutation algorithm.
         /// The input array is first sorted as required for WithoutRepetition and always just for consistency.
         /// This array is constructed one of two way depending on the type of the collection.
@@ -355,14 +358,14 @@ namespace AScore_DLL.Combinatorics
         /// and the lexicographic orders are simply generated as 1, 2, ... N.
         /// E.g.
         /// Input array:          {A A B C D E E}
-        /// Lexicograhpic Orders: {1 2 3 4 5 6 7}
+        /// Sort Orders:          {1 2 3 4 5 6 7}
         ///
         /// When type is MetaCollectionType.WithoutRepetition, then fewer are generated, with each
         /// identical element in the input array not repeated.  The lexicographic sort algorithm
         /// handles this natively as long as the repetition is repeated.
         /// E.g.
         /// Input array:          {A A B C D E E}
-        /// Lexicograhpic Orders: {1 1 2 3 4 5 5}
+        /// Sort Orders:          {1 1 2 3 4 5 5}
         /// </remarks>
         private void Initialize(ICollection<T> values, GenerateOption type, IComparer<T> comparer)
         {
@@ -405,7 +408,7 @@ namespace AScore_DLL.Combinatorics
         /// Calculates the total number of permutations that will be returned.
         /// As this can grow very large, extra effort is taken to avoid overflowing the accumulator.
         /// While the algorithm looks complex, it really is just collecting numerator and denominator terms
-        /// and cancelling out all of the denominator terms before taking the product of the numerator terms.
+        /// and canceling out all of the denominator terms before taking the product of the numerator terms.
         /// </summary>
         /// <returns>The number of permutations.</returns>
         private long GetCount()
@@ -446,7 +449,7 @@ namespace AScore_DLL.Combinatorics
         private List<T> myValues;
 
         /// <summary>
-        /// Parrellel array of integers that represent the location of items in the myValues array.
+        /// Parallel array of integers that represent the location of items in the myValues array.
         /// This is generated at Initialization and is used as a performance speed up rather that
         /// comparing T each time, much faster to let the CLR optimize around integers.
         /// </summary>
