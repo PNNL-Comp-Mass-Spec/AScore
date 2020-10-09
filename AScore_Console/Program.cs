@@ -104,7 +104,7 @@ namespace AScore_Console
                     var logFile = new FileInfo(mLogFilePath);
                     if (logFile.Directory == null)
                     {
-                        PRISM.ConsoleMsgUtils.ShowWarning("Unable to determine the parent directory of " + mLogFilePath);
+                        ConsoleMsgUtils.ShowWarning("Unable to determine the parent directory of " + mLogFilePath);
                         return -1;
                     }
 
