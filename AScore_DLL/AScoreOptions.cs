@@ -42,7 +42,7 @@ namespace AScore_DLL
             Mzid,
         }
 
-        public const string PROGRAM_DATE = "October 9, 2020";
+        public const string PROGRAM_DATE = "October 13, 2020";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
@@ -197,7 +197,7 @@ namespace AScore_DLL
         {
             if (!File.Exists(AScoreParamFile))
             {
-                errorReporter(GetInputFileNotFoundMessage("Input file not found: " + AScoreParamFile));
+                errorReporter(GetInputFileNotFoundMessage(AScoreParamFile));
                 return -10;
             }
 
@@ -242,7 +242,7 @@ namespace AScore_DLL
             }
             catch (Exception)
             {
-                return string.Format("Input file not found: ", filePath ?? "?UnknownFile?");
+                return string.Format("Input file not found: {0}", filePath ?? "?UnknownFile?");
             }
         }
 
