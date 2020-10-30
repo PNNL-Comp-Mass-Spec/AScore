@@ -16,6 +16,8 @@ namespace AScore_DLL.Combinatorics
     /// </summary>
     public class SmallPrimeUtility
     {
+        // Ignore Spelling: Akison
+
         /// <summary>
         /// Utility class, no instances allowed.
         /// </summary>

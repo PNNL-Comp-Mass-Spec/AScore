@@ -21,6 +21,7 @@ namespace AScore_DLL.Mod
         /// <summary>
         /// Default constructor
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public Modification()
         {
         }

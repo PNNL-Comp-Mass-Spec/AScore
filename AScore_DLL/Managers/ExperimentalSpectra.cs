@@ -5,8 +5,7 @@ using System.Linq;
 namespace AScore_DLL.Managers
 {
     /// <summary>
-    /// Represents the top ten spectra for each section in the dta file from
-    /// the Master DTA.
+    /// Represents the top ten spectra for each section in the DTA file from the Master DTA.
     /// </summary>
     public class ExperimentalSpectra
     {
@@ -55,8 +54,8 @@ namespace AScore_DLL.Managers
         /// </summary>
         /// <param name="scanNum">Scan number of this experimental spectra.</param>
         /// <param name="chargeState">Charge state of the peptide in this experimental spectrum</param>
-        /// <param name="precursorMass">Precursor mass (first number in dta file); this is an M+H value</param>
-        /// <param name="precursorChargeState">Precursor charge state (second number in dta file).</param>
+        /// <param name="precursorMass">Precursor mass (first number in DTA file); this is an M+H value</param>
+        /// <param name="precursorChargeState">Precursor charge state (second number in DTA file).</param>
         /// <param name="spectra">List of the experimental spectra from the Master DTA file.</param>
         /// <param name="peptideMassCalculator">Mass calculator class</param>
         public ExperimentalSpectra(int scanNum, int chargeState, double precursorMass,

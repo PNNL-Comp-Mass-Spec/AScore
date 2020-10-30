@@ -177,8 +177,8 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Make a copy of this class
         /// </summary>
-        /// <returns></returns>
         ///
+        // ReSharper disable once UnusedMember.Global
         public ParameterFileManager Clone()
         {
             return new ParameterFileManager(

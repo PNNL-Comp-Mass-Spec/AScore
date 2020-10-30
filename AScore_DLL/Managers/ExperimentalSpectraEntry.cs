@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace AScore_DLL.Managers
 {
     /// <summary>
-    /// Represents an individual entry within a dta file. Default IComparable sorts by Mz, ascending
+    /// Represents an individual spectrum. Default IComparable sorts by Mz, ascending
     /// </summary>
     public class ExperimentalSpectraEntry : IComparable<ExperimentalSpectraEntry>
     {

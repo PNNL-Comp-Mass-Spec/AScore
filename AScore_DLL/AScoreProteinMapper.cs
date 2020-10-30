@@ -10,7 +10,7 @@ namespace AScore_DLL
 {
     class AScoreProteinMapper
     {
-        //Ignore Spelling: ascore
+        // Ignore Spelling: AScore
 
         private const string OutputFilenameAddition = "_ProteinMap";
         private const string PeptideFilenameAddition = "_Peptides";
@@ -131,7 +131,7 @@ namespace AScore_DLL
                     ReadFastaProteinDescription();
                 }
 
-                // Read the ascore again, and output a combined results file
+                // Read the AScore again, and output a combined results file
                 CombineAScoreAndProteinData();
 
                 if (mTotalPeptidesNotFound > 0)
@@ -414,7 +414,7 @@ namespace AScore_DLL
         /// </summary>
         private void CombineAScoreAndProteinData()
         {
-            // Read the ascore again...
+            // Read the AScore again...
             using (var aScoreReader = new StreamReader(new FileStream(mAScoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             using (var mappedWriter = new StreamWriter(new FileStream(mMappingResultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {

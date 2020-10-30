@@ -12,7 +12,7 @@ namespace AScore_DLL.Managers
 
         private static readonly Dictionary<int, double> mCachedFactorial = new Dictionary<int, double>();
 
-        #endregion // Class Members
+        #endregion
 
         #region Public Methods
 

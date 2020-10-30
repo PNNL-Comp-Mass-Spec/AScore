@@ -7,11 +7,14 @@ namespace AScore_DLL.Combinatorics
 {
     /// <summary>
     /// Interface for Permutations, Combinations and any other classes that present
-    /// a collection of collections based on an input collection.  The enumerators that 
-    /// this class inherits defines the mechanism for enumerating through the collections.  
+    /// a collection of collections based on an input collection.  The enumerators that
+    /// this class inherits defines the mechanism for enumerating through the collections.
     /// </summary>
     /// <typeparam name="T">The of the elements in the collection, not the type of the collection.</typeparam>
-    interface IMetaCollection<T> : IEnumerable<IList<T>> {
+    interface IMetaCollection<T> : IEnumerable<IList<T>>
+    {
+        // Ignore Spelling: Akison
+
         /// <summary>
         /// The count of items in the collection.  This is not inherited from
         /// ICollection since this meta-collection cannot be extended by users.
@@ -19,7 +22,7 @@ namespace AScore_DLL.Combinatorics
         long Count { get; }
 
         /// <summary>
-        /// The type of the meta-collection, determining how the collections are 
+        /// The type of the meta-collection, determining how the collections are
         /// determined from the inputs.
         /// </summary>
         GenerateOption Type { get; }

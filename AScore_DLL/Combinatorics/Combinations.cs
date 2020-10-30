@@ -8,7 +8,7 @@ namespace AScore_DLL.Combinatorics
     /// <summary>
     /// Combinations defines a meta-collection, typically a list of lists, of all possible
     /// subsets of a particular size from the set of values.  This list is enumerable and
-    /// allows the scanning of all possible combinations using a simple foreach() loop.
+    /// allows the scanning of all possible combinations using a simple for each() loop.
     /// Within the returned set, there is no prescribed order.  This follows the mathematical
     /// concept of choose.  For example, put 10 dominoes in a hat and pick 5.  The number of possible
     /// combinations is defined as "10 choose 5", which is calculated as (10!) / ((10 - 5)! * 5!).
@@ -24,13 +24,15 @@ namespace AScore_DLL.Combinatorics
     /// MetaCollectionType.WithoutRepetition =>
     /// {A B}, {A C}, {B C}
     ///
-    /// Input sets with multiple equal values will generate redundant combinations in proprotion
-    /// to the likelyhood of outcome.  For example, {A A B B} and a lower index of 3 will generate:
+    /// Input sets with multiple equal values will generate redundant combinations in proportion
+    /// to the likelihood of outcome.  For example, {A A B B} and a lower index of 3 will generate:
     /// {A A B} {A A B} {A B B} {A B B}
     /// </remarks>
     /// <typeparam name="T">The type of the values within the list.</typeparam>
     public class Combinations<T> : IMetaCollection<T>
     {
+        // Ignore Spelling: Akison
+
         #region Constructors
 
         /// <summary>
@@ -124,7 +126,7 @@ namespace AScore_DLL.Combinatorics
             /// <returns>True if successfully moved to next combination, False if no more unique combinations exist.</returns>
             /// <remarks>
             /// The heavy lifting is done by the permutations object, the combination is generated
-            /// by creating a new list of those items that have a true in the permutation parrellel array.
+            /// by creating a new list of those items that have a true in the permutation parallel array.
             /// </remarks>
             public bool MoveNext()
             {
@@ -238,7 +240,7 @@ namespace AScore_DLL.Combinatorics
             private List<T> myCurrentList;
 
             /// <summary>
-            /// An enumertor of the parents list of lexicographic orderings.
+            /// An enumerator of the parent's list of lexicographic orderings.
             /// </summary>
             private readonly Permutations<bool>.Enumerator myPermutationsEnumerator;
 
@@ -282,20 +284,20 @@ namespace AScore_DLL.Combinatorics
         /// <param name="type">The type of Combinations set to generate.</param>
         /// <remarks>
         /// Copies the array and parameters and then creates a map of booleans that will
-        /// be used by a permutations object to refence the subset.  This map is slightly
+        /// be used by a permutations object to reference the subset.  This map is slightly
         /// different based on whether the type is with or without repetition.
         ///
         /// When the type is WithoutRepetition, then a map of upper index elements is
-        /// created with lower index false's.
+        /// created with lower index false values.
         /// E.g. 8 choose 3 generates:
         /// Map: {1 1 1 1 1 0 0 0}
         /// Note: For sorting reasons, false denotes inclusion in output.
         ///
         /// When the type is WithRepetition, then a map of upper index - 1 + lower index
-        /// elements is created with the falses indicating that the 'current' element should
+        /// elements is created with the false values indicating that the 'current' element should
         /// be included and the trues meaning to advance the 'current' element by one.
         /// E.g. 8 choose 3 generates:
-        /// Map: {1 1 1 1 1 1 1 1 0 0 0} (7 trues, 3 falses).
+        /// Map: {1 1 1 1 1 1 1 1 0 0 0} (7 true, 3 false).
         /// </remarks>
         private void Initialize(ICollection<T> values, int lowerIndex, GenerateOption type)
         {
@@ -337,7 +339,7 @@ namespace AScore_DLL.Combinatorics
         #region Data
 
         /// <summary>
-        /// Copy of values object is intialized with, required for enumerator reset.
+        /// Copy of values object is initialized with, required for enumerator reset.
         /// </summary>
         private List<T> myValues;
 

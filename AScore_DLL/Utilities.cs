@@ -27,8 +27,8 @@ namespace AScore_DLL
                     {
                         // it's empty, that's an error
                         throw new ApplicationException(string.Format(
-                                                           "The data provided in {0} is not in a valid format (empty header line found by {1})",
-                                                           psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
+                            "The data provided in {0} is not in a valid format (empty header line found by {1})",
+                            psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
                     }
 
                     var headers = headerLine.Split('\t', ',');
@@ -42,8 +42,8 @@ namespace AScore_DLL
                 {
                     // it's empty, that's an error
                     throw new ApplicationException(string.Format(
-                                                       "The data provided in {0} is not in a valid format (empty data file found by {1})",
-                                                       psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
+                        "The data provided in {0} is not in a valid format (empty data file found by {1})",
+                        psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
                 }
 
                 // fill the rest of the table; positional

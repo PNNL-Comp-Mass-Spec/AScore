@@ -20,6 +20,7 @@
         /// <summary>
         /// Constructor whose source is a dynamic mod entry
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public DynamicModification(DynamicModification itemToCopy)
         {
             this.CopyFrom(itemToCopy);

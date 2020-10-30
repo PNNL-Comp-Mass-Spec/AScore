@@ -81,8 +81,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 entries.Add(new ExperimentalSpectraEntry(mz, intensity));
             }
 
-            var expSpec = new ExperimentalSpectra(scanNumber, chargeState,
-                                                                  precursorMass, precursorChargeState, entries, mPeptideMassCalculator);
+            var expSpec = new ExperimentalSpectra(scanNumber, chargeState, precursorMass, precursorChargeState, entries, mPeptideMassCalculator);
             return expSpec;
         }
 
