@@ -345,7 +345,7 @@ namespace AScore_DLL
             var modSummaryManager = new ModSummaryFileManager();
             RegisterEvents(modSummaryManager);
 
-            var peptideMassCalculator = new PHRPReader.clsPeptideMassCalculator();
+            var peptideMassCalculator = new clsPeptideMassCalculator();
 
             if (FilterOnMSGFScore)
             {

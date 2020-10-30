@@ -273,20 +273,24 @@ namespace AScore_DLL
         private bool MapProteins()
         {
             // Configure the peptide to protein mapper
-            var peptideToProteinMapper = new clsPeptideToProteinMapEngine
+            var options = new ProteinCoverageSummarizerOptions
             {
-                DeleteTempFiles = true,
                 IgnoreILDifferences = false,
-                InspectParameterFilePath = string.Empty,
                 MatchPeptidePrefixAndSuffixToProtein = false,
                 OutputProteinSequence = false,
-                PeptideInputFileFormat = clsPeptideToProteinMapEngine.ePeptideInputFileFormatConstants.PeptideListFile,
                 PeptideFileSkipFirstLine = false,
-                ProteinDataRemoveSymbolCharacters = true,
+                RemoveSymbolCharacters = true,
                 ProteinInputFilePath = mFastaFilePath,
                 SaveProteinToPeptideMappingFile = true,
                 SearchAllProteinsForPeptideSequence = true,
                 SearchAllProteinsSkipCoverageComputationSteps = true
+            };
+
+            var peptideToProteinMapper = new clsPeptideToProteinMapEngine(options)
+            {
+                DeleteTempFiles = true,
+                InspectParameterFilePath = string.Empty,
+                PeptideInputFileFormat = clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.PeptideListFile,
             };
 
             if (!string.IsNullOrEmpty(mOutputDirectoryPath))
