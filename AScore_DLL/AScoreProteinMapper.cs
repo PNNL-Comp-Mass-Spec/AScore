@@ -70,9 +70,9 @@ namespace AScore_DLL
             mOutputDirectoryPath = Path.GetDirectoryName(aScoreResultsFilePath);
             mOutputProteinDescriptions = outputDescriptions;
             mFastaFilePath = fastaFilePath;
-            mMappingResultsFilePath = Path.Combine(mOutputDirectoryPath, Path.GetFileNameWithoutExtension(mAScoreResultsFilePath) + OutputFilenameAddition + Path.GetExtension(mAScoreResultsFilePath));
-            mPeptideListFilePath = Path.Combine(mOutputDirectoryPath, Path.GetFileNameWithoutExtension(mAScoreResultsFilePath) + PeptideFilenameAddition + Path.GetExtension(mAScoreResultsFilePath));
-            mProteinToPeptideMapFilePath = Path.Combine(mOutputDirectoryPath, Path.GetFileNameWithoutExtension(mPeptideListFilePath) + clsProteinCoverageSummarizer.FILENAME_SUFFIX_PROTEIN_TO_PEPTIDE_MAPPING);
+            mMappingResultsFilePath = Path.Combine(mOutputDirectoryPath ?? string.Empty, Path.GetFileNameWithoutExtension(mAScoreResultsFilePath) + OutputFilenameAddition + Path.GetExtension(mAScoreResultsFilePath));
+            mPeptideListFilePath = Path.Combine(mOutputDirectoryPath ?? string.Empty, Path.GetFileNameWithoutExtension(mAScoreResultsFilePath) + PeptideFilenameAddition + Path.GetExtension(mAScoreResultsFilePath));
+            mProteinToPeptideMapFilePath = Path.Combine(mOutputDirectoryPath ?? string.Empty, Path.GetFileNameWithoutExtension(mPeptideListFilePath) + clsProteinCoverageSummarizer.FILENAME_SUFFIX_PROTEIN_TO_PEPTIDE_MAPPING);
 
             mPeptideToProteinMap = new Dictionary<string, List<ProteinPeptideMapType>>();
             mProteinDescriptions = new Dictionary<string, string>();

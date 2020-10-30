@@ -462,7 +462,10 @@ namespace AScore_DLL.Combinatorics
         {
             public int Compare(TU x, TU y)
             {
-                return ((IComparable<TU>)x).CompareTo(y);
+                if (x != null)
+                    return ((IComparable<TU>)x).CompareTo(y);
+
+                return 0;
             }
         }
 
