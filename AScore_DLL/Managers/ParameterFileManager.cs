@@ -150,26 +150,6 @@ namespace AScore_DLL.Managers
             MultiDissociationParamFile = false;
         }
 
-        public void InitializeAScoreParameters(List<Modification> staticModDefs, FragmentType fragmentationMode, double massTolerance)
-        {
-            ClearMods();
-
-            StaticMods.AddRange(staticModDefs);
-
-            mFragmentType = fragmentationMode;
-            FragmentMassTolerance = massTolerance;
-            MultiDissociationParamFile = false;
-        }
-
-        public void InitializeAScoreParameters(FragmentType fragmentationMode, double massTolerance)
-        {
-            ClearMods();
-
-            mFragmentType = fragmentationMode;
-            FragmentMassTolerance = massTolerance;
-            MultiDissociationParamFile = false;
-        }
-
         #endregion
 
         #region Public Methods

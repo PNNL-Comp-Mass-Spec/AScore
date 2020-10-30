@@ -16,8 +16,8 @@ namespace AScore_DLL.Managers
         private const string COL_MASS = "Modification_Mass";
         private const string COL_RESIDUE = "Target_Residues";
         private const string COL_TYPE = "Modification_Type";
-        private const string COL_TAG = "Mass_Correction_Tag";
-        private const string COL_COUNT = "Occurrence_Count";
+        // private constant string COL_TAG = "Mass_Correction_Tag";
+        // private constant string COL_COUNT = "Occurrence_Count";
 
         /// <summary>
         /// Look for the mod summary file for the given PSM results file

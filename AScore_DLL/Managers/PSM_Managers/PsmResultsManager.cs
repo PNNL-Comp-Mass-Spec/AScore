@@ -34,7 +34,7 @@ namespace AScore_DLL.Managers.PSM_Managers
         protected int mCurrentRow;
         protected int maxSteps;
         public bool AtEnd { get; set; }
-        
+
         protected string m_jobNum;
         protected bool m_JobColumnDefined;
 
@@ -132,14 +132,6 @@ namespace AScore_DLL.Managers.PSM_Managers
         public abstract void GetNextRow(out int scanNumber, out int scanCount, out int chargeState,
             out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParams);
 
-        /// <summary>
-        /// Resets the counter to the beginning
-        /// </summary>
-        public void ResetToStart()
-        {
-            mCurrentRow = 0;
-        }
-
         public int CurrentRowNum => mCurrentRow;
 
         public int ResultsCount => mAScoresTable.Rows.Count;
@@ -154,11 +146,6 @@ namespace AScore_DLL.Managers.PSM_Managers
         /// <param name="ascoreResult"></param>
         public virtual void WriteToTable(string peptideSeq, string bestSeq, int scanNum, double topPeptideScore, AScoreResult ascoreResult)
         {
-            //if (peptideSeq == "R.HGTDLWIDNM@SSAVPNHS*PEKK.D")
-            //{
-            //    Console.WriteLine("Debug: found " + peptideSeq);
-            //}
-
             var newRow = mAScoresTable.NewRow();
 
             newRow[RESULTS_COL_JOB] = m_jobNum;
@@ -187,11 +174,6 @@ namespace AScore_DLL.Managers.PSM_Managers
         /// <param name="modInfo"></param>
         public virtual void WriteToTable(string peptideSeq, int scanNum, double pScore, int[] positionList, string modInfo)
         {
-            //if (peptideSeq == "R.HGTDLWIDNM@SSAVPNHS*PEKK.D")
-            //{
-            //    Console.WriteLine("Debug: found " + peptideSeq);
-            //}
-
             var dataRow = mAScoresTable.NewRow();
 
             dataRow[RESULTS_COL_JOB] = m_jobNum;

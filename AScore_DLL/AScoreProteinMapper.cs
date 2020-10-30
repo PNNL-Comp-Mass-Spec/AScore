@@ -21,13 +21,6 @@ namespace AScore_DLL
             public string peptideSequence;
             public string proteinName;
             public int residueStart;
-            public int residueEnd;
-
-            public void Initialize()
-            {
-                peptideSequence = string.Empty;
-                proteinName = string.Empty;
-            }
         }
 
         private readonly string mAScoreResultsFilePath;
@@ -359,7 +352,7 @@ namespace AScore_DLL
                     var item = new ProteinPeptideMapType
                     {
                         residueStart = Convert.ToInt32(columns[columnMap["Residue Start"]]),
-                        residueEnd = Convert.ToInt32(columns[columnMap["Residue End"]]),
+                        // residueEnd = Convert.ToInt32(columns[columnMap["Residue End"]]),
                         proteinName = columns[columnMap["Protein Name"]],
                         peptideSequence = columns[columnMap["Peptide Sequence"]]
                     };
