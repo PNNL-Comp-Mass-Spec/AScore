@@ -237,20 +237,20 @@ namespace AScore_DLL
             return modInfoNames;
         }
 
-        protected bool InitializeReader(FileInfo fiInputFile)
+        protected bool InitializeReader(FileInfo inputFile)
         {
             try
             {
-                var ePeptideHitResultType = clsPHRPReader.AutoDetermineResultType(fiInputFile.FullName);
+                var peptideHitResultType = clsPHRPReader.AutoDetermineResultType(inputFile.FullName);
 
-                if (ePeptideHitResultType == clsPHRPReader.ePeptideHitResultType.Unknown)
+                if (peptideHitResultType == clsPHRPReader.PeptideHitResultTypes.Unknown)
                 {
-                    OnErrorEvent("Error: Could not determine the format of the PHRP data file: " + fiInputFile.FullName);
+                    OnErrorEvent("Error: Could not determine the format of the PHRP data file: " + inputFile.FullName);
                     return false;
                 }
 
                 // Open the data file and read the data
-                mPHRPReader = new clsPHRPReader(fiInputFile.FullName, clsPHRPReader.ePeptideHitResultType.Unknown, false, false, false)
+                mPHRPReader = new clsPHRPReader(inputFile.FullName, clsPHRPReader.PeptideHitResultTypes.Unknown, false, false, false)
                 {
                     EchoMessagesToConsole = false,
                     SkipDuplicatePSMs = false
