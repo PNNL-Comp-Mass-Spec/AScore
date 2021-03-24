@@ -581,9 +581,9 @@ namespace AScore_UnitTests
             }
         }
 
-        private PHRPReader.clsPeptideMassCalculator GetDefaultPeptideMassCalculator()
+        private PHRPReader.PeptideMassCalculator GetDefaultPeptideMassCalculator()
         {
-            return new PHRPReader.clsPeptideMassCalculator();
+            return new PHRPReader.PeptideMassCalculator();
         }
     }
 }

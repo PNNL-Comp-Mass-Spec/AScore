@@ -110,7 +110,7 @@ namespace AScore_DLL
                         ));
                     return -13;
             }
-            var peptideMassCalculator = new clsPeptideMassCalculator();
+            var peptideMassCalculator = new PeptideMassCalculator();
 
             var spectraManager = new SpectraManagerCache(peptideMassCalculator);
 
@@ -345,7 +345,7 @@ namespace AScore_DLL
             var modSummaryManager = new ModSummaryFileManager();
             RegisterEvents(modSummaryManager);
 
-            var peptideMassCalculator = new clsPeptideMassCalculator();
+            var peptideMassCalculator = new PeptideMassCalculator();
 
             if (FilterOnMSGFScore)
             {

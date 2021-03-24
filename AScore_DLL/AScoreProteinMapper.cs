@@ -254,7 +254,7 @@ namespace AScore_DLL
                     }
 
                     var sequence = columns[columnMap["BestSequence"]];
-                    var cleanSequence = clsPeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
+                    var cleanSequence = PeptideCleavageStateCalculator.ExtractCleanSequenceFromSequenceWithMods(sequence, true);
                     if (!peptides.ContainsKey(cleanSequence))
                     {
                         peptides.Add(cleanSequence, 0);

@@ -49,7 +49,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         protected string m_datasetName;
         protected bool m_initialized;
 
-        private readonly PHRPReader.clsPeptideMassCalculator m_PeptideMassCalculator;
+        private readonly PHRPReader.PeptideMassCalculator m_PeptideMassCalculator;
         #endregion // Variables
 
         #region Constructor
@@ -58,7 +58,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// Initializes a DtaManager for which we don't yet know the path of the CDTA file to read
         /// </summary>
         /// <remarks>You must call UpdateDtaFilePath() prior to using GetDtaFileName() or GetExperimentalSpectra()</remarks>
-        public MzMLManager(PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
+        public MzMLManager(PHRPReader.PeptideMassCalculator peptideMassCalculator)
         {
             m_PeptideMassCalculator = peptideMassCalculator;
             m_initialized = false;

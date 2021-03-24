@@ -15,7 +15,7 @@ namespace AScore_DLL.Managers
         public double m_minMZ = -1;
         private readonly List<List<ExperimentalSpectraEntry>> TopTenSpectra = new List<List<ExperimentalSpectraEntry>>();
 
-        private readonly PHRPReader.clsPeptideMassCalculator mPeptideMassCalculator;
+        private readonly PHRPReader.PeptideMassCalculator mPeptideMassCalculator;
 
         #endregion // Variables
 
@@ -60,7 +60,7 @@ namespace AScore_DLL.Managers
         /// <param name="peptideMassCalculator">Mass calculator class</param>
         public ExperimentalSpectra(int scanNum, int chargeState, double precursorMass,
             int precursorChargeState, List<ExperimentalSpectraEntry> spectra,
-            PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
+            PHRPReader.PeptideMassCalculator peptideMassCalculator)
         {
             ScanNumber = scanNum;
             ChargeState = chargeState;

@@ -43,7 +43,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         private StreamReader m_masterDta;
         private readonly Dictionary<string, long> dtaEntries = new Dictionary<string, long>();
 
-        private readonly PHRPReader.clsPeptideMassCalculator m_PeptideMassCalculator;
+        private readonly PHRPReader.PeptideMassCalculator m_PeptideMassCalculator;
 
         #endregion // Variables
 
@@ -61,7 +61,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// Initializes a DtaManager for which we don't yet know the path of the CDTA file to read
         /// </summary>
         /// <remarks>You must call UpdateDtaFilePath() prior to using GetDtaFileName() or GetExperimentalSpectra()</remarks>
-        public DtaManager(PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
+        public DtaManager(PHRPReader.PeptideMassCalculator peptideMassCalculator)
         {
             m_PeptideMassCalculator = peptideMassCalculator;
             Initialized = false;

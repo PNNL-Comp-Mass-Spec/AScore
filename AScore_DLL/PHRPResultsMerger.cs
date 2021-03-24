@@ -16,7 +16,7 @@ namespace AScore_DLL
         // Ignore Spelling: phrp
 
         protected string m_MergedFilePath = string.Empty;
-        protected clsPHRPReader mPHRPReader;
+        protected ReaderFactory mPHRPReader;
 
         protected struct AScoreResultsType
         {
@@ -160,24 +160,24 @@ namespace AScore_DLL
 
                         if (!headersParsed)
                         {
-                            clsPHRPReader.ParseColumnHeaders(splitLine, columnHeaders);
+                            ReaderFactory.ParseColumnHeaders(splitLine, columnHeaders);
                             headersParsed = true;
                             continue;
                         }
 
-                        var scanNumber = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SCAN, columnHeaders, -1);
-                        var originalPeptide = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ORIGINAL_SEQUENCE, columnHeaders, string.Empty);
-                        var bestSequence = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_BEST_SEQUENCE, columnHeaders, string.Empty);
-                        var peptideScore = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE, columnHeaders, 0.0);
-                        var ascoreValue = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
+                        var scanNumber = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SCAN, columnHeaders, -1);
+                        var originalPeptide = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ORIGINAL_SEQUENCE, columnHeaders, string.Empty);
+                        var bestSequence = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_BEST_SEQUENCE, columnHeaders, string.Empty);
+                        var peptideScore = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE, columnHeaders, 0.0);
+                        var ascoreValue = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
 
                         // ReSharper disable CommentTypo
-                        //int numSiteIonsPossible = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_POSS, columnHeaders, 0);
-                        //int numSitIonsMatched = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_MATCHED, columnHeaders, 0);
-                        //string secondSequence = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SECOND_SEQUENCE, columnHeaders, string.Empty);
+                        //int numSiteIonsPossible = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_POSS, columnHeaders, 0);
+                        //int numSitIonsMatched = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_MATCHED, columnHeaders, 0);
+                        //string secondSequence = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SECOND_SEQUENCE, columnHeaders, string.Empty);
                         // ReSharper restore CommentTypo
 
-                        var modInfo = clsPHRPReader.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_MOD_INFO, columnHeaders, string.Empty);
+                        var modInfo = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_MOD_INFO, columnHeaders, string.Empty);
 
                         var scanPeptideKey = ConstructScanPeptideKey(scanNumber, originalPeptide);
 
@@ -200,7 +200,6 @@ namespace AScore_DLL
                             cachedAscoreResults.Add(scanPeptideKey, ascoreResult);
                         }
                     }
-                }
             }
             catch (Exception ex)
             {
@@ -241,16 +240,16 @@ namespace AScore_DLL
         {
             try
             {
-                var peptideHitResultType = clsPHRPReader.AutoDetermineResultType(inputFile.FullName);
+                var peptideHitResultType = ReaderFactory.AutoDetermineResultType(inputFile.FullName);
 
-                if (peptideHitResultType == clsPHRPReader.PeptideHitResultTypes.Unknown)
+                if (peptideHitResultType == Enums.PeptideHitResultTypes.Unknown)
                 {
                     OnErrorEvent("Error: Could not determine the format of the PHRP data file: " + inputFile.FullName);
                     return false;
                 }
 
                 // Open the data file and read the data
-                mPHRPReader = new clsPHRPReader(inputFile.FullName, clsPHRPReader.PeptideHitResultTypes.Unknown, false, false, false)
+                mPHRPReader = new ReaderFactory(inputFile.FullName, Enums.PeptideHitResultTypes.Unknown, false, false, false)
                 {
                     EchoMessagesToConsole = false,
                     SkipDuplicatePSMs = false
@@ -277,7 +276,7 @@ namespace AScore_DLL
         private void MakeUpdatedPHRPFile(
             FileSystemInfo inputFile,
             FileSystemInfo outputFile,
-            clsPHRPReader phrpReader,
+            ReaderFactory phrpReader,
             Dictionary<string, AScoreResultsType> cachedAscoreResults)
         {
             try

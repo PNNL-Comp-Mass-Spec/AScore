@@ -10,7 +10,7 @@ namespace AScore_DLL.Managers.SpectraManagers
     {
         private readonly clsMzXMLFileAccessor mzAccessor;
 
-        private readonly PHRPReader.clsPeptideMassCalculator mPeptideMassCalculator;
+        private readonly PHRPReader.PeptideMassCalculator mPeptideMassCalculator;
 
         public bool Initialized { get; } = false;
 
@@ -21,7 +21,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// </summary>
         /// <param name="mzXmlPath"></param>
         /// <param name="peptideMassCalculator"></param>
-        private MzXmlManager(string mzXmlPath, PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
+        private MzXmlManager(string mzXmlPath, PHRPReader.PeptideMassCalculator peptideMassCalculator)
         {
             mPeptideMassCalculator = peptideMassCalculator;
 

@@ -16,7 +16,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// <summary>
         /// Constructor
         /// </summary>
-        public SpectraManagerCache(PHRPReader.clsPeptideMassCalculator peptideMassCalculator)
+        public SpectraManagerCache(PHRPReader.PeptideMassCalculator peptideMassCalculator)
         {
             _mzMLManager = new MzMLManager(peptideMassCalculator);
             _dtaManager = new DtaManager(peptideMassCalculator);
