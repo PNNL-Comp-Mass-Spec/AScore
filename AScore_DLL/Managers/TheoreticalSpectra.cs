@@ -10,8 +10,8 @@ namespace AScore_DLL.Managers
     public class TheoreticalSpectra : IEnumerable
     {
         private int chargeState;
-        private readonly List<double> bIonsMass = new List<double>();
-        private readonly List<double> yIonsMass = new List<double>();
+        private readonly List<double> bIonsMass = new();
+        private readonly List<double> yIonsMass = new();
 
         /// <summary>
         /// Peptide sequence, without any mods

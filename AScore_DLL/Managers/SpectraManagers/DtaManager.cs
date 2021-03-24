@@ -41,7 +41,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         #region Variables
 
         private StreamReader m_masterDta;
-        private readonly Dictionary<string, long> dtaEntries = new Dictionary<string, long>();
+        private readonly Dictionary<string, long> dtaEntries = new();
 
         private readonly PHRPReader.PeptideMassCalculator m_PeptideMassCalculator;
 

@@ -67,7 +67,7 @@ namespace AScore_DLL.Managers.PSM_Managers
             maxSteps = data.Count;
         }
 
-        private readonly List<SpectrumIdentificationItemWrapper> data = new List<SpectrumIdentificationItemWrapper>();
+        private readonly List<SpectrumIdentificationItemWrapper> data = new();
 
         private class SpectrumIdentificationItemWrapper
         {
@@ -104,8 +104,8 @@ namespace AScore_DLL.Managers.PSM_Managers
             }
         }
 
-        private readonly List<SearchModificationAndSymbol> searchMods = new List<SearchModificationAndSymbol>();
-        private readonly Dictionary<string, List<SearchModificationAndSymbol>> modLookup = new Dictionary<string, List<SearchModificationAndSymbol>>();
+        private readonly List<SearchModificationAndSymbol> searchMods = new();
+        private readonly Dictionary<string, List<SearchModificationAndSymbol>> modLookup = new();
 
         private string FormatModName(string modName, double modMass)
         {

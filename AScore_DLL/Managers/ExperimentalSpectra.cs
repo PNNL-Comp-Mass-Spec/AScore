@@ -13,7 +13,7 @@ namespace AScore_DLL.Managers
 
         public double m_maxMZ = -1;
         public double m_minMZ = -1;
-        private readonly List<List<ExperimentalSpectraEntry>> TopTenSpectra = new List<List<ExperimentalSpectraEntry>>();
+        private readonly List<List<ExperimentalSpectraEntry>> TopTenSpectra = new();
 
         private readonly PHRPReader.PeptideMassCalculator mPeptideMassCalculator;
 

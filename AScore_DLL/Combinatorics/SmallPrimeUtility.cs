@@ -161,6 +161,6 @@ namespace AScore_DLL.Combinatorics
         /// </summary>
         public static IList<int> PrimeTable => myPrimes;
 
-        private static List<int> myPrimes = new List<int>();
+        private static List<int> myPrimes = new();
     }
 }

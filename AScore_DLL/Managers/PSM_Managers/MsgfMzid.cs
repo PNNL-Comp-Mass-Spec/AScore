@@ -45,8 +45,8 @@ namespace AScore_DLL.Managers.PSM_Managers
             }
         }
 
-        private readonly List<SearchModificationAndSymbol> searchMods = new List<SearchModificationAndSymbol>();
-        private readonly Dictionary<string, List<SearchModificationAndSymbol>> modLookup = new Dictionary<string, List<SearchModificationAndSymbol>>();
+        private readonly List<SearchModificationAndSymbol> searchMods = new();
+        private readonly Dictionary<string, List<SearchModificationAndSymbol>> modLookup = new();
 
         private string FormatModName(SimpleMZIdentMLReader.Modification mod)
         {

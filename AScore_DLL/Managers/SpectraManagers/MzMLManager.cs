@@ -45,7 +45,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
         private SimpleMzMLReader m_MzMLReader;
         //private List<MS2_Spectrum> m_ms2_spectra = null;
-        private readonly Dictionary<string, SimpleMzMLReader> m_readers = new Dictionary<string, SimpleMzMLReader>();
+        private readonly Dictionary<string, SimpleMzMLReader> m_readers = new();
         protected string m_datasetName;
         protected bool m_initialized;
 
