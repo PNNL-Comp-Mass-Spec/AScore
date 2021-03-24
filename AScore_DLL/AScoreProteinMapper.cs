@@ -8,7 +8,7 @@ using ProteinCoverageSummarizer;
 
 namespace AScore_DLL
 {
-    class AScoreProteinMapper
+    internal class AScoreProteinMapper
     {
         // Ignore Spelling: AScore
 
@@ -34,7 +34,7 @@ namespace AScore_DLL
         /// <summary>
         /// Keys are peptide clean sequence, values are the list of proteins that contain the peptide
         /// </summary>
-        readonly Dictionary<string, List<ProteinPeptideMapType>> mPeptideToProteinMap;
+        private readonly Dictionary<string, List<ProteinPeptideMapType>> mPeptideToProteinMap;
 
         /// <summary>
         /// Keys are protein names, values are descriptions (from the FASTA file)

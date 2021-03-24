@@ -203,6 +203,5 @@ namespace AScore_DLL.Managers
             foreach (var yIon in yIonsMass)
                 yield return yIon;
         }
-
     }
 }

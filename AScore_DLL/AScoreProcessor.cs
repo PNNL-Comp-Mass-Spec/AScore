@@ -304,8 +304,10 @@ namespace AScore_DLL
             };
 
             if (spectraManager == null || !spectraManager.Initialized)
+            {
                 throw new Exception(
                     "spectraManager must be instantiated and initialized before calling RunAScoreOnSingleFile for a single source file");
+            }
 
             RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, psmResultsManager, ascoreParams, ascoreOptions, true);
 
@@ -628,6 +630,7 @@ namespace AScore_DLL
         /// <param name="mzMin">min m/z</param>
         /// <param name="mySpectra">dictionary of theoretical ions organized by charge</param>
         /// <returns>list of theoretical ions</returns>
+        [Obsolete("Unused")]
         private List<double> GetCurrentComboTheoreticalIons(double mzMax, double mzMin, Dictionary<int, ChargeStateIons> mySpectra)
         {
             var myIons = new List<double>();

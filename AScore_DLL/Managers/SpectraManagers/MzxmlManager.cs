@@ -6,7 +6,7 @@ using MSDataFileReader;
 namespace AScore_DLL.Managers.SpectraManagers
 {
     [Obsolete("Unused")]
-    public class MzXmlManager : ISpectraManager
+    public sealed class MzXmlManager : ISpectraManager
     {
         private readonly clsMzXMLFileAccessor mzAccessor;
 

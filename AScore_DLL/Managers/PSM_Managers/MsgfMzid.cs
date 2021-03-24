@@ -243,9 +243,7 @@ namespace AScore_DLL.Managers.PSM_Managers
                 sequence = leftSide + symbol + rightSide;
             }
 
-            sequence = $"{pepEv.Pre}.{sequence}.{pepEv.Post}";
-
-            return sequence;
+            return $"{pepEv.Pre}.{sequence}.{pepEv.Post}";
         }
 
         public override int GetRowLength()
@@ -269,21 +267,13 @@ namespace AScore_DLL.Managers.PSM_Managers
 
             if (id.AllParamsDict.TryGetValue("AssumedDissociationMethod", out var fragType))
             {
-                switch (fragType.ToLower())
+                ascoreParams.FragmentType = fragType.ToLower() switch
                 {
-                    case "hcd":
-                        ascoreParams.FragmentType = FragmentType.HCD;
-                        break;
-                    case "etd":
-                        ascoreParams.FragmentType = FragmentType.ETD;
-                        break;
-                    case "cid":
-                        ascoreParams.FragmentType = FragmentType.CID;
-                        break;
-                    default:
-                        ascoreParams.FragmentType = FragmentType.Unspecified;
-                        break;
-                }
+                    "hcd" => FragmentType.HCD,
+                    "etd" => FragmentType.ETD,
+                    "cid" => FragmentType.CID,
+                    _ => FragmentType.Unspecified,
+                };
             }
             else
             {

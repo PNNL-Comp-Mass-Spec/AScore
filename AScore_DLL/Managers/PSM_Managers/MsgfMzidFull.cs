@@ -198,7 +198,7 @@ namespace AScore_DLL.Managers.PSM_Managers
 
         private static bool GetIsNTerm(SearchModificationObj sm)
         {
-            if (sm.SpecificityRules != null && sm.SpecificityRules.Count > 0)
+            if (sm.SpecificityRules?.Count > 0)
             {
                 var specRules = sm.SpecificityRules.First(); // Only 0 or 1 allowed
                 var peptide = specRules.CVParams.GetCvParam(CV.CVID.MS_modification_specificity_peptide_N_term, "");
@@ -353,9 +353,7 @@ namespace AScore_DLL.Managers.PSM_Managers
                 sequence = leftSide + symbol + rightSide;
             }
 
-            sequence = $"{pepEv.Pre}.{sequence}.{pepEv.Post}";
-
-            return sequence;
+            return $"{pepEv.Pre}.{sequence}.{pepEv.Post}";
         }
 
         public override int GetRowLength()
@@ -395,21 +393,13 @@ namespace AScore_DLL.Managers.PSM_Managers
 
             if (fragMatches.Count > 0)
             {
-                switch (fragMatches[0].Value.ToLower())
+                ascoreParams.FragmentType = fragMatches[0].Value.ToLower() switch
                 {
-                    case "hcd":
-                        ascoreParams.FragmentType = FragmentType.HCD;
-                        break;
-                    case "etd":
-                        ascoreParams.FragmentType = FragmentType.ETD;
-                        break;
-                    case "cid":
-                        ascoreParams.FragmentType = FragmentType.CID;
-                        break;
-                    default:
-                        ascoreParams.FragmentType = FragmentType.Unspecified;
-                        break;
-                }
+                    "hcd" => FragmentType.HCD,
+                    "etd" => FragmentType.ETD,
+                    "cid" => FragmentType.CID,
+                    _ => FragmentType.Unspecified,
+                };
             }
             else
             {

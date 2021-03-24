@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace AScore_UnitTests
 {
     [TestFixture]
-    class Test
+    internal class Test
     {
         [Test]
         [Ignore("Local testing")]
@@ -236,7 +236,7 @@ namespace AScore_UnitTests
         {
             var direct = @"C:\Documents and Settings\aldr699\My Documents2011\EColiPhos";
 
-            var ascoreP = @"parameterFile.xml";
+            var ascoreP = "parameterFile.xml";
 
             var fhtFiles = new List<string>{
                 "775945_10012010_MG1655_phospho_s05_101002094806_msgfdb_fht.txt",
@@ -471,8 +471,8 @@ namespace AScore_UnitTests
             {
                 for (var i = 0; i < fhtFiles.Count; i++)
                 {
-                    var direct = "";
-                    var ascoreP = "";
+                    string direct;
+                    string ascoreP;
                     if (j == 0)
                     {
                         direct = directETD;
@@ -539,8 +539,8 @@ namespace AScore_UnitTests
             {
                 for (var i = 0; i < 4; i++)
                 {
-                    var fht = "";
-                    var direct = "";
+                    string fht;
+                    string direct;
                     if (j == 0)
                     {
                         direct = directSeq;
@@ -556,7 +556,7 @@ namespace AScore_UnitTests
                     var tempdta = Path.Combine(direct2, dtaFiles[i]);
                     var ascP = Path.Combine(direct2, ascoreP);
                     var tempout = Path.Combine(direct, fhtFiles[i].Substring(0, fhtFiles[i].Length - 4) + "_AScore.txt");
-                    PsmResultsManager dsman = null;
+                    PsmResultsManager dsman;
                     if (j == 0)
                     {
                          dsman = new SequestFHT(tempfht);

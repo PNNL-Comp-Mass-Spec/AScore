@@ -132,6 +132,5 @@ namespace AScore_DLL
 
             return prefix + type + mod.MassMonoisotopic + " on " + residues;
         }
-
     }
 }

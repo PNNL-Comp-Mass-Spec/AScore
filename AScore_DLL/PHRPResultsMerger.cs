@@ -126,7 +126,7 @@ namespace AScore_DLL
         private bool CacheAScoreResults(string ascoreResultsFilePath, IDictionary<string, AScoreResultsType> cachedAscoreResults)
         {
             var headersParsed = false;
-            var columnHeaders = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
+            var columnHeaders = new SortedDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             try
             {
@@ -293,12 +293,12 @@ namespace AScore_DLL
 
                 // Write the header line
                 outLine.Append(outputHeaderLine);
-                outLine.Append("\t" + PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE);
-                outLine.Append("\t" + "Modified_Residues");
+                outLine.AppendFormat("\t{0}", PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE);
+                outLine.Append("\tModified_Residues");
 
                 foreach (var modInfoName in modInfoNames)
                 {
-                    outLine.Append("\t" + modInfoName);
+                    outLine.AppendFormat("\t{0}", modInfoName);
                 }
                 phrpWriter.WriteLine(outLine);
 
@@ -325,11 +325,11 @@ namespace AScore_DLL
                     outLine.Clear();
                     outLine.Append(dataLineUpdated);
 
-                    outLine.Append("\t" + StringUtilities.ValueToString(ascoreResult.PeptideScore));
+                    outLine.AppendFormat("\t{0}", StringUtilities.ValueToString(ascoreResult.PeptideScore));
 
                     // Count the number of modInfo entries that are not "-"
                     var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != AScoreProcessor.MOD_INFO_NO_MODIFIED_RESIDUES select item.Key).Count();
-                    outLine.Append("\t" + modTypeCount);
+                    outLine.AppendFormat("\t{0}", modTypeCount);
 
                     foreach (var modInfoName in modInfoNames)
                     {
@@ -338,7 +338,7 @@ namespace AScore_DLL
                         {
                             if (modInfoName == modInfoEntry.Key)
                             {
-                                outLine.Append("\t" + StringUtilities.ValueToString(modInfoEntry.Value));
+                                outLine.AppendFormat("\t{0}", StringUtilities.ValueToString(modInfoEntry.Value));
                                 modInfoMatch = true;
                                 break;
                             }
@@ -364,10 +364,7 @@ namespace AScore_DLL
             var filePath1 = Path.GetFullPath(fiFile1.FullName);
             var filePath2 = Path.GetFullPath(fiFile2.FullName);
 
-            if (string.Equals(filePath1, filePath2, StringComparison.CurrentCultureIgnoreCase))
-                return true;
-
-            return false;
+            return string.Equals(filePath1, filePath2, StringComparison.OrdinalIgnoreCase);
         }
 
         protected string ReadHeaderLine(string filePath)

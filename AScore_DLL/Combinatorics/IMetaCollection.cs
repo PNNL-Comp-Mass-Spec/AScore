@@ -11,7 +11,7 @@ namespace AScore_DLL.Combinatorics
     /// this class inherits defines the mechanism for enumerating through the collections.
     /// </summary>
     /// <typeparam name="T">The of the elements in the collection, not the type of the collection.</typeparam>
-    interface IMetaCollection<T> : IEnumerable<IList<T>>
+    internal interface IMetaCollection<T> : IEnumerable<IList<T>>
     {
         // Ignore Spelling: Akison
 

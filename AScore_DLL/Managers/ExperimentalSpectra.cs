@@ -124,7 +124,7 @@ namespace AScore_DLL.Managers
         private void GenerateSpectraForPeptideScore(
             List<ExperimentalSpectraEntry> spectra)
         {
-            var tol = 0.6;
+            const double tol = 0.6;
             var index = 0;
 
             var minMZ = spectra[0].Mz;
@@ -144,7 +144,7 @@ namespace AScore_DLL.Managers
                 // Now iterate through each mz value in this section looking for
                 // entries that are within 1.0 of the current mz value and picking
                 // the one with the highest Value2 property
-                for (var mz = lowerBound; mz < upperBound; mz += 1.0)
+                for (var mz = lowerBound; mz < upperBound; ++mz)
                 {
                     // Get all of the entries for this mz value
                     var count = 0;

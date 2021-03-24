@@ -7,7 +7,7 @@ using PSI_Interface.MSData;
 
 namespace AScore_DLL.Managers.SpectraManagers
 {
-    class MzMLManager : EventNotifier, ISpectraManager
+    internal class MzMLManager : EventNotifier, ISpectraManager
     {
         // Ignore Spelling: dta
 
@@ -121,7 +121,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             try
             {
                 m_datasetName = Path.GetFileNameWithoutExtension(mzMLPath);
-                if (m_datasetName != null && m_datasetName.EndsWith(".mzML", StringComparison.OrdinalIgnoreCase))
+                if (m_datasetName?.EndsWith(".mzML", StringComparison.OrdinalIgnoreCase) == true)
                 {
                     m_datasetName = Path.GetFileNameWithoutExtension(m_datasetName);
                 }
@@ -166,7 +166,8 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (!m_initialized)
                 throw new Exception("Class has not yet been initialized; call OpenFile() before calling this function");
 
-            if (!(m_MzMLReader.ReadMassSpectrum(scanNumber) is SimpleMzMLReader.SimpleSpectrum spectrum))
+            var spectrum = m_MzMLReader.ReadMassSpectrum(scanNumber);
+            if (spectrum == null)
             {
                 return null;
             }
@@ -188,8 +189,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             var chargeStateText = "";
 
             if (spectrum.Precursors.Count > 0 &&
-                spectrum.Precursors[0].SelectedIons != null &&
-                spectrum.Precursors[0].SelectedIons.Count > 0)
+                spectrum.Precursors[0].SelectedIons?.Count > 0)
             {
                 foreach (var cvParam in spectrum.Precursors[0].SelectedIons[0].CVParams)
                 {

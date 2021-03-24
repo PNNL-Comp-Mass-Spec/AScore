@@ -14,16 +14,9 @@ namespace AScore_DLL.Combinatorics
     /// The prime table contains all primes up to Sqrt(2^31) which are all of the primes
     /// requires to factorize any Int32 positive integer.
     /// </summary>
-    public class SmallPrimeUtility
+    public static class SmallPrimeUtility
     {
         // Ignore Spelling: Akison
-
-        /// <summary>
-        /// Utility class, no instances allowed.
-        /// </summary>
-        private SmallPrimeUtility()
-        {
-        }
 
         /// <summary>
         /// Performs a prime factorization of a given integer using the table of primes in PrimeTable.

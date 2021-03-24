@@ -42,7 +42,7 @@ namespace AScore_DLL
             Mzid,
         }
 
-        public const string PROGRAM_DATE = "January 25, 2021";
+        public const string PROGRAM_DATE = "March 24, 2021";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
@@ -160,7 +160,7 @@ namespace AScore_DLL
 
             // If OutputDirectoryPath points to a file, change it to the parent directory
             var outputDirectoryFile = new FileInfo(OutputDirectoryPath);
-            if (outputDirectoryFile.Extension.Length > 1 && outputDirectoryFile.Directory != null && outputDirectoryFile.Directory.Exists)
+            if (outputDirectoryFile.Extension.Length > 1 && outputDirectoryFile.Directory?.Exists == true)
             {
                 OutputDirectoryPath = outputDirectoryFile.Directory.FullName;
             }

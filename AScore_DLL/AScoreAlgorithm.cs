@@ -202,10 +202,13 @@ namespace AScore_DLL
                     {
                         var sites = siteInfo.Keys.ToList();
                         for (var i = 0; i < sites.Count; i++)
+                        {
                             if (i != indSite)
                             {
                                 othersMatch = othersMatch && secondDict.ContainsKey(sites[i]);
                             }
+                        }
+
                         if (othersMatch)
                         {
                             ascoreResult.PeptideMods = myPositionsList[sortedSumScore[secondPeptide].Index];
