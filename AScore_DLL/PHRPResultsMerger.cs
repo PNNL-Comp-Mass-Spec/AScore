@@ -148,58 +148,58 @@ namespace AScore_DLL
                 columnHeaders.Add(PsmResultsManager.RESULTS_COL_SECOND_SEQUENCE, 8);
                 columnHeaders.Add(PsmResultsManager.RESULTS_COL_MOD_INFO, 9);
 
-                using (var resultsFileReader = new StreamReader(new FileStream(ascoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+                using var resultsFileReader = new StreamReader(new FileStream(ascoreResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
+
+                while (!resultsFileReader.EndOfStream)
                 {
-                    while (!resultsFileReader.EndOfStream)
+                    var lineIn = resultsFileReader.ReadLine();
+                    if (string.IsNullOrEmpty(lineIn))
+                        continue;
+
+                    var splitLine = lineIn.Split('\t');
+
+                    if (!headersParsed)
                     {
-                        var lineIn = resultsFileReader.ReadLine();
-                        if (string.IsNullOrEmpty(lineIn))
-                            continue;
+                        ReaderFactory.ParseColumnHeaders(splitLine, columnHeaders);
+                        headersParsed = true;
+                        continue;
+                    }
 
-                        var splitLine = lineIn.Split('\t');
+                    var scanNumber = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SCAN, columnHeaders, -1);
+                    var originalPeptide = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ORIGINAL_SEQUENCE, columnHeaders, string.Empty);
+                    var bestSequence = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_BEST_SEQUENCE, columnHeaders, string.Empty);
+                    var peptideScore = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE, columnHeaders, 0.0);
+                    var ascoreValue = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
 
-                        if (!headersParsed)
+                    // ReSharper disable CommentTypo
+                    //int numSiteIonsPossible = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_POSS, columnHeaders, 0);
+                    //int numSitIonsMatched = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_MATCHED, columnHeaders, 0);
+                    //string secondSequence = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SECOND_SEQUENCE, columnHeaders, string.Empty);
+                    // ReSharper restore CommentTypo
+
+                    var modInfo = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_MOD_INFO, columnHeaders, string.Empty);
+
+                    var scanPeptideKey = ConstructScanPeptideKey(scanNumber, originalPeptide);
+
+                    if (cachedAscoreResults.TryGetValue(scanPeptideKey, out var ascoreResult))
+                    {
+                        if (!ascoreResult.AScoreByMod.ContainsKey(modInfo))
                         {
-                            ReaderFactory.ParseColumnHeaders(splitLine, columnHeaders);
-                            headersParsed = true;
-                            continue;
-                        }
-
-                        var scanNumber = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SCAN, columnHeaders, -1);
-                        var originalPeptide = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ORIGINAL_SEQUENCE, columnHeaders, string.Empty);
-                        var bestSequence = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_BEST_SEQUENCE, columnHeaders, string.Empty);
-                        var peptideScore = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE, columnHeaders, 0.0);
-                        var ascoreValue = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_ASCORE, columnHeaders, 0.0);
-
-                        // ReSharper disable CommentTypo
-                        //int numSiteIonsPossible = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_POSS, columnHeaders, 0);
-                        //int numSitIonsMatched = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_NUM_SITE_IONS_MATCHED, columnHeaders, 0);
-                        //string secondSequence = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_SECOND_SEQUENCE, columnHeaders, string.Empty);
-                        // ReSharper restore CommentTypo
-
-                        var modInfo = ReaderFactory.LookupColumnValue(splitLine, PsmResultsManager.RESULTS_COL_MOD_INFO, columnHeaders, string.Empty);
-
-                        var scanPeptideKey = ConstructScanPeptideKey(scanNumber, originalPeptide);
-
-                        if (cachedAscoreResults.TryGetValue(scanPeptideKey, out var ascoreResult))
-                        {
-                            if (!ascoreResult.AScoreByMod.ContainsKey(modInfo))
-                            {
-                                ascoreResult.AScoreByMod.Add(modInfo, ascoreValue);
-                            }
-                        }
-                        else
-                        {
-                            ascoreResult = new AScoreResultsType();
-                            ascoreResult.Clear();
-
-                            ascoreResult.BestSequence = string.Copy(bestSequence);
-                            ascoreResult.PeptideScore = peptideScore;
                             ascoreResult.AScoreByMod.Add(modInfo, ascoreValue);
-
-                            cachedAscoreResults.Add(scanPeptideKey, ascoreResult);
                         }
                     }
+                    else
+                    {
+                        ascoreResult = new AScoreResultsType();
+                        ascoreResult.Clear();
+
+                        ascoreResult.BestSequence = string.Copy(bestSequence);
+                        ascoreResult.PeptideScore = peptideScore;
+                        ascoreResult.AScoreByMod.Add(modInfo, ascoreValue);
+
+                        cachedAscoreResults.Add(scanPeptideKey, ascoreResult);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -287,72 +287,71 @@ namespace AScore_DLL
                 var modInfoNames = DetermineModInfoNames(cachedAscoreResults);
 
                 // Create the output file
-                using (var phrpWriter = new StreamWriter(new FileStream(outputFile.FullName, FileMode.Create, FileAccess.Write, FileShare.Read)))
-                {
-                    var outLine = new System.Text.StringBuilder();
+                using var phrpWriter = new StreamWriter(new FileStream(outputFile.FullName, FileMode.Create, FileAccess.Write, FileShare.Read));
 
-                    // Write the header line
-                    outLine.Append(outputHeaderLine);
-                    outLine.Append("\t" + PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE);
-                    outLine.Append("\t" + "Modified_Residues");
+                var outLine = new System.Text.StringBuilder();
+
+                // Write the header line
+                outLine.Append(outputHeaderLine);
+                outLine.Append("\t" + PsmResultsManager.RESULTS_COL_PEPTIDE_SCORE);
+                outLine.Append("\t" + "Modified_Residues");
+
+                foreach (var modInfoName in modInfoNames)
+                {
+                    outLine.Append("\t" + modInfoName);
+                }
+                phrpWriter.WriteLine(outLine);
+
+                var skipCount = 0;
+
+                while (phrpReader.MoveNext())
+                {
+                    var currentPSM = phrpReader.CurrentPSM;
+
+                    var scanPeptideKey = ConstructScanPeptideKey(currentPSM.ScanNumber, currentPSM.Peptide);
+
+                    if (!cachedAscoreResults.TryGetValue(scanPeptideKey, out var ascoreResult))
+                    {
+                        skipCount++;
+                        if (skipCount < 10)
+                            Console.WriteLine("  Skipping PHRP result without AScore result: " + scanPeptideKey);
+
+                        continue;
+                    }
+
+                    // Replace the original peptide with the "best" peptide
+                    var dataLineUpdated = ReplaceFirst(currentPSM.DataLineText, currentPSM.Peptide, ascoreResult.BestSequence);
+
+                    outLine.Clear();
+                    outLine.Append(dataLineUpdated);
+
+                    outLine.Append("\t" + StringUtilities.ValueToString(ascoreResult.PeptideScore));
+
+                    // Count the number of modInfo entries that are not "-"
+                    var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != AScoreProcessor.MOD_INFO_NO_MODIFIED_RESIDUES select item.Key).Count();
+                    outLine.Append("\t" + modTypeCount);
 
                     foreach (var modInfoName in modInfoNames)
                     {
-                        outLine.Append("\t" + modInfoName);
-                    }
-                    phrpWriter.WriteLine(outLine);
-
-                    var skipCount = 0;
-
-                    while (phrpReader.MoveNext())
-                    {
-                        var currentPSM = phrpReader.CurrentPSM;
-
-                        var scanPeptideKey = ConstructScanPeptideKey(currentPSM.ScanNumber, currentPSM.Peptide);
-
-                        if (!cachedAscoreResults.TryGetValue(scanPeptideKey, out var ascoreResult))
+                        var modInfoMatch = false;
+                        foreach (var modInfoEntry in ascoreResult.AScoreByMod)
                         {
-                            skipCount++;
-                            if (skipCount < 10)
-                                Console.WriteLine("  Skipping PHRP result without AScore result: " + scanPeptideKey);
-
-                            continue;
-                        }
-
-                        // Replace the original peptide with the "best" peptide
-                        var dataLineUpdated = ReplaceFirst(currentPSM.DataLineText, currentPSM.Peptide, ascoreResult.BestSequence);
-
-                        outLine.Clear();
-                        outLine.Append(dataLineUpdated);
-
-                        outLine.Append("\t" + StringUtilities.ValueToString(ascoreResult.PeptideScore));
-
-                        // Count the number of modInfo entries that are not "-"
-                        var modTypeCount = (from item in ascoreResult.AScoreByMod where item.Key != AScoreProcessor.MOD_INFO_NO_MODIFIED_RESIDUES select item.Key).Count();
-                        outLine.Append("\t" + modTypeCount);
-
-                        foreach (var modInfoName in modInfoNames)
-                        {
-                            var modInfoMatch = false;
-                            foreach (var modInfoEntry in ascoreResult.AScoreByMod)
+                            if (modInfoName == modInfoEntry.Key)
                             {
-                                if (modInfoName == modInfoEntry.Key)
-                                {
-                                    outLine.Append("\t" + StringUtilities.ValueToString(modInfoEntry.Value));
-                                    modInfoMatch = true;
-                                    break;
-                                }
+                                outLine.Append("\t" + StringUtilities.ValueToString(modInfoEntry.Value));
+                                modInfoMatch = true;
+                                break;
                             }
-                            if (!modInfoMatch)
-                                outLine.Append("\t");
                         }
-
-                        phrpWriter.WriteLine(outLine);
+                        if (!modInfoMatch)
+                            outLine.Append("\t");
                     }
 
-                    if (skipCount > 0)
-                        OnStatusEvent("  Skipped " + skipCount + " PHRP results without an AScore result");
+                    phrpWriter.WriteLine(outLine);
                 }
+
+                if (skipCount > 0)
+                    OnStatusEvent("  Skipped " + skipCount + " PHRP results without an AScore result");
             }
             catch (Exception ex)
             {
@@ -375,12 +374,11 @@ namespace AScore_DLL
         {
             var headerLine = string.Empty;
 
-            using (var reader = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using var reader = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read));
+
+            if (!reader.EndOfStream)
             {
-                if (!reader.EndOfStream)
-                {
-                    headerLine = reader.ReadLine();
-                }
+                headerLine = reader.ReadLine();
             }
 
             return headerLine;

@@ -16,54 +16,53 @@ namespace AScore_DLL
         {
             var dt = new DataTable();
 
-            using (var reader = new StreamReader(new FileStream(psmResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using var reader = new StreamReader(new FileStream(psmResultsFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+            // first line has headers
+            if (!reader.EndOfStream)
             {
-                // first line has headers
-                if (!reader.EndOfStream)
-                {
-                    var headerLine = reader.ReadLine();
+                var headerLine = reader.ReadLine();
 
-                    if (string.IsNullOrWhiteSpace(headerLine))
-                    {
-                        // it's empty, that's an error
-                        throw new ApplicationException(string.Format(
-                            "The data provided in {0} is not in a valid format (empty header line found by {1})",
-                            psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
-                    }
-
-                    var headers = headerLine.Split('\t', ',');
-                    foreach (var s in headers)
-                    {
-                        dt.Columns.Add(s);
-                        dt.Columns[s].DefaultValue = "";
-                    }
-                }
-                else
+                if (string.IsNullOrWhiteSpace(headerLine))
                 {
                     // it's empty, that's an error
                     throw new ApplicationException(string.Format(
-                        "The data provided in {0} is not in a valid format (empty data file found by {1})",
+                        "The data provided in {0} is not in a valid format (empty header line found by {1})",
                         psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
                 }
 
-                // fill the rest of the table; positional
-                while (!reader.EndOfStream)
+                var headers = headerLine.Split('\t', ',');
+                foreach (var s in headers)
                 {
-                    var line = reader.ReadLine();
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-
-                    var row = dt.NewRow();
-
-                    var dataColumns = line.Split('\t', ',');
-                    var i = 0;
-                    foreach (var s in dataColumns)
-                    {
-                        row[i] = s;
-                        i++;
-                    }
-                    dt.Rows.Add(row);
+                    dt.Columns.Add(s);
+                    dt.Columns[s].DefaultValue = "";
                 }
+            }
+            else
+            {
+                // it's empty, that's an error
+                throw new ApplicationException(string.Format(
+                    "The data provided in {0} is not in a valid format (empty data file found by {1})",
+                    psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
+            }
+
+            // fill the rest of the table; positional
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                var row = dt.NewRow();
+
+                var dataColumns = line.Split('\t', ',');
+                var i = 0;
+                foreach (var s in dataColumns)
+                {
+                    row[i] = s;
+                    i++;
+                }
+                dt.Rows.Add(row);
             }
 
             return dt;
@@ -93,24 +92,23 @@ namespace AScore_DLL
         /// <param name="filePath"></param>
         public static void WriteDataTableToText(DataTable dt, string filePath)
         {
-            using (var writer = new StreamWriter(filePath))
+            using var writer = new StreamWriter(filePath);
+
+            var headerLine = dt.Columns[0].ColumnName;
+            for (var i = 1; i < dt.Columns.Count; i++)
             {
-                var headerLine = dt.Columns[0].ColumnName;
+                headerLine += "\t" + dt.Columns[i].ColumnName;
+            }
+            writer.WriteLine(headerLine);
+
+            foreach (DataRow row in dt.Rows)
+            {
+                var dataLine = row[0].ToString();
                 for (var i = 1; i < dt.Columns.Count; i++)
                 {
-                    headerLine += "\t" + dt.Columns[i].ColumnName;
+                    dataLine += "\t" + row[i];
                 }
-                writer.WriteLine(headerLine);
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    var dataLine = row[0].ToString();
-                    for (var i = 1; i < dt.Columns.Count; i++)
-                    {
-                        dataLine += "\t" + row[i];
-                    }
-                    writer.WriteLine(dataLine);
-                }
+                writer.WriteLine(dataLine);
             }
         }
 
