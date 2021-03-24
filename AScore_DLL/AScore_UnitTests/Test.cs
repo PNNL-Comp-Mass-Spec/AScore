@@ -16,14 +16,14 @@ namespace AScore_UnitTests
         public void NewTest()
         {
             var ascore = new string[] { "SOSM_May_P1_R2_13Jun11_Hawk_11-04-02p_fht.txt"};
-                //"SOSM_May_G2_R2_13Jun11_Hawk_11-04-02p_fht.txt",
-                //"SOSM_May_M_R2_6Jun11_Hawk_11-04-02p_fht.txt",
-                //"SOSM_May_P1_R1_6Jun11_Hawk_11-04-02p_fht.txt",
-                //"SOSM_May_P1_R2_6Jun11_Hawk_11-04-02p_fht.txt"};
+            //"SOSM_May_G2_R2_13Jun11_Hawk_11-04-02p_fht.txt",
+            //"SOSM_May_M_R2_6Jun11_Hawk_11-04-02p_fht.txt",
+            //"SOSM_May_P1_R1_6Jun11_Hawk_11-04-02p_fht.txt",
+            //"SOSM_May_P1_R2_6Jun11_Hawk_11-04-02p_fht.txt"};
 
-            var fhtPath = @"C:\Documents and Settings\aldr699\My Documents2011\SOSM\CID\ForAScore";
-            var dtapath = @"C:\Documents and Settings\aldr699\My Documents2011\SOSM";
-            var parFile = @"C:\Documents and Settings\aldr699\My Documents2011\SOSM\parameterFile.xml";
+            const string fhtPath = @"C:\Documents and Settings\aldr699\My Documents2011\SOSM\CID\ForAScore";
+            const string dtapath = @"C:\Documents and Settings\aldr699\My Documents2011\SOSM";
+            const string parFile = @"C:\Documents and Settings\aldr699\My Documents2011\SOSM\parameterFile.xml";
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
 
@@ -48,9 +48,9 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void ForJohnJacobs()
         {
-            var myfht = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt.txt";
-            var mydta = @"C:\DMS_WorkDir\Step_1_ASCORE\dtas\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_dta.txt";
-            var mypar = @"C:\DMS_WorkDir\Step_1_ASCORE\DynMWPYOx_EmH20_QmNH3_cid.xml";
+            const string myfht = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt.txt";
+            const string mydta = @"C:\DMS_WorkDir\Step_1_ASCORE\dtas\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_dta.txt";
+            const string mypar = @"C:\DMS_WorkDir\Step_1_ASCORE\DynMWPYOx_EmH20_QmNH3_cid.xml";
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
 
@@ -59,7 +59,7 @@ namespace AScore_UnitTests
             var spectraCache = new SpectraManagerCache(peptideMassCalculator);
             spectraCache.OpenFile(mydta);
             var par = new ParameterFileManager(mypar);
-            var fileOutput = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt_ascore.txt";
+            const string fileOutput = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt_ascore.txt";
             var ascoreEngine = new AScore_DLL.AScoreProcessor();
             //ascoreEngine.AlgorithmRun(dta, dataman, par, fileOutput);
             ascoreEngine.RunAScoreOnSingleFile(spectraCache, dataman, par, fileOutput);
@@ -234,9 +234,9 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void QuYi()
         {
-            var direct = @"C:\Documents and Settings\aldr699\My Documents2011\EColiPhos";
+            const string direct = @"C:\Documents and Settings\aldr699\My Documents2011\EColiPhos";
 
-            var ascoreP = "parameterFile.xml";
+            const string ascoreP = "parameterFile.xml";
 
             var fhtFiles = new List<string>{
                 "775945_10012010_MG1655_phospho_s05_101002094806_msgfdb_fht.txt",
@@ -324,8 +324,8 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void Sisi()
         {
-            var ascoreP = "parameterFile.xml";
-            var direct = @"C:\Users\aldr699\Documents\2012\Sisi_ASCORE\Group2";
+            const string ascoreP = "parameterFile.xml";
+            const string direct = @"C:\Users\aldr699\Documents\2012\Sisi_ASCORE\Group2";
 
             var fhtFiles = new List<string>{
                 "NMR_HetR_UG_01_20Jul11_Andromeda_11-06-19_fhtf.txt",
@@ -375,7 +375,7 @@ namespace AScore_UnitTests
         [Test]
         public void TestMSGFFilter()
         {
-            var workDir = @"F:\My Documents\Projects\JoshAldrich\AScore\AScore_DLL\TestCase";
+            const string workDir = @"F:\My Documents\Projects\JoshAldrich\AScore\AScore_DLL\TestCase";
             var fht = Path.Combine(workDir, "GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_fht.txt");
             var param = Path.Combine(workDir, "AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da_MSGF1E-12.xml");
             var dta = Path.Combine(workDir, "GmaxP_itraq_NiNTA_15_29Apr10_Hawk_03-10-09p_dta.txt");
@@ -402,7 +402,7 @@ namespace AScore_UnitTests
         [Test]
         public void TestMSGFPlusResults()
         {
-            var workDir = @"F:\My Documents\Projects\JoshAldrich\AScore\AScore_DLL\TestCase";
+            const string workDir = @"F:\My Documents\Projects\JoshAldrich\AScore\AScore_DLL\TestCase";
             var fht = Path.Combine(workDir, "CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_msgfdb_fht.txt");
             var param = Path.Combine(workDir, "AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da_MSGF1E-12.xml");
             var dta = Path.Combine(workDir, "CPTAC_CompREF_00_iTRAQ_NiNTA_01b_22Mar12_Lynx_12-02-29_dta.txt");
@@ -429,7 +429,7 @@ namespace AScore_UnitTests
         [Test]
         public void QuickTest()
         {
-            var s = "3.432";
+            const string s = "3.432";
             var d = double.Parse(s);
 
             Console.WriteLine("{0} converts to {1}", s, d);
@@ -440,10 +440,10 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void OsmaniRedux()
         {
-            var ascorePETD = "ETDPhos.xml";
-            var ascorePCID = "CIDPhos.xml";
-            var directETD = @"C:\Users\aldr699\Documents\2012\Osmani\ETD";
-            var directCID = @"C:\Users\aldr699\Documents\2012\Osmani\CID";
+            const string ascorePETD = "ETDPhos.xml";
+            const string ascorePCID = "CIDPhos.xml";
+            const string directETD = @"C:\Users\aldr699\Documents\2012\Osmani\ETD";
+            const string directCID = @"C:\Users\aldr699\Documents\2012\Osmani\CID";
 
             var fhtFiles = new List<string>{
                 "SOSM_May_G2_RR1_26Jan12_Hawk_11-11-03p_fhtf.txt",
@@ -454,7 +454,7 @@ namespace AScore_UnitTests
                 "SOSM_May_P1_RR1_31Jan12_Hawk_11-11-03p_fhtf.txt"
             };
 
-            var direct2 = @"C:\Users\aldr699\Documents\2012\Osmani";
+            const string direct2 = @"C:\Users\aldr699\Documents\2012\Osmani";
 
             var dtaFiles = new List<string>{
                 "SOSM_May_G2_RR1_26Jan12_Hawk_11-11-03p_dta.txt",
@@ -506,9 +506,9 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void Sisi_Kidneys()
         {
-            var ascoreP = "HCDPhos.xml";
-            var directSeq = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas\Sequest";
-            var directMsg = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas\MSGFDB";
+            const string ascoreP = "HCDPhos.xml";
+            const string directSeq = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas\Sequest";
+            const string directMsg = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas\MSGFDB";
 
             var fhtFiles = new List<string>{
                 "Kidney_ACHN_Das_1_pTyr_HCD_8May12_Lynx_12-02-29_fht.txt",
@@ -524,7 +524,7 @@ namespace AScore_UnitTests
                 "Kidney_ACHN_Das_2_IMAC_HCD_11May12_Lynx_12-02-31_msgfdb_fht.txt"
             };
 
-            var direct2 = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas";
+            const string direct2 = @"C:\Users\aldr699\Documents\2012\Sisi_Work\DarthVehDas";
 
             var dtaFiles = new List<string>{
                 "Kidney_ACHN_Das_1_pTyr_HCD_8May12_Lynx_12-02-29_dta.txt",
