@@ -181,9 +181,6 @@ namespace AScore_DLL
             PsmResultsManager psmResultsManager,
             ParameterFileManager ascoreParams)
         {
-            var jobToDatasetNameMap = new Dictionary<string, DatasetFileInfo>();
-
-            var columnMap = new Dictionary<string, int>();
             var requiredColumns = new List<string>
             {
                 "Job",
@@ -192,57 +189,69 @@ namespace AScore_DLL
 
             OnStatusEvent("Reading Job to Dataset Map File: " + PathUtils.CompactPathString(ascoreOptions.JobToDatasetMapFile, 80));
 
-            // Read the contents of JobToDatasetMapFile
-            using (var mapFileReader = new StreamReader(new FileStream(ascoreOptions.JobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read)))
-            {
-                var rowNumber = 0;
-                var requiredColumnCount = 0;
-
-                while (!mapFileReader.EndOfStream)
-                {
-                    var dataLine = mapFileReader.ReadLine();
-                    rowNumber++;
-
-                    if (string.IsNullOrWhiteSpace(dataLine))
-                        continue;
-
-                    var dataColumns = dataLine.Split('\t').ToList();
-
-                    if (requiredColumnCount == 0)
-                    {
-                        // Parse the headers
-                        foreach (var columnName in requiredColumns)
-                        {
-                            var colIndex = dataColumns.IndexOf(columnName);
-                            if (colIndex < 0)
-                            {
-                                var errorMessage = "JobToDatasetMapFile is missing column " + columnName;
-                                OnErrorEvent(errorMessage);
-                                throw new Exception(errorMessage);
-                            }
-                            columnMap.Add(columnName, colIndex);
-                        }
-
-                        requiredColumnCount = dataColumns.Count;
-                        continue;
-                    }
-
-                    if (dataColumns.Count < requiredColumnCount)
-                    {
-                        OnWarningEvent("Row " + rowNumber + " has fewer than " + columnMap.Count + " columns; skipping this row");
-                        continue;
-                    }
-
-                    var job = dataColumns[columnMap["Job"]];
-                    var spectrumFilePath = dataColumns[columnMap["Dataset"]];
-
-                    jobToDatasetNameMap.Add(job, new DatasetFileInfo(spectrumFilePath));
-                }
-            }
+            ReadJobToDatasetMapFile(ascoreOptions, requiredColumns, out var jobToDatasetNameMap);
 
             RunAScoreOnPreparedData(jobToDatasetNameMap, spectraManager, psmResultsManager, ascoreParams, ascoreOptions, false);
 
             ProteinMapperTestRun(ascoreOptions);
+        }
+
+        private void ReadJobToDatasetMapFile(
+            AScoreOptions ascoreOptions,
+            IReadOnlyCollection<string> requiredColumns,
+            out Dictionary<string, DatasetFileInfo> jobToDatasetNameMap)
+        {
+            jobToDatasetNameMap = new Dictionary<string, DatasetFileInfo>();
+
+            var columnMap = new Dictionary<string, int>();
+
+            // Read the contents of JobToDatasetMapFile
+            using var mapFileReader = new StreamReader(new FileStream(ascoreOptions.JobToDatasetMapFile, FileMode.Open, FileAccess.Read, FileShare.Read));
+
+            var rowNumber = 0;
+            var requiredColumnCount = 0;
+
+            while (!mapFileReader.EndOfStream)
+            {
+                var dataLine = mapFileReader.ReadLine();
+                rowNumber++;
+
+                if (string.IsNullOrWhiteSpace(dataLine))
+                    continue;
+
+                var dataColumns = dataLine.Split('\t').ToList();
+
+                if (requiredColumnCount == 0)
+                {
+                    // Parse the headers
+                    foreach (var columnName in requiredColumns)
+                    {
+                        var colIndex = dataColumns.IndexOf(columnName);
+                        if (colIndex < 0)
+                        {
+                            var errorMessage = "JobToDatasetMapFile is missing column " + columnName;
+                            OnErrorEvent(errorMessage);
+                            throw new Exception(errorMessage);
+                        }
+
+                        columnMap.Add(columnName, colIndex);
+                    }
+
+                    requiredColumnCount = dataColumns.Count;
+                    continue;
+                }
+
+                if (dataColumns.Count < requiredColumnCount)
+                {
+                    OnWarningEvent("Row " + rowNumber + " has fewer than " + columnMap.Count + " columns; skipping this row");
+                    continue;
+                }
+
+                var job = dataColumns[columnMap["Job"]];
+                var spectrumFilePath = dataColumns[columnMap["Dataset"]];
+
+                jobToDatasetNameMap.Add(job, new DatasetFileInfo(spectrumFilePath));
+            }
         }
 
         /// <summary>
