@@ -39,10 +39,10 @@ namespace AScore_DLL
             /// <summary>
             /// .mzid file
             /// </summary>
-            Mzid,
+            Mzid
         }
 
-        public const string PROGRAM_DATE = "March 24, 2021";
+        public const string PROGRAM_DATE = "March 25, 2021";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
