@@ -272,7 +272,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (precursorChargeState != dtaChargeState)
             {
                 OnWarningEvent("Charge state mismatch: dtaChargeState=" + dtaChargeState + " vs. precursorChargeState=" + precursorChargeState);
-                dtaChargeState = precursorChargeState;
             }
 
             // Process the rest of the entries in this spectra
