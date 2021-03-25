@@ -95,7 +95,7 @@ namespace AScore_Console
                 // If we encountered an error in the input - a necessary file does not exist - then exit.
                 if (returnCode != 0)
                 {
-                    clsParseCommandLine.PauseAtConsole(2000, 333);
+                    ConsoleMsgUtils.PauseAtConsole(2000, 333);
                     return returnCode;
                 }
 
@@ -124,7 +124,7 @@ namespace AScore_Console
 
                 if (returnCode != 0)
                 {
-                    clsParseCommandLine.PauseAtConsole(2000, 333);
+                    ConsoleMsgUtils.PauseAtConsole(2000, 333);
                 }
                 else
                 {
