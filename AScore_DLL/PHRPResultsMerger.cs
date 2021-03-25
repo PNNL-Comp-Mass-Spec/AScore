@@ -242,14 +242,14 @@ namespace AScore_DLL
             {
                 var peptideHitResultType = ReaderFactory.AutoDetermineResultType(inputFile.FullName);
 
-                if (peptideHitResultType == Enums.PeptideHitResultTypes.Unknown)
+                if (peptideHitResultType == PeptideHitResultTypes.Unknown)
                 {
                     OnErrorEvent("Error: Could not determine the format of the PHRP data file: " + inputFile.FullName);
                     return false;
                 }
 
                 // Open the data file and read the data
-                mPHRPReader = new ReaderFactory(inputFile.FullName, Enums.PeptideHitResultTypes.Unknown, false, false, false)
+                mPHRPReader = new ReaderFactory(inputFile.FullName, PeptideHitResultTypes.Unknown, false, false, false)
                 {
                     EchoMessagesToConsole = false,
                     SkipDuplicatePSMs = false
