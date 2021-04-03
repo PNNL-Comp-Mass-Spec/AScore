@@ -166,7 +166,7 @@ namespace AScore_DLL.Managers.SpectraManagers
             if (!m_initialized)
                 throw new Exception("Class has not yet been initialized; call OpenFile() before calling this function");
 
-            var spectrum = m_MzMLReader.ReadMassSpectrum(scanNumber);
+            var spectrum = m_MzMLReader.GetSpectrumForScan(scanNumber);
             if (spectrum == null)
             {
                 return null;
