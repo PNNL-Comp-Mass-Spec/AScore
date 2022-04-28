@@ -50,7 +50,7 @@ namespace AScore_DLL.Managers
                 return false;
             }
 
-            var modSummaryFile = modSummaryFiles.First();
+            var modSummaryFile = modSummaryFiles[0];
 
             var success = ReadModSummary(modSummaryFile, ascoreParams);
 
