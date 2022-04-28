@@ -31,12 +31,12 @@ namespace AScore_DLL.Managers
         /// <summary>
         /// Gets the bIons with no phosphorylation
         /// </summary>
-        public List<double> BIons { get; } = new List<double>();
+        public List<double> BIons { get; } = new();
 
         /// <summary>
         /// Gets the yIons with no phosphorylation
         /// </summary>
-        public List<double> YIons { get; } = new List<double>();
+        public List<double> YIons { get; } = new();
 
         #endregion // Properties
 

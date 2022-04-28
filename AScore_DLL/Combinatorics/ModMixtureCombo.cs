@@ -40,12 +40,12 @@ namespace AScore_DLL.Combinatorics
         /// <summary>
         /// Final Combination sets
         /// </summary>
-        public List<List<int>> FinalCombos { get; } = new List<List<int>>();
+        public List<List<int>> FinalCombos { get; } = new();
 
         /// <summary>
         /// List of all modifiable sites for all modifications
         /// </summary>
-        public List<int> AllSite { get; } = new List<int>();
+        public List<int> AllSite { get; } = new();
 
         #endregion
 
