@@ -23,4 +23,4 @@ echo Directory not found: AScore_Console\bin
 echo.
 
 :Done
-pause
+if not "%1"=="NoPause" pause

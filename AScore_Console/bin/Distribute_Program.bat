@@ -16,6 +16,6 @@ xcopy Debug\*.dll \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistrib
 @echo off
 if "%1"=="NoPause" Goto done
 
-pause
+if not "%1"=="NoPause" pause
 
 :Done
