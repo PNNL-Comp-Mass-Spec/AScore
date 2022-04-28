@@ -373,21 +373,19 @@ namespace AScore_DLL.Managers
         /// <returns>the type of fragmentation</returns>
         private FragmentType GetFragmentType(XmlNode fragmentTypeNode)
         {
-            var f = FragmentType.CID;
-
             if (Regex.IsMatch(fragmentTypeNode.InnerText, "CID"))
             {
-                f = FragmentType.CID;
+                return FragmentType.CID;
             }
-            else if (Regex.IsMatch(fragmentTypeNode.InnerText, "ETD"))
+
+            if (Regex.IsMatch(fragmentTypeNode.InnerText, "ETD"))
             {
-                f = FragmentType.ETD;
+                return FragmentType.ETD;
             }
-            else if (Regex.IsMatch(fragmentTypeNode.InnerText, "HCD"))
-            {
-                f = FragmentType.HCD;
-            }
-            return f;
+
+            return Regex.IsMatch(fragmentTypeNode.InnerText, "HCD")
+                ? FragmentType.HCD
+                : FragmentType.CID;
         }
         #endregion
     }
