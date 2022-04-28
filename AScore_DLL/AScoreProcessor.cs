@@ -571,7 +571,7 @@ namespace AScore_DLL
                 else
                 {
                     // No modifiable sites
-                    psmResultsManager.WriteToTable(peptideSeq, scanNumber, 0, new int[0], MOD_INFO_NO_MODIFIED_RESIDUES);
+                    psmResultsManager.WriteToTable(peptideSeq, scanNumber, 0, Array.Empty<int>(), MOD_INFO_NO_MODIFIED_RESIDUES);
                 }
                 psmResultsManager.IncrementRow();
             }
