@@ -79,32 +79,30 @@ namespace AScore_DLL
         /// it does not.</returns>
         public static double GetMassByLetter(char aminoAcid)
         {
-            switch (aminoAcid)
+            return aminoAcid switch
             {
-                case 'A': return Alanine;
-                case 'R': return Arginine;
-                case 'N': return Asparagine;
-                case 'D': return AsparticAcid;
-                case 'C': return Cysteine;
-                case 'E': return GlutamicAcid;
-                case 'Q': return Glutamine;
-                case 'G': return Glycine;
-                case 'H': return Histidine;
-                case 'I': return Isoleucine;
-                case 'L': return Leucine;
-                case 'K': return Lysine;
-                case 'M': return Methionine;
-                case 'F': return Phenylalanine;
-                case 'P': return Proline;
-                case 'S': return Serine;
-                case 'T': return Threonine;
-                case 'W': return Tryptophan;
-                case 'Y': return Tyrosine;
-                case 'V': return Valine;
-                default:
-                    // Unrecognized character (or a symbol)
-                    return 0;
-            }
+                'A' => Alanine,
+                'R' => Arginine,
+                'N' => Asparagine,
+                'D' => AsparticAcid,
+                'C' => Cysteine,
+                'E' => GlutamicAcid,
+                'Q' => Glutamine,
+                'G' => Glycine,
+                'H' => Histidine,
+                'I' => Isoleucine,
+                'L' => Leucine,
+                'K' => Lysine,
+                'M' => Methionine,
+                'F' => Phenylalanine,
+                'P' => Proline,
+                'S' => Serine,
+                'T' => Threonine,
+                'W' => Tryptophan,
+                'Y' => Tyrosine,
+                'V' => Valine,
+                _ => 0      // Unrecognized character (or a symbol)
+            };
         }
 
         #endregion // Public Methods
@@ -118,12 +116,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 71.0779;
-                    case MassType.Monoisotopic: return 71.037114;
-                    default: return 0;
-                }
+                    MassType.Average => 71.0779,
+                    MassType.Monoisotopic => 71.037114,
+                    _ => 0
+                };
             }
         }
 
@@ -134,12 +132,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 156.1857;
-                    case MassType.Monoisotopic: return 156.10111;
-                    default: return 0;
-                }
+                    MassType.Average => 156.1857,
+                    MassType.Monoisotopic => 156.10111,
+                    _ => 0
+                };
             }
         }
 
@@ -150,12 +148,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 114.1026;
-                    case MassType.Monoisotopic: return 114.04293;
-                    default: return 0;
-                }
+                    MassType.Average => 114.1026,
+                    MassType.Monoisotopic => 114.04293,
+                    _ => 0
+                };
             }
         }
 
@@ -166,12 +164,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 115.0874;
-                    case MassType.Monoisotopic: return 115.02694;
-                    default: return 0;
-                }
+                    MassType.Average => 115.0874,
+                    MassType.Monoisotopic => 115.02694,
+                    _ => 0
+                };
             }
         }
 
@@ -182,12 +180,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 103.1429;
-                    case MassType.Monoisotopic: return 103.00919;
-                    default: return 0;
-                }
+                    MassType.Average => 103.1429,
+                    MassType.Monoisotopic => 103.00919,
+                    _ => 0
+                };
             }
         }
 
@@ -198,12 +196,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 129.11400;
-                    case MassType.Monoisotopic: return 129.04259;
-                    default: return 0;
-                }
+                    MassType.Average => 129.11400,
+                    MassType.Monoisotopic => 129.04259,
+                    _ => 0
+                };
             }
         }
 
@@ -214,12 +212,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 128.12920;
-                    case MassType.Monoisotopic: return 128.05858;
-                    default: return 0;
-                }
+                    MassType.Average => 128.12920,
+                    MassType.Monoisotopic => 128.05858,
+                    _ => 0
+                };
             }
         }
 
@@ -230,12 +228,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 57.05130;
-                    case MassType.Monoisotopic: return 57.021464;
-                    default: return 0;
-                }
+                    MassType.Average => 57.05130,
+                    MassType.Monoisotopic => 57.021464,
+                    _ => 0
+                };
             }
         }
 
@@ -246,12 +244,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 137.13930;
-                    case MassType.Monoisotopic: return 137.05891;
-                    default: return 0;
-                }
+                    MassType.Average => 137.13930,
+                    MassType.Monoisotopic => 137.05891,
+                    _ => 0
+                };
             }
         }
 
@@ -262,12 +260,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 113.15760;
-                    case MassType.Monoisotopic: return 113.08406;
-                    default: return 0;
-                }
+                    MassType.Average => 113.15760,
+                    MassType.Monoisotopic => 113.08406,
+                    _ => 0
+                };
             }
         }
 
@@ -278,12 +276,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 113.1576;
-                    case MassType.Monoisotopic: return 113.08406;
-                    default: return 0;
-                }
+                    MassType.Average => 113.1576,
+                    MassType.Monoisotopic => 113.08406,
+                    _ => 0
+                };
             }
         }
 
@@ -294,12 +292,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 128.1723;
-                    case MassType.Monoisotopic: return 128.09496;
-                    default: return 0;
-                }
+                    MassType.Average => 128.1723,
+                    MassType.Monoisotopic => 128.09496,
+                    _ => 0
+                };
             }
         }
 
@@ -310,12 +308,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 131.1961;
-                    case MassType.Monoisotopic: return 131.04048;
-                    default: return 0;
-                }
+                    MassType.Average => 131.1961,
+                    MassType.Monoisotopic => 131.04048,
+                    _ => 0
+                };
             }
         }
 
@@ -326,12 +324,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 147.1739;
-                    case MassType.Monoisotopic: return 147.06841;
-                    default: return 0;
-                }
+                    MassType.Average => 147.1739,
+                    MassType.Monoisotopic => 147.06841,
+                    _ => 0
+                };
             }
         }
 
@@ -342,12 +340,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 97.1152;
-                    case MassType.Monoisotopic: return 97.052764;
-                    default: return 0;
-                }
+                    MassType.Average => 97.1152,
+                    MassType.Monoisotopic => 97.052764,
+                    _ => 0
+                };
             }
         }
 
@@ -358,12 +356,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 87.0773;
-                    case MassType.Monoisotopic: return 87.032029;
-                    default: return 0;
-                }
+                    MassType.Average => 87.0773,
+                    MassType.Monoisotopic => 87.032029,
+                    _ => 0
+                };
             }
         }
 
@@ -374,12 +372,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 101.1039;
-                    case MassType.Monoisotopic: return 101.04768;
-                    default: return 0;
-                }
+                    MassType.Average => 101.1039,
+                    MassType.Monoisotopic => 101.04768,
+                    _ => 0
+                };
             }
         }
 
@@ -390,12 +388,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 186.2099;
-                    case MassType.Monoisotopic: return 186.07931;
-                    default: return 0;
-                }
+                    MassType.Average => 186.2099,
+                    MassType.Monoisotopic => 186.07931,
+                    _ => 0
+                };
             }
         }
 
@@ -406,12 +404,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 163.1733;
-                    case MassType.Monoisotopic: return 163.06333;
-                    default: return 0;
-                }
+                    MassType.Average => 163.1733,
+                    MassType.Monoisotopic => 163.06333,
+                    _ => 0
+                };
             }
         }
 
@@ -422,12 +420,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 99.13110;
-                    case MassType.Monoisotopic: return 99.068414;
-                    default: return 0;
-                }
+                    MassType.Average => 99.13110,
+                    MassType.Monoisotopic => 99.068414,
+                    _ => 0
+                };
             }
         }
 
@@ -459,12 +457,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 1.0072765;
-                    case MassType.Monoisotopic: return 1.0072765;
-                    default: return 0;
-                }
+                    MassType.Average => 1.0072765,
+                    MassType.Monoisotopic => 1.0072765,
+                    _ => 0
+                };
             }
         }
 
@@ -475,12 +473,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 18.0153214;
-                    case MassType.Monoisotopic: return 18.0105633;
-                    default: return 0;
-                }
+                    MassType.Average => 18.0153214,
+                    MassType.Monoisotopic => 18.0105633,
+                    _ => 0
+                };
             }
         }
 
@@ -491,12 +489,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 17.03065;
-                    case MassType.Monoisotopic: return 17.026547;
-                    default: return 0;
-                }
+                    MassType.Average => 17.03065,
+                    MassType.Monoisotopic => 17.026547,
+                    _ => 0
+                };
             }
         }
 
@@ -507,12 +505,12 @@ namespace AScore_DLL
         {
             get
             {
-                switch (MassType)
+                return MassType switch
                 {
-                    case MassType.Average: return 16.02267;
-                    case MassType.Monoisotopic: return 16.0187224;
-                    default: return 0;
-                }
+                    MassType.Average => 16.02267,
+                    MassType.Monoisotopic => 16.0187224,
+                    _ => 0
+                };
             }
         }
 

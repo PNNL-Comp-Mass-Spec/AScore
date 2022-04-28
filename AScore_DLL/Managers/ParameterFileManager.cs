@@ -44,18 +44,13 @@ namespace AScore_DLL.Managers
             {
                 mFragmentType = value;
 
-                switch (mFragmentType)
+                FragmentMassTolerance = mFragmentType switch
                 {
-                    case FragmentType.CID:
-                        FragmentMassTolerance = FragmentMassToleranceCID;
-                        break;
-                    case FragmentType.ETD:
-                        FragmentMassTolerance = FragmentMassToleranceETD;
-                        break;
-                    case FragmentType.HCD:
-                        FragmentMassTolerance = FragmentMassToleranceHCD;
-                        break;
-                }
+                    FragmentType.CID => FragmentMassToleranceCID,
+                    FragmentType.ETD => FragmentMassToleranceETD,
+                    FragmentType.HCD => FragmentMassToleranceHCD,
+                    _ => FragmentMassTolerance
+                };
             }
         }
 

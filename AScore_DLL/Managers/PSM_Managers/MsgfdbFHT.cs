@@ -27,21 +27,13 @@
             {
                 var fragType = ((string)mDataTable.Rows[mCurrentRow]["FragMethod"]).ToLower();
 
-                switch (fragType)
+                ascoreParams.FragmentType = fragType switch
                 {
-                    case "hcd":
-                        ascoreParams.FragmentType = FragmentType.HCD;
-                        break;
-                    case "etd":
-                        ascoreParams.FragmentType = FragmentType.ETD;
-                        break;
-                    case "cid":
-                        ascoreParams.FragmentType = FragmentType.CID;
-                        break;
-                    default:
-                        ascoreParams.FragmentType = FragmentType.Unspecified;
-                        break;
-                }
+                    "hcd" => FragmentType.HCD,
+                    "etd" => FragmentType.ETD,
+                    "cid" => FragmentType.CID,
+                    _ => FragmentType.Unspecified
+                };
             }
             else
                 ascoreParams.FragmentType = FragmentType.Unspecified;

@@ -50,12 +50,12 @@ namespace AScore_DLL.Mod
         {
             get
             {
-                switch (ModMassType)
+                return ModMassType switch
                 {
-                    case MassType.Average: return MassAverage;
-                    case MassType.Monoisotopic: return MassMonoisotopic;
-                    default: return -1.0;
-                }
+                    MassType.Average => MassAverage,
+                    MassType.Monoisotopic => MassMonoisotopic,
+                    _ => -1.0
+                };
             }
         }
 
