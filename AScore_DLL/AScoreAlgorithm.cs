@@ -42,12 +42,9 @@ namespace AScore_DLL
 
                 if (Math.Abs(peptideMassTheoretical - expSpec.PrecursorNeutralMass) > 20)
                 {
-                    OnWarningEvent(string.Format(
-                                       "Scan {0}: Observed precursor mass of {1:F1} Da is more than 20 Da away from the computed mass of {2:F1} Da; DeltaMass = {3:F1} Da",
-                                       scanNumber,
-                                       expSpec.PrecursorNeutralMass,
-                                       peptideMassTheoretical,
-                                       expSpec.PrecursorNeutralMass - peptideMassTheoretical));
+                    OnWarningEvent(
+                        "Scan {0}: Observed precursor mass of {1:F1} Da is more than 20 Da away from the computed mass of {2:F1} Da; DeltaMass = {3:F1} Da",
+                        scanNumber, expSpec.PrecursorNeutralMass, peptideMassTheoretical, expSpec.PrecursorNeutralMass - peptideMassTheoretical);
                 }
                 else
                 {
@@ -72,15 +69,9 @@ namespace AScore_DLL
 
                     if (!validMatch)
                     {
-                        OnWarningEvent(string.Format(
-                                         "Scan {0}: Observed precursor mass of {1:F1} Da is not a reasonable match for computed mass of {2:F1} Da; " +
-                                         "DeltaMass = {3:F1} Da; Peptide = {4}",
-                                         scanNumber,
-                                         expSpec.PrecursorNeutralMass,
-                                         peptideMassTheoretical,
-                                         expSpec.PrecursorNeutralMass - peptideMassTheoretical,
-                                         peptideSeq
-                                     ));
+                        OnWarningEvent(
+                            "Scan {0}: Observed precursor mass of {1:F1} Da is not a reasonable match for computed mass of {2:F1} Da; DeltaMass = {3:F1} Da; Peptide = {4}",
+                            scanNumber, expSpec.PrecursorNeutralMass, peptideMassTheoretical, expSpec.PrecursorNeutralMass - peptideMassTheoretical, peptideSeq);
                     }
                 }
 
@@ -145,7 +136,7 @@ namespace AScore_DLL
             }
             catch (Exception ex)
             {
-                OnErrorEvent("Exception in ComputeAScore: " + ex.Message);
+                OnErrorEvent("Exception in ComputeAScore", ex);
                 throw;
             }
         }

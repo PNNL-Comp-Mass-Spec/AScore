@@ -103,11 +103,7 @@ namespace AScore_DLL
                     break;
 
                 default:
-                    OnErrorEvent(string.Format(
-                        "Incorrect search type: {0} , supported values are {1}",
-                        ascoreOptions.SearchType,
-                        string.Join(", ", Enum.GetNames(typeof(AScoreOptions.SearchMode)))
-                        ));
+                    OnErrorEvent("Incorrect search type: {0} , supported values are {1}", ascoreOptions.SearchType, string.Join(", ", Enum.GetNames(typeof(AScoreOptions.SearchMode))));
                     return -13;
             }
             var peptideMassCalculator = new PeptideMassCalculator();
@@ -582,7 +578,7 @@ namespace AScore_DLL
 
             Console.WriteLine();
 
-            OnStatusEvent(string.Format("Writing {0:N0} rows to {1}", psmResultsManager.ResultsCount, PathUtils.CompactPathString(ascoreOptions.AScoreResultsFilePath, 80)));
+            OnStatusEvent("Writing {0:N0} rows to {1}", psmResultsManager.ResultsCount, PathUtils.CompactPathString(ascoreOptions.AScoreResultsFilePath, 80));
             psmResultsManager.WriteToFile(ascoreOptions.AScoreResultsFilePath);
 
             Console.WriteLine();
@@ -697,7 +693,7 @@ namespace AScore_DLL
 
         private void ReportStatsForFragType(string fragTypeText, IReadOnlyList<int> statsByType, FragmentType fragmentType)
         {
-            OnStatusEvent(string.Format("{0} peptides: {1:N0}", fragTypeText, statsByType[(int)fragmentType]));
+            OnStatusEvent("{0} peptides: {1:N0}", fragTypeText, statsByType[(int)fragmentType]);
         }
 
         /// <summary>

@@ -269,7 +269,7 @@ namespace AScore_DLL.Managers
 
             if (xmlModInfo == null)
             {
-                OnErrorEvent(string.Format("Section {0} not found in AScore parameter file {1}", xpath, ascoreParameterFilePath));
+                OnErrorEvent("Section {0} not found in AScore parameter file {1}", xpath, ascoreParameterFilePath);
                 return modList;
             }
 

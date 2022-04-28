@@ -65,7 +65,7 @@ namespace AScore_DLL.Managers.SpectraManagers
 
             // _dta.txt or .mzML file not found (checked both the directory with the dataset file and the parent directory)
 
-            OnErrorEvent(string.Format("Could not find the spectra file for dataset \"{0}\" in {1} or one directory up", datasetName, psmResultsFile.Directory.FullName));
+            OnErrorEvent("Could not find the spectra file for dataset \"{0}\" in {1} or one directory up", datasetName, psmResultsFile.Directory.FullName);
 
             return null;
         }

@@ -43,9 +43,9 @@ namespace AScore_DLL.Managers
             {
                 if (ascoreParams.DynamicMods.Count == 0)
                 {
-                    OnWarningEvent(string.Format(
+                    OnWarningEvent(
                         "ModSummary.txt file not found; PSMs may not be recognized properly;\nLooked for {0} in directory {1}",
-                        modSummaryFileSpec, PathUtils.CompactPathString(workingDirectory.FullName, 100)));
+                        modSummaryFileSpec, PathUtils.CompactPathString(workingDirectory.FullName, 100));
                 }
                 return false;
             }
