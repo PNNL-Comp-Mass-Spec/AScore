@@ -39,6 +39,9 @@
     <WarningLevel>2</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MSDataFileReader">
+      <HintPath>..\AScore_DLL\lib\MSDataFileReader.dll</HintPath>
+    </Reference>
     <Reference Include="PeptideToProteinMapEngine, Version=1.1.5309.22613, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\AScore_DLL\lib\PeptideToProteinMapEngine.dll</HintPath>
