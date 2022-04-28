@@ -11,7 +11,7 @@ namespace AScore_DLL
 {
     public class AScoreAlgorithm : EventNotifier
     {
-        // Ignore Spelling: Da, diff, ascore
+        // Ignore Spelling: ascore, Da, diff, loc, phosphorylation
 
         private const double MASS_C13 = 1.00335483;
 

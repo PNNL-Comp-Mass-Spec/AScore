@@ -10,7 +10,7 @@ namespace AScore_DLL.Managers.PSM_Managers
     /// </summary>
     public class MsgfMzid : PsmResultsManager
     {
-        // Ignore Spelling: hcd, etd, cid, pre
+        // Ignore Spelling: hcd, etd, cid, mzid, pre
 
         /// <summary>
         /// Default modification symbols

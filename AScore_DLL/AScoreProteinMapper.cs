@@ -374,7 +374,7 @@ namespace AScore_DLL
         }
 
         /// <summary>
-        /// Read the protein name and description lines out of the Fasta file, and store them in a dictionary.
+        /// Read the protein name and description lines out of the FASTA file, and store them in a dictionary.
         /// </summary>
         private void ReadFastaProteinDescription()
         {

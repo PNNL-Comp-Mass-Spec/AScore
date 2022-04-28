@@ -14,7 +14,7 @@ namespace AScore_DLL.Managers.PSM_Managers
     /// </summary>
     public class MsgfMzidFull : PsmResultsManager
     {
-        // Ignore Spelling: hcd, etd, cid, pre, Ident, namespace, UniMod, ascore
+        // Ignore Spelling: hcd, etd, cid, pre, Ident, mzid, namespace, UniMod, ascore
 
         /// <summary>
         /// Default modification symbols
@@ -25,7 +25,7 @@ namespace AScore_DLL.Managers.PSM_Managers
 
         public MsgfMzidFull(string mzidFilePath) : base(mzidFilePath, false)
         {
-            // load mzid file;
+            // Load mzid file;
             // obviously won't have a 'Job' number available
             identData = IdentDataReaderWriter.Read(mzidFilePath);
             identData.Version = "1.2"; // Instruct the output to use MzIdentML 1.2 schema and namespace

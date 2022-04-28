@@ -9,6 +9,8 @@ namespace AScore_DLL.Managers.SpectraManagers
 {
     internal class MzMLManager : EventNotifier, ISpectraManager
     {
+        // Ignore Spelling: gzipped
+
         public const double Proton = 1.00727649;
 
         public static string GetFilePath(string datasetFilePath, string datasetName)

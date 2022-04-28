@@ -5,6 +5,8 @@ namespace AScore_DLL.Combinatorics
 {
     public class ModMixtureCombo
     {
+        // Ignore Spelling: phosphorylation
+
         private readonly List<List<int>> sitePositions;
         private readonly List<List<List<int>>> combinationSets;
 

@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace AScore_DLL.Managers
 {
-    // Ignore Spelling: Rehkop
+    // Ignore Spelling: phosphorylation, Rehkop
 
     /// <summary>
     /// Represents the bIons and yIons of a specific charge state of a
