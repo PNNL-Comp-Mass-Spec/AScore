@@ -42,7 +42,7 @@ namespace AScore_DLL
             Mzid
         }
 
-        public const string PROGRAM_DATE = "May 5, 2021";
+        public const string PROGRAM_DATE = "April 27, 2022";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
@@ -86,10 +86,10 @@ namespace AScore_DLL
         [Option("Skip", "SkipExistingResults", HelpText = "If specified, will not re-run AScore if a results file already exists")]
         public bool SkipExistingResults { get; set; }
 
-        [Option("Fasta", "FastaFile", HelpText = "Fasta file path; if set, Protein Data from the Fasta file will be included in the output")]
+        [Option("Fasta", "FastaFile", HelpText = "FASTA file path; if set, Protein Data from the FASTA file will be included in the output")]
         public string FastaFilePath { get; set; }
 
-        [Option("PD", "OutputProteinDescriptions", HelpText = "If specified, the Protein Description from the Fasta file will also be included in the output. REQUIRES -Fasta")]
+        [Option("PD", "OutputProteinDescriptions", HelpText = "If specified, the Protein Description from the FASTA file will also be included in the output. REQUIRES -Fasta")]
         public bool OutputProteinDescriptions { get; set; }
 
         public bool MultiJobMode { get; private set; }
@@ -221,7 +221,7 @@ namespace AScore_DLL
 
             if (!string.IsNullOrEmpty(FastaFilePath) && !File.Exists(FastaFilePath))
             {
-                errorReporter(GetInputFileNotFoundMessage(FastaFilePath, "Fasta file"));
+                errorReporter(GetInputFileNotFoundMessage(FastaFilePath, "FASTA file"));
                 return -13;
             }
 

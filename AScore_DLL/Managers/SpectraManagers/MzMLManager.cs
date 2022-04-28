@@ -44,6 +44,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         #region Variables
 
         private SimpleMzMLReader m_MzMLReader;
+
         //private List<MS2_Spectrum> m_ms2_spectra = null;
         private readonly Dictionary<string, SimpleMzMLReader> m_readers = new();
         protected string m_datasetName;
@@ -55,9 +56,9 @@ namespace AScore_DLL.Managers.SpectraManagers
         #region Constructor
 
         /// <summary>
-        /// Initializes a DtaManager for which we don't yet know the path of the CDTA file to read
+        /// Initializes a MzML manager for which we don't yet know the path of the .mzML file to read
         /// </summary>
-        /// <remarks>You must call UpdateDtaFilePath() prior to using GetDtaFileName() or GetExperimentalSpectra()</remarks>
+        /// <remarks>You must call OpenFile() prior to using GetFilePath() or GetExperimentalSpectra()</remarks>
         public MzMLManager(PHRPReader.PeptideMassCalculator peptideMassCalculator)
         {
             m_PeptideMassCalculator = peptideMassCalculator;
@@ -65,9 +66,9 @@ namespace AScore_DLL.Managers.SpectraManagers
         }
 
         /// <summary>
-        /// Initializes a new instance of DtaManger.
+        /// Initializes a new instance of the MzMLManager
         /// </summary>
-        /// <param name="mzMLPath">Pathname of the master dta file.</param>
+        /// <param name="mzMLPath">Pathname of the master .mzML file</param>
         /// <exception cref="DirectoryNotFoundException"></exception>
         /// <exception cref="FileNotFoundException"></exception>
         public MzMLManager(string mzMLPath)
@@ -81,8 +82,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         #region Destructor
 
         /// <summary>
-        /// Closes the open file stream for the dta file and clears the
-        /// internal dictionary
+        /// Closes the .mzML file reader
         /// </summary>
         ~MzMLManager()
         {
@@ -157,7 +157,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         }
 
         /// <summary>
-        /// Retrieves an experimental spectra entry from the Master DTA file.
+        /// Retrieves an experimental spectra entry from the Master mzML file.
         /// </summary>
         /// <returns>A newly constructed ExperimentalSpectra if the specified
         /// spectra name exists, null if it does not.</returns>
@@ -274,8 +274,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         }
 
         /// <summary>
-        /// Initializes the internal dictionary with the offsets of the files located
-        /// in the master dta.
+        /// Initializes the .mzML reader
         /// </summary>
         protected void Initialize(string mzMLPath)
         {
