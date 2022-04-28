@@ -9,8 +9,6 @@ namespace AScore_DLL.Managers.SpectraManagers
 {
     internal class MzMLManager : EventNotifier, ISpectraManager
     {
-        // Ignore Spelling: dta
-
         public const double Proton = 1.00727649;
 
         public static string GetFilePath(string datasetFilePath, string datasetName)
@@ -172,18 +170,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 return null;
             }
 
-            // Find the desired spectrum
-            // Dictionary keys are the header text for each DTA in the _DTA.txt file, for example:
-            // MyDataset.0538.0538.3.dta
-            // Note that scans could have one or more leading zeros, so we may need to check for that
-
             var entries = new List<ExperimentalSpectraEntry>();
-
-            // Determine the precursor mass
-            // The mass listed in the DTA file is the M+H mass
-            // Example line:
-            // precursorMass precursorCharge ScanNumber dtaChargeState
-            // 1196.03544724 3   scan=99 cs=3
 
             var monoMzText = "";
             var chargeStateText = "";
@@ -284,50 +271,6 @@ namespace AScore_DLL.Managers.SpectraManagers
             }
 
             m_MzMLReader = m_readers[mzMLPath];
-
-            /*
-            long bytesRead = 0;
-            string line = string.Empty;
-
-            try
-            {
-                m_masterDta = new StreamReader(masterDtaPath);
-                while (!m_masterDta.EndOfStream)
-                {
-                    // Find the next individual dta file entry
-                    while ((!line.Contains("\"")) && (!m_masterDta.EndOfStream))
-                    {
-                        line = m_masterDta.ReadLine();
-                        if (line != null)
-                        {
-                            bytesRead += line.Length + Environment.NewLine.Length;
-                        }
-                    }
-
-                    // If we're not at the end of the file get the next entry
-                    if (!m_masterDta.EndOfStream)
-                    {
-                        // First extract the name of this dta entry
-                        int entryNameIndex = line.IndexOf('\"') + 1;
-                        int entryNameLength = line.LastIndexOf('\"') - entryNameIndex;
-                        string entryName = line.Substring(entryNameIndex, entryNameLength);
-
-                        // Add it to the dictionary
-                        dtaEntries.Add(entryName, bytesRead);
-
-                        // Read the next line from the file
-                        line = m_masterDta.ReadLine();
-                        if (line != null)
-                        {
-                            bytesRead += line.Length + Environment.NewLine.Length;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error initializing the MzMLManager using " + m_MzMLReader + ": " + ex.Message);
-            }*/
 
             m_initialized = true;
         }
