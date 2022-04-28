@@ -210,7 +210,7 @@ namespace AScore_DLL.Combinatorics
 
                 foreach (var item in currentPermutation)
                 {
-                    if (item == false)
+                    if (!item)
                     {
                         myCurrentList.Add(myParent.myValues[index]);
                         if (myParent.Type == GenerateOption.WithoutRepetition)

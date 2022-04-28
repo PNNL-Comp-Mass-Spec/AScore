@@ -60,7 +60,7 @@ namespace AScore_DLL.Combinatorics
         {
             var possiblePositions = new List<List<int>>();
 
-            foreach (var unused in dynMods)
+            foreach (var _ in dynMods)
             {
                 possiblePositions.Add(new List<int>());
             }

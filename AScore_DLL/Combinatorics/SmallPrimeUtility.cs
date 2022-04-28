@@ -57,14 +57,10 @@ namespace AScore_DLL.Combinatorics
         public static List<int> MultiplyPrimeFactors(IList<int> lhs, IList<int> rhs)
         {
             var product = new List<int>();
-            foreach (var prime in lhs)
-            {
-                product.Add(prime);
-            }
-            foreach (var prime in rhs)
-            {
-                product.Add(prime);
-            }
+
+            product.AddRange(lhs);
+            product.AddRange(rhs);
+
             product.Sort();
             return product;
         }
@@ -83,14 +79,14 @@ namespace AScore_DLL.Combinatorics
         public static List<int> DividePrimeFactors(IList<int> numerator, IList<int> denominator)
         {
             var product = new List<int>();
-            foreach (var prime in numerator)
-            {
-                product.Add(prime);
-            }
+
+            product.AddRange(numerator);
+
             foreach (var prime in denominator)
             {
                 product.Remove(prime);
             }
+
             return product;
         }
 

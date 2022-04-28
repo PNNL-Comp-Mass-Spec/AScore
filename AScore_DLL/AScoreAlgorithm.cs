@@ -306,7 +306,8 @@ namespace AScore_DLL
                     {
                         if (peptideMods[i] == dynamicMod.UniqueID)
                         {
-                            sbFinalSeq.Append(seq[i] + dynamicMod.ModSymbol.ToString(CultureInfo.InvariantCulture));
+                            sbFinalSeq.Append(seq[i]);
+                            sbFinalSeq.Append(dynamicMod.ModSymbol.ToString(CultureInfo.InvariantCulture));
                         }
                     }
                 }

@@ -24,10 +24,9 @@
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParams)
         {
-            this.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParams);
+            GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParams);
 
-            msgfScore = 0;
-            double.TryParse((string)mDataTable.Rows[mCurrentRow]["MSGF_SpecProb"],out msgfScore);
+            double.TryParse((string)mDataTable.Rows[mCurrentRow]["MSGF_SpecProb"], out msgfScore);
         }
     }
 }

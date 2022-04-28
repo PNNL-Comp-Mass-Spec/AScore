@@ -28,12 +28,12 @@ namespace AScore_DLL.Managers
             var fail = Math.Log10(1 - prob);
             for (var i = matches; i <= numPossMatch; i++)
             {
-                var logTotal = success * (i) + fail * (numPossMatch - i);
+                var logTotal = success * i + fail * (numPossMatch - i);
                 logTotal += LogAChooseB(numPossMatch, i);
                 sum += Math.Pow(10, logTotal);
             }
-            sum = -10 * Math.Log(sum, 10);
-            return sum;
+
+            return -10 * Math.Log(sum, 10);
         }
 
         /// <summary>

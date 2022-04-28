@@ -36,7 +36,9 @@
                 };
             }
             else
+            {
                 ascoreParams.FragmentType = FragmentType.Unspecified;
+            }
         }
 
         public override void GetNextRow(out int scanNumber, out int scanCount, out int chargeState, out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParams)

@@ -161,7 +161,7 @@ namespace AScore_DLL.Combinatorics
                     {
                         myPosition = Position.AfterLast;
                     }
-                    else if (NextPermutation() == false)
+                    else if (!NextPermutation())
                     {
                         myPosition = Position.AfterLast;
                     }

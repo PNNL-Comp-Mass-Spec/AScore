@@ -262,7 +262,7 @@ namespace AScore_DLL.Managers.PSM_Managers
             scanNumber = id.ScanNum;
             scanCount = 1;
             chargeState = id.Charge;
-            peptideSeq = GetSequenceWithMods(id.PepEvidence.First());
+            peptideSeq = GetSequenceWithMods(id.PepEvidence[0]);
             msgfScore = id.SpecEv;
 
             if (id.AllParamsDict.TryGetValue("AssumedDissociationMethod", out var fragType))
