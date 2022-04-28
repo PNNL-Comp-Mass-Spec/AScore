@@ -14,19 +14,23 @@ namespace AScore_DLL.Combinatorics
     /// combinations is defined as "10 choose 5", which is calculated as (10!) / ((10 - 5)! * 5!).
     /// </summary>
     /// <remarks>
+    /// <para>
     /// The MetaCollectionType parameter of the constructor allows for the creation of
     /// two types of sets,  those with and without repetition in the output set when
     /// presented with repetition in the input set.
-    ///
+    /// </para>
+    /// <para>
     /// When given a input collect {A B C} and lower index of 2, the following sets are generated:
     /// MetaCollectionType.WithRepetition =>
     /// {A A}, {A B}, {A C}, {B B}, {B C}, {C C}
     /// MetaCollectionType.WithoutRepetition =>
     /// {A B}, {A C}, {B C}
-    ///
+    /// </para>
+    /// <para>
     /// Input sets with multiple equal values will generate redundant combinations in proportion
     /// to the likelihood of outcome.  For example, {A A B B} and a lower index of 3 will generate:
     /// {A A B} {A A B} {A B B} {A B B}
+    /// </para>
     /// </remarks>
     /// <typeparam name="T">The type of the values within the list.</typeparam>
     public class Combinations<T> : IMetaCollection<T>
@@ -177,17 +181,20 @@ namespace AScore_DLL.Combinatorics
             /// by the call to .Current on the underlying enumeration.
             /// </summary>
             /// <remarks>
+            /// <para>
             /// To compute the current list of values, the underlying permutation object
             /// which moves with this enumerator, is scanned differently based on the type.
             /// The items have only two values, true and false, which have different meanings:
-            ///
+            /// </para>
+            /// <para>
             /// For type WithoutRepetition, the output is a straightforward subset of the input array.
             /// E.g. 6 choose 3 without repetition
             /// Input array:   {A B C D E F}
             /// Permutations:  {0 1 0 0 1 1}
             /// Generates set: {A   C D    }
             /// Note: size of permutation is equal to upper index.
-            ///
+            /// </para>
+            /// <para>
             /// For type WithRepetition, the output is defined by runs of characters and when to
             /// move to the next element.
             /// E.g. 6 choose 5 with repetition
@@ -195,6 +202,7 @@ namespace AScore_DLL.Combinatorics
             /// Permutations:  {0 1 0 0 1 1 0 0 1 1}
             /// Generates set: {A   B B     D D    }
             /// Note: size of permutation is equal to upper index - 1 + lower index.
+            /// </para>
             /// </remarks>
             private void ComputeCurrent()
             {
@@ -283,21 +291,25 @@ namespace AScore_DLL.Combinatorics
         /// <param name="lowerIndex">The size of each combination set to return.</param>
         /// <param name="type">The type of Combinations set to generate.</param>
         /// <remarks>
+        /// <para>
         /// Copies the array and parameters and then creates a map of booleans that will
         /// be used by a permutations object to reference the subset.  This map is slightly
         /// different based on whether the type is with or without repetition.
-        ///
+        /// </para>
+        /// <para>
         /// When the type is WithoutRepetition, then a map of upper index elements is
         /// created with lower index false values.
         /// E.g. 8 choose 3 generates:
         /// Map: {1 1 1 1 1 0 0 0}
         /// Note: For sorting reasons, false denotes inclusion in output.
-        ///
+        /// </para>
+        /// <para>
         /// When the type is WithRepetition, then a map of upper index - 1 + lower index
         /// elements is created with the false values indicating that the 'current' element should
         /// be included and the trues meaning to advance the 'current' element by one.
         /// E.g. 8 choose 3 generates:
         /// Map: {1 1 1 1 1 1 1 1 0 0 0} (7 true, 3 false).
+        /// </para>
         /// </remarks>
         private void Initialize(ICollection<T> values, int lowerIndex, GenerateOption type)
         {

@@ -17,18 +17,22 @@ namespace AScore_DLL.Combinatorics
     /// presented with repetition in the input set.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// When given a input collect {A A B}, the following sets are generated:
     /// MetaCollectionType.WithRepetition =>
     /// {A A B}, {A B A}, {A A B}, {A B A}, {B A A}, {B A A}
     /// MetaCollectionType.WithoutRepetition =>
     /// {A A B}, {A B A}, {B A A}
-    ///
+    /// </para>
+    /// <para>
     /// When generating non-repetition sets, ordering is based on the lexicographic
     /// ordering of the lists based on the provided Comparer.
     /// If no comparer is provided, then T must be IComparable on T.
-    ///
+    /// </para>
+    /// <para>
     /// When generating repetition sets, no comparisons are performed and therefore
     /// no comparer is required and T does not need to be IComparable.
+    /// </para>
     /// </remarks>
     /// <typeparam name="T">The type of the values within the list.</typeparam>
     public class Permutations<T> : IMetaCollection<T>
@@ -349,23 +353,27 @@ namespace AScore_DLL.Combinatorics
         /// Common initializer used by the multiple flavors of constructors.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Copies information provided and then creates a parallel int array of lexicographic
         /// orders that will be used for the actual permutation algorithm.
         /// The input array is first sorted as required for WithoutRepetition and always just for consistency.
         /// This array is constructed one of two way depending on the type of the collection.
-        ///
+        /// </para>
+        /// <para>
         /// When type is MetaCollectionType.WithRepetition, then all N! permutations are returned
         /// and the lexicographic orders are simply generated as 1, 2, ... N.
         /// E.g.
         /// Input array:          {A A B C D E E}
         /// Sort Orders:          {1 2 3 4 5 6 7}
-        ///
+        /// </para>
+        /// <para>
         /// When type is MetaCollectionType.WithoutRepetition, then fewer are generated, with each
         /// identical element in the input array not repeated.  The lexicographic sort algorithm
         /// handles this natively as long as the repetition is repeated.
         /// E.g.
         /// Input array:          {A A B C D E E}
         /// Sort Orders:          {1 1 2 3 4 5 5}
+        /// </para>
         /// </remarks>
         private void Initialize(ICollection<T> values, GenerateOption type, IComparer<T> comparer)
         {
