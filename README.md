@@ -1,7 +1,9 @@
 # AScore Console
 
-The AScore program can process first-hits or synopsis files from MSGF+, SEQUEST, or X!Tandem
-to compute confidence scores for the position of modified residues.  It is most commonly used
+The AScore program can process first-hits or synopsis files created by 
+Peptide Hit Results Processor ([PHRP](https://github.com/PNNL-Comp-Mass-Spec/PHRP))
+to compute confidence scores for the position of modified residues, as identified by
+MS-GF+, MaxQuant, MSFragger, X!Tandem, etc. AScore is most commonly used 
 to compute confidence scores for phosphorylated residues (phosphosites).
 
 ## Scores
@@ -51,10 +53,10 @@ Create a single, combined file using "Process files to local folder"
 
 ## Retrieve PHRP data files (filter on MSGF SpecProb)
 
-Use [Mage Extractor](https://github.com/PNNL-Comp-Mass-Spec/Mage) to filter the MSGF+ results with MSGF_SpecProb < 1E-10
+Use [Mage Extractor](https://github.com/PNNL-Comp-Mass-Spec/Mage) to filter the MS-GF+ results with MSGF_SpecProb < 1E-10
 * Search jobs by dataset ID: 340332, 340360, 340380, 340369, 340366, 340356, 340336, 340354, 340359, 340371, 340372, 340363
 * Select the MSGFPlus jobs
-* Set the MSGF Cutoff to "1E-10" and Result Type to Extract to "MSGF+ Synopsis First Protein"
+* Set the MSGF Cutoff to "1E-10" and Result Type to Extract to "MS-GF+ Synopsis First Protein"
 * Define the output file: Leishmania_TMT_NiNTA_filtered_results.txt
 * Click "Extract results from Selected Jobs"
 
@@ -102,43 +104,47 @@ AScore_Console.exe is a console application, and must be run from the Windows co
  -PD
 ```
 
-Use -T to specify the search engine type, for example -T:msgfplus
-* Allowed values for search_engine are: sequest, xtandem, inspect, msgfdb, or msgfplus
+Use `-T` to specify the search engine type, for example `-T:msgfplus`
+* Allowed values for search engine are: sequest, xtandem, inspect, msgfdb, or msgfplus
 
-Use -F to specify the input file: first hits file (_fht.txt), synopsis file (_syn.txt), .mzid, or .mzid.gz
-* See [Peptide Hit Results Processor (PHRP)](https://github.com/PNNL-Comp-Mass-Spec/PHRP)
-* Example synopsis file: [QC_Shew_13_05b_HCD_500ng_24Mar14_Tiger_14-03-04_msgfplus_syn.txt](https://raw.githubusercontent.com/PNNL-Comp-Mass-Spec/PHRP/master/Data/MSGFPlus_Example/QC_Shew_13_05b_HCD_500ng_24Mar14_Tiger_14-03-04_msgfplus_syn.txt)
-* This file can optionally include results from multiple datasets
-  * In this case, the header for the first column must be Job
+Use `-F` to specify the input file: 
+* Supported formats: First hits file (\_fht.txt), synopsis file (\_syn.txt), .mzid, or .mzid.gz
+* First hits files and synopsis files are tab-delimited files created by the [Peptide Hit Results Processor (PHRP)](https://github.com/PNNL-Comp-Mass-Spec/PHRP)
+  * Example synopsis file: [QC_Shew_13_05b_HCD_500ng_24Mar14_Tiger_14-03-04_msgfplus_syn.txt](https://raw.githubusercontent.com/PNNL-Comp-Mass-Spec/PHRP/master/Data/MSGFPlus_Example/QC_Shew_13_05b_HCD_500ng_24Mar14_Tiger_14-03-04_msgfplus_syn.txt)
+* Mzid files correspond to the mzIdentML Data Standard for Mass Spectrometry-Based Proteomics Results ([PMID:22375074](https://pubmed.ncbi.nlm.nih.gov/22375074/))
+  * `.mzid.gz` files are gzipped `.mzid` files
+* First hits files and synopsis files can optionally include results from multiple datasets
+  * In this case, the header for the first column must be `Job`
   * Then, the first column of each row should be the job number for that row's PSM
   
-Use -D to specify the file with spectra data. 
-* This can be a concatenated DTA file (_dta.txt), a .mzML file, or a .mzML.gz file
+Use `-D` to specify the file with spectra data. 
+* This is typically a `.mzML` file, or a `.mzML.gz` file
+  * The program also supports the legacy concatenated DTA file (_dta.txt) format
 
-If the first hits file specified by -F includes job numbers in the first column, use -JM to specify a job to dataset map file.
-* When using -JM, do not use -D
+If the first hits file specified by `-F` includes job numbers in the first column, use `-JM` to specify a job to dataset map file.
+* When using `-JM`, do not use `-D`
 * Columns in the job to dataset map file are Job and Dataset (tab-separated)
   * List the Dataset name in the second column
 
-Use -P for the AScore parameter file
+Use `-P` for the AScore parameter file
 * Example file: [AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml](https://github.com/PNNL-Comp-Mass-Spec/AScore/blob/master/AScore_Console/Parameter_Files/AScore_CID_0.5Da_ETD_0.5Da_HCD_0.05Da.xml)
 
-Optionally use -O to specify the output directory
+Optionally use `-O` to specify the output directory
 
-Optionally use -L to create a log file
+Optionally use `-L` to create a log file
 
-Use -noFM to disable filtering on data in column MSGF_SpecProb.
+Use `-noFM` to disable filtering on data in column MSGF_SpecProb.
 * By default, data is filtered using the MSGFPreFilter score specified in the AScore parameter file
 * For example, to filter on MSGF SpecProb 1E-12 use:
   * `<MSGFPreFilter>1E-12</MSGFPreFilter>`
 
-Use -U to create an updated version of the input file, but with AScore columns appended to each row
+Use `-U` to create an updated version of the input file, but with AScore columns appended to each row
 
-Use -Skip to not re-run AScore if an existing results file already exists
+Use `-Skip` to not re-run AScore if an existing results file already exists
 
-Optionally use -Fasta to add Protein Data from Fasta_file to the output
+Optionally use `-Fasta` to add Protein Data from Fasta_file to the output
 
-When using -Fasta, use -PD to include Protein Descriptions in the output
+When using `-Fasta`, use `-PD` to include Protein Descriptions in the output
 
 ## Example command line #1
 ```
