@@ -8,10 +8,9 @@ namespace AScore_DLL
     internal static class Utilities
     {
         /// <summary>
-        /// Generates a DataTable with all entries being a string
+        /// Reads data from a tab-delimited text file, storing in a DataTable instance
         /// </summary>
         /// <param name="psmResultsFilePath">PSM results file path</param>
-        /// <returns></returns>
         public static DataTable TextFileToDataTableAssignTypeString(string psmResultsFilePath)
         {
             var dt = new DataTable();
@@ -31,7 +30,7 @@ namespace AScore_DLL
                         psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
                 }
 
-                var headers = headerLine.Split('\t', ',');
+                var headers = headerLine.Split('\t');
                 foreach (var s in headers)
                 {
                     dt.Columns.Add(s);
@@ -55,7 +54,9 @@ namespace AScore_DLL
 
                 var row = dt.NewRow();
 
-                var dataColumns = line.Split('\t', ',');
+                // Only split on tabs, since the Protein column may contain a comma
+                var dataColumns = line.Split('\t');
+
                 var i = 0;
                 foreach (var s in dataColumns)
                 {
