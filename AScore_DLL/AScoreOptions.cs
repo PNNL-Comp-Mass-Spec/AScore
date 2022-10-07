@@ -42,7 +42,7 @@ namespace AScore_DLL
             Mzid
         }
 
-        public const string PROGRAM_DATE = "April 27, 2022";
+        public const string PROGRAM_DATE = "October 7, 2022";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }

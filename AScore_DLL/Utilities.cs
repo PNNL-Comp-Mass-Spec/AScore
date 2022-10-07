@@ -45,10 +45,16 @@ namespace AScore_DLL
                     psmResultsFilePath, "TextFileToDataTableAssignTypeString"));
             }
 
+            var columnCount = dt.Columns.Count;
+
+            var lineNumber = 1;
+
             // fill the rest of the table; positional
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
+                lineNumber++;
+
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
 
@@ -60,6 +66,15 @@ namespace AScore_DLL
                 var i = 0;
                 foreach (var s in dataColumns)
                 {
+                    if (i >= columnCount)
+                    {
+                        PRISM.ConsoleMsgUtils.ShowWarning(
+                            "Line {0} in the input file has {1} tab-delimited columns, but the header row only has {2} columns; skipping the extra columns",
+                            lineNumber, dataColumns.Length, columnCount);
+
+                        break;
+                    }
+
                     row[i] = s;
                     i++;
                 }
