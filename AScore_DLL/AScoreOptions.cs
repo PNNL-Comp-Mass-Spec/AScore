@@ -42,7 +42,13 @@ namespace AScore_DLL
             Mzid
         }
 
-        public const string PROGRAM_DATE = "October 7, 2022";
+        /// <summary>
+        /// Program release date
+        /// </summary>
+        /// <remarks>
+        /// This constant is used by the AScore executable (AScore_Console.exe)
+        /// </remarks>
+        public const string PROGRAM_DATE = "November 22, 2022";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
