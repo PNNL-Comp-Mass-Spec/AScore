@@ -390,10 +390,7 @@ namespace AScore_DLL.Combinatorics
             }
             else
             {
-                if (comparer == null)
-                {
-                    comparer = new SelfComparer<T>();
-                }
+                comparer ??= new SelfComparer<T>();
                 myValues.Sort(comparer);
                 var j = 1;
                 if (myLexicographicOrders.Length > 0)
