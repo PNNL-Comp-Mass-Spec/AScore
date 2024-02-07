@@ -27,10 +27,10 @@
             out int scanNumber, out int scanCount, out int chargeState,
             out string peptideSeq, out double msgfScore, ref ParameterFileManager ascoreParams)
         {
-            this.GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParams);
+            GetNextRow(out scanNumber, out scanCount, out chargeState, out peptideSeq, ref ascoreParams);
 
             msgfScore = 0;
-            if (this.MSGFSpecProbColumnPresent)
+            if (MSGFSpecProbColumnPresent)
             {
                 var msgfSpecProb = (string)mDataTable.Rows[mCurrentRow]["MSGF_SpecProb"];
                 if (!double.TryParse(msgfSpecProb, out msgfScore))

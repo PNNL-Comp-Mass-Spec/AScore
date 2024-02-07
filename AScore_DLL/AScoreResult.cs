@@ -43,7 +43,7 @@
         public AScoreResult()
         {
             // Empty mod array
-            this.PeptideMods = new int[] { };
+            PeptideMods = new int[] { };
 
             ModInfo = string.Empty;
             SecondSequence = string.Empty;

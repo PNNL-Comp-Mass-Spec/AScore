@@ -1,7 +1,8 @@
-﻿using AScore_DLL.Mod;
-using System;
+﻿using System;
 using System.Data;
 using System.IO;
+using AScore_DLL.Mod;
+using PRISM;
 
 namespace AScore_DLL
 {
@@ -68,7 +69,7 @@ namespace AScore_DLL
                 {
                     if (i >= columnCount)
                     {
-                        PRISM.ConsoleMsgUtils.ShowWarning(
+                        ConsoleMsgUtils.ShowWarning(
                             "Line {0} in the input file has {1} tab-delimited columns, but the header row only has {2} columns; skipping the extra columns",
                             lineNumber, dataColumns.Length, columnCount);
 

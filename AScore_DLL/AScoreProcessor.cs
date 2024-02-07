@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AScore_DLL.Combinatorics;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.PSM_Managers;
 using AScore_DLL.Managers.SpectraManagers;
@@ -548,7 +549,7 @@ namespace AScore_DLL
                 }
 
                 //Generate all combination mixtures
-                var modMixture = new Combinatorics.ModMixtureCombo(ascoreParams.DynamicMods, sequenceClean);
+                var modMixture = new ModMixtureCombo(ascoreParams.DynamicMods, sequenceClean);
 
                 var myPositionsList = GetMyPositionList(sequenceClean, modMixture);
 
@@ -656,7 +657,7 @@ namespace AScore_DLL
         /// <param name="sequence"></param>
         /// <param name="modMixture"></param>
         /// <returns></returns>
-        private List<int[]> GetMyPositionList(string sequence, Combinatorics.ModMixtureCombo modMixture)
+        private List<int[]> GetMyPositionList(string sequence, ModMixtureCombo modMixture)
         {
             var myPositionsList = new List<int[]>();
             foreach (var combo in modMixture.FinalCombos)

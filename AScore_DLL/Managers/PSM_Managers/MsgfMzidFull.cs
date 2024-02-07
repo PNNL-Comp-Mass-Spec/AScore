@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using AScore_DLL.Mod;
 using PSI_Interface;
 using PSI_Interface.CV;
@@ -29,13 +31,14 @@ namespace AScore_DLL.Managers.PSM_Managers
             // obviously won't have a 'Job' number available
             identData = IdentDataReaderWriter.Read(mzidFilePath);
             identData.Version = "1.2"; // Instruct the output to use MzIdentML 1.2 schema and namespace
-            var ascoreSoftware = new AnalysisSoftwareObj()
-                {
+            var ascoreSoftware = new AnalysisSoftwareObj
+            {
                     Id = "AScore_software",
                     Name = "AScore",
-                    Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                    SoftwareName = new ParamObj() { Item = new CVParamObj(CV.CVID.MS_Ascore_software) },
-                };
+                    Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                    SoftwareName = new ParamObj { Item = new CVParamObj(CV.CVID.MS_Ascore_software) }
+            };
+
             identData.AnalysisSoftwareList.Add(ascoreSoftware);
 
             identData.AnalysisProtocolCollection.SpectrumIdentificationProtocols.First().AdditionalSearchParams.Items.Add(new CVParamObj(CV.CVID.MS_modification_localization_scoring));
@@ -186,7 +189,7 @@ namespace AScore_DLL.Managers.PSM_Managers
         {
             foreach (var cvParam in cvParams)
             {
-                if (cvParam.Accession.IndexOf("UniMod", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                if (cvParam.Accession.IndexOf("UniMod", StringComparison.OrdinalIgnoreCase) >= 0 ||
                     cvParam.Cvid == CV.CVID.MS_unknown_modification)
                 {
                     return cvParam.Name;
@@ -398,7 +401,7 @@ namespace AScore_DLL.Managers.PSM_Managers
                     "hcd" => FragmentType.HCD,
                     "etd" => FragmentType.ETD,
                     "cid" => FragmentType.CID,
-                    _ => FragmentType.Unspecified,
+                    _ => FragmentType.Unspecified
                 };
             }
             else
@@ -442,16 +445,16 @@ namespace AScore_DLL.Managers.PSM_Managers
             var id = data[mCurrentRow];
             if (ascoreResultsCount == 1)
             {
-                id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+                id.SpectrumIdentification.UserParams.Add(new UserParamObj
                 {
                     Name = "AScore BestSequence",
-                    Value = bestSeq,
+                    Value = bestSeq
                 });
 
-                id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+                id.SpectrumIdentification.UserParams.Add(new UserParamObj
                 {
                     Name = "AScore PeptideScore",
-                    Value = topPeptideScore.ToString(CultureInfo.InvariantCulture),
+                    Value = topPeptideScore.ToString(CultureInfo.InvariantCulture)
                 });
             }
 
@@ -462,28 +465,28 @@ namespace AScore_DLL.Managers.PSM_Managers
 
             id.SpectrumIdentification.CVParams.Add(new CVParamObj(CV.CVID.MS_Ascore, ascoreFormatted));
 
-            id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+            id.SpectrumIdentification.UserParams.Add(new UserParamObj
             {
                 Name = $"AScore PTM{ascoreResultsCount}",
-                Value = ascoreResult.AScore.ToString(CultureInfo.InvariantCulture),
+                Value = ascoreResult.AScore.ToString(CultureInfo.InvariantCulture)
             });
 
-            id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+            id.SpectrumIdentification.UserParams.Add(new UserParamObj
             {
                 Name = $"AScore PTM{ascoreResultsCount} SecondSequence",
-                Value = ascoreResult.SecondSequence,
+                Value = ascoreResult.SecondSequence
             });
 
-            id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+            id.SpectrumIdentification.UserParams.Add(new UserParamObj
             {
                 Name = $"AScore PTM{ascoreResultsCount} numSiteIonsPoss",
-                Value = ascoreResult.NumSiteIons.ToString(),
+                Value = ascoreResult.NumSiteIons.ToString()
             });
 
-            id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+            id.SpectrumIdentification.UserParams.Add(new UserParamObj
             {
                 Name = $"AScore PTM{ascoreResultsCount} numSiteIonsMatched",
-                Value = ascoreResult.SiteDetermineMatched.ToString(),
+                Value = ascoreResult.SiteDetermineMatched.ToString()
             });
         }
         /*
@@ -510,10 +513,10 @@ namespace AScore_DLL.Managers.PSM_Managers
 
             if (positionList.Count(x => x > 0) != 0)
             {
-                id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+                id.SpectrumIdentification.UserParams.Add(new UserParamObj
                 {
                     Name = "AScore PeptideScore",
-                    Value = pScore.ToString(CultureInfo.InvariantCulture),
+                    Value = pScore.ToString(CultureInfo.InvariantCulture)
                 });
 
                 const double ascoreScore = 1000.0;
@@ -524,10 +527,10 @@ namespace AScore_DLL.Managers.PSM_Managers
 
                 id.SpectrumIdentification.CVParams.Add(new CVParamObj(CV.CVID.MS_Ascore, ascoreFormatted));
 
-                id.SpectrumIdentification.UserParams.Add(new UserParamObj()
+                id.SpectrumIdentification.UserParams.Add(new UserParamObj
                 {
                     Name = "AScore PTM1",
-                    Value = ascoreScore.ToString(CultureInfo.InvariantCulture),
+                    Value = ascoreScore.ToString(CultureInfo.InvariantCulture)
                 });
             }
 

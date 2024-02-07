@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using PHRPReader;
 using PRISM;
 using PSI_Interface.CV;
 using PSI_Interface.MSData;
@@ -50,7 +51,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         protected string m_datasetName;
         protected bool m_initialized;
 
-        private readonly PHRPReader.PeptideMassCalculator m_PeptideMassCalculator;
+        private readonly PeptideMassCalculator m_PeptideMassCalculator;
         #endregion // Variables
 
         #region Constructor
@@ -59,7 +60,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// Initializes a MzML manager for which we don't yet know the path of the .mzML file to read
         /// </summary>
         /// <remarks>You must call OpenFile() prior to using GetFilePath() or GetExperimentalSpectra()</remarks>
-        public MzMLManager(PHRPReader.PeptideMassCalculator peptideMassCalculator)
+        public MzMLManager(PeptideMassCalculator peptideMassCalculator)
         {
             m_PeptideMassCalculator = peptideMassCalculator;
             m_initialized = false;

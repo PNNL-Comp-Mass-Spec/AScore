@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AScore_DLL.Mod;
 
 namespace AScore_DLL.Combinatorics
 {
@@ -15,7 +16,7 @@ namespace AScore_DLL.Combinatorics
         /// </summary>
         /// <param name="dynMods">Dynamic mods</param>
         /// <param name="sequence">Peptide sequence</param>
-        public ModMixtureCombo(List<Mod.DynamicModification> dynMods, string sequence)
+        public ModMixtureCombo(List<DynamicModification> dynMods, string sequence)
         {
             sitePositions = GetSiteLocation(dynMods, sequence);
             combinationSets = GenerateCombosToCheck(sitePositions, dynMods);
@@ -58,7 +59,7 @@ namespace AScore_DLL.Combinatorics
         /// <param name="dynMods">Dynamic modification list from AScore parameters</param>
         /// <param name="sequence">peptide sequence</param>
         /// <returns>list of lists of possible modification sites</returns>
-        public List<List<int>> GetSiteLocation(List<Mod.DynamicModification> dynMods, string sequence)
+        public List<List<int>> GetSiteLocation(List<DynamicModification> dynMods, string sequence)
         {
             var possiblePositions = new List<List<int>>();
 
@@ -160,7 +161,7 @@ namespace AScore_DLL.Combinatorics
         /// <param name="sitePositions">list of site position lists</param>
         /// <param name="myMods">dynamic modifications from AScore parameters</param>
         /// <returns></returns>
-        public static List<List<List<int>>> GenerateCombosToCheck(List<List<int>> sitePositions, List<Mod.DynamicModification> myMods)
+        public static List<List<List<int>>> GenerateCombosToCheck(List<List<int>> sitePositions, List<DynamicModification> myMods)
         {
             // The first loop is to create the template for each of the combination sets
             // For example: given 2 mods, where mod1 has three sites in the sequence and mod2 has 2 mods at 4 sites,

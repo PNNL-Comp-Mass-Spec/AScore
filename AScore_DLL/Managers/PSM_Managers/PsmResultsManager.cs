@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Linq;
+using PRISM;
 
 namespace AScore_DLL.Managers.PSM_Managers
 {
@@ -152,9 +153,9 @@ namespace AScore_DLL.Managers.PSM_Managers
             newRow[RESULTS_COL_SCAN] = scanNum;
             newRow[RESULTS_COL_ORIGINAL_SEQUENCE] = peptideSeq;
             newRow[RESULTS_COL_BEST_SEQUENCE] = bestSeq;
-            newRow[RESULTS_COL_PEPTIDE_SCORE] = PRISM.StringUtilities.ValueToString(topPeptideScore);
+            newRow[RESULTS_COL_PEPTIDE_SCORE] = StringUtilities.ValueToString(topPeptideScore);
 
-            newRow[RESULTS_COL_ASCORE] = PRISM.StringUtilities.ValueToString(ascoreResult.AScore);
+            newRow[RESULTS_COL_ASCORE] = StringUtilities.ValueToString(ascoreResult.AScore);
             newRow[RESULTS_COL_NUM_SITE_IONS_POSS] = ascoreResult.NumSiteIons;
             newRow[RESULTS_COL_NUM_SITE_IONS_MATCHED] = ascoreResult.SiteDetermineMatched;
             newRow[RESULTS_COL_SECOND_SEQUENCE] = ascoreResult.SecondSequence;
@@ -180,7 +181,7 @@ namespace AScore_DLL.Managers.PSM_Managers
             dataRow[RESULTS_COL_SCAN] = scanNum;
             dataRow[RESULTS_COL_ORIGINAL_SEQUENCE] = peptideSeq;
             dataRow[RESULTS_COL_BEST_SEQUENCE] = peptideSeq;
-            dataRow[RESULTS_COL_PEPTIDE_SCORE] = PRISM.StringUtilities.ValueToString(pScore);
+            dataRow[RESULTS_COL_PEPTIDE_SCORE] = StringUtilities.ValueToString(pScore);
 
             var intNonZeroCount = (from item in positionList where item > 0 select item).Count();
 

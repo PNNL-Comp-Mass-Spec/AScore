@@ -289,7 +289,7 @@ namespace AScore_DLL
             {
                 DeleteTempFiles = true,
                 InspectParameterFilePath = string.Empty,
-                PeptideInputFileFormat = clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.PeptideListFile,
+                PeptideInputFileFormat = clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.PeptideListFile
             };
 
             if (!string.IsNullOrEmpty(mOutputDirectoryPath))

@@ -272,7 +272,7 @@ namespace AScore_DLL.Managers.PSM_Managers
                     "hcd" => FragmentType.HCD,
                     "etd" => FragmentType.ETD,
                     "cid" => FragmentType.CID,
-                    _ => FragmentType.Unspecified,
+                    _ => FragmentType.Unspecified
                 };
             }
             else

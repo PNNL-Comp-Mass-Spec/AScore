@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using AScore_DLL;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.PSM_Managers;
 using AScore_DLL.Managers.SpectraManagers;
 using NUnit.Framework;
+using PHRPReader;
 
 namespace AScore_UnitTests
 {
@@ -15,7 +18,7 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void NewTest()
         {
-            var ascore = new string[] { "SOSM_May_P1_R2_13Jun11_Hawk_11-04-02p_fht.txt"};
+            var ascore = new[] { "SOSM_May_P1_R2_13Jun11_Hawk_11-04-02p_fht.txt"};
             //"SOSM_May_G2_R2_13Jun11_Hawk_11-04-02p_fht.txt",
             //"SOSM_May_M_R2_6Jun11_Hawk_11-04-02p_fht.txt",
             //"SOSM_May_P1_R1_6Jun11_Hawk_11-04-02p_fht.txt",
@@ -38,7 +41,7 @@ namespace AScore_UnitTests
                 spectraCache.OpenFile(myDta);
                 var paramFile = new ParameterFileManager(parFile);
 
-                var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                var ascoreEngine = new AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
@@ -60,7 +63,7 @@ namespace AScore_UnitTests
             spectraCache.OpenFile(mydta);
             var par = new ParameterFileManager(mypar);
             const string fileOutput = @"C:\DMS_WorkDir\Step_1_ASCORE\U54_HPp1_LoBMI_NS_11_5Sep08_Draco_08-07-15_xt_ascore.txt";
-            var ascoreEngine = new AScore_DLL.AScoreProcessor();
+            var ascoreEngine = new AScoreProcessor();
             //ascoreEngine.AlgorithmRun(dta, dataman, par, fileOutput);
             ascoreEngine.RunAScoreOnSingleFile(spectraCache, dataman, par, fileOutput);
         }
@@ -69,7 +72,7 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void SisiConfirm()
         {
-            var dtaname = new string[]{
+            var dtaname = new[]{
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\09302010_MG1655_phospho_S_08_B_100930113735_dta.txt",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10012010_MG1655_phospho_S_09_B_101001105913_dta.txt",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10012010_MG1655_phospho_s06_101002094806_dta.txt",
@@ -78,7 +81,7 @@ namespace AScore_UnitTests
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10022010_MG1655_phospho_s12_101002094806_dta.txt",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10022010_MG1655_phospho_s7_101002094806_dta.txt"
             };
-            var datasetname = new string[]{
+            var datasetname = new[]{
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\09302010_MG1655_phospho_S_08_B_100930113735_msgfdb_fht.txt",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10012010_MG1655_phospho_S_09_B_101001105913_msgfdb_fht.txt",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10012010_MG1655_phospho_s06_101002094806_msgfdb_fht.txt",
@@ -87,7 +90,7 @@ namespace AScore_UnitTests
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10022010_MG1655_phospho_s12_101002094806_msgfdb_fht.txt",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\10022010_MG1655_phospho_s7_101002094806_msgfdb_fht.txt"
             };
-            var ascParam = new string[]{
+            var ascParam = new[]{
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\HistPhos.xml",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\HistPhos.xml",
                 @"C:\Users\aldr699\Documents\2012\Sisi_Work\PhosphohistidineConfirmation\HistPhos.xml",
@@ -109,7 +112,7 @@ namespace AScore_UnitTests
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(dtaname[i]);
                 var paramFile = new ParameterFileManager(ascParam[i]);
-                var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                var ascoreEngine = new AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
@@ -119,7 +122,7 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void FengTest()
         {
-            var datasetname = new string[]{
+            var datasetname = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\A_Mus_AD_13Oct10_Hawk_03-10-10p_fht.txt",
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\A_Mus_AD-2_15Oct10_Hawk_03-10-10p_fht.txt",
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\A_Mus_con_10Oct10_Hawk_03-10-10p_fht.txt",
@@ -127,7 +130,7 @@ namespace AScore_UnitTests
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\B_Mus_AD_13Oct10_Hawk_03-10-10p_fht.txt",
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\B_Mus_con_15Oct10_Hawk_03-10-10p_fht.txt"};
 
-            var dtaname = new string[]{
+            var dtaname = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\A_Mus_AD_13Oct10_Hawk_03-10-10p_dta.txt",
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\A_Mus_AD-2_15Oct10_Hawk_03-10-10p_dta.txt",
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\A_Mus_con_10Oct10_Hawk_03-10-10p_dta.txt",
@@ -135,7 +138,7 @@ namespace AScore_UnitTests
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\B_Mus_AD_13Oct10_Hawk_03-10-10p_dta.txt",
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\B_Mus_con_15Oct10_Hawk_03-10-10p_dta.txt"};
 
-            var ascParam = new string[]{
+            var ascParam = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\parameterFileForMusETD2.xml",
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\parameterFileForMusETD2.xml",
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\parameterFileForMusETD2.xml",
@@ -153,7 +156,7 @@ namespace AScore_UnitTests
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(dtaname[i]);
                 var paramFile = new ParameterFileManager(ascParam[i]);
-                var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                var ascoreEngine = new AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
@@ -163,13 +166,13 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void FengTest2()
         {
-            var datasetname = new string[]{
+            var datasetname = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\B_Mus_con_15Oct10_Hawk_03-10-10p_fht.txt"};
 
-            var dtaname = new string[]{
+            var dtaname = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\ETD\B_Mus_con_15Oct10_Hawk_03-10-10p_dta.txt"};
 
-            var ascParam = new string[]{
+            var ascParam = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\FengTest\parameterFileForMusETD2.xml"};
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
@@ -182,7 +185,7 @@ namespace AScore_UnitTests
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(dtaname[i]);
                 var paramFile = new ParameterFileManager(ascParam[i]);
-                var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                var ascoreEngine = new AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
@@ -192,13 +195,13 @@ namespace AScore_UnitTests
         [Ignore("Local testing")]
         public void EcoliTest2()
         {
-            var datasetname = new string[]{
+            var datasetname = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\SisiTopDown\E_coli_BW_70_bottom_up_23Sep11_Draco_11-07-12_fht.txt"};
 
-            var dtaname = new string[]{
+            var dtaname = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\SisiTopDown\E_coli_BW_70_bottom_up_23Sep11_Draco_11-07-12_dta.txt"};
 
-            var ascParam = new string[]{
+            var ascParam = new[]{
                 @"C:\Documents and Settings\aldr699\My Documents2011\SisiTopDown\parameterFileForMus.xml"};
 
             var peptideMassCalculator = GetDefaultPeptideMassCalculator();
@@ -211,7 +214,7 @@ namespace AScore_UnitTests
                 var spectraCache = new SpectraManagerCache(peptideMassCalculator);
                 spectraCache.OpenFile(dtaname[i]);
                 var paramFile = new ParameterFileManager(ascParam[i]);
-                var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                var ascoreEngine = new AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtaManager, datasetMan, paramFile, outFile);
                 ascoreEngine.RunAScoreOnSingleFile(spectraCache, datasetMan, paramFile, outFile);
             }
@@ -314,7 +317,7 @@ namespace AScore_UnitTests
                 spectraCache.OpenFile(tempdta);
                 var pman = new ParameterFileManager(ascP);
 
-                var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                var ascoreEngine = new AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
                 ascoreEngine.RunAScoreOnSingleFile(spectraCache, dsman, pman, tempout);
             }
@@ -366,7 +369,7 @@ namespace AScore_UnitTests
                 spectraCache.OpenFile(tempdta);
                 var pman = new ParameterFileManager(ascP);
 
-                var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                var ascoreEngine = new AScoreProcessor();
                 //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
                 ascoreEngine.RunAScoreOnSingleFile(spectraCache, dsman, pman, tempout);
             }
@@ -389,9 +392,9 @@ namespace AScore_UnitTests
             var spectraCache = new SpectraManagerCache(peptideMassCalculator);
             spectraCache.OpenFile(dta);
 
-            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 
-            var ascoreEngine = new AScore_DLL.AScoreProcessor();
+            var ascoreEngine = new AScoreProcessor();
             ascoreEngine.RunAScoreOnSingleFile(spectraCache, dfht, pfile, resultsFile);
 
             sw.Stop();
@@ -416,9 +419,9 @@ namespace AScore_UnitTests
             var spectraCache = new SpectraManagerCache(peptideMassCalculator);
             spectraCache.OpenFile(dta);
 
-            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 
-            var ascoreEngine = new AScore_DLL.AScoreProcessor();
+            var ascoreEngine = new AScoreProcessor();
             ascoreEngine.RunAScoreOnSingleFile(spectraCache, dfht, pfile, resultsFile);
 
             sw.Stop();
@@ -495,7 +498,7 @@ namespace AScore_UnitTests
                     spectraCache.OpenFile(tempdta);
                     var pman = new ParameterFileManager(ascP);
 
-                    var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                    var ascoreEngine = new AScoreProcessor();
                     //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
                     ascoreEngine.RunAScoreOnSingleFile(spectraCache, dsman, pman, tempout);
                 }
@@ -574,16 +577,16 @@ namespace AScore_UnitTests
                     spectraCache.OpenFile(tempdta);
                     var pman = new ParameterFileManager(ascP);
 
-                    var ascoreEngine = new AScore_DLL.AScoreProcessor();
+                    var ascoreEngine = new AScoreProcessor();
                     //ascoreEngine.AlgorithmRun(dtman, dsman, pman, tempout);
                     ascoreEngine.RunAScoreOnSingleFile(spectraCache, dsman, pman, tempout);
                 }
             }
         }
 
-        private PHRPReader.PeptideMassCalculator GetDefaultPeptideMassCalculator()
+        private PeptideMassCalculator GetDefaultPeptideMassCalculator()
         {
-            return new PHRPReader.PeptideMassCalculator();
+            return new PeptideMassCalculator();
         }
     }
 }

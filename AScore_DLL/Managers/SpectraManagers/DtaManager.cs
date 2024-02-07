@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using PHRPReader;
 using PRISM;
 
 //TODO: leverage mzXmlFileReader and random access indexing to insert experimental spectra as needed.  may want to use an abstract class that DtaManager can inherit from.  Make all the same calls.
@@ -43,7 +44,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         private StreamReader m_masterDta;
         private readonly Dictionary<string, long> dtaEntries = new();
 
-        private readonly PHRPReader.PeptideMassCalculator m_PeptideMassCalculator;
+        private readonly PeptideMassCalculator m_PeptideMassCalculator;
 
         #endregion // Variables
 
@@ -61,7 +62,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// Initializes a DtaManager for which we don't yet know the path of the CDTA file to read
         /// </summary>
         /// <remarks>You must call UpdateDtaFilePath() prior to using GetDtaFileName() or GetExperimentalSpectra()</remarks>
-        public DtaManager(PHRPReader.PeptideMassCalculator peptideMassCalculator)
+        public DtaManager(PeptideMassCalculator peptideMassCalculator)
         {
             m_PeptideMassCalculator = peptideMassCalculator;
             Initialized = false;
@@ -302,7 +303,7 @@ namespace AScore_DLL.Managers.SpectraManagers
                 var precursorMZ = m_PeptideMassCalculator.ConvoluteMass(precursorMass, 1, precursorChargeState);
 
                 // Convert precursor m/z to the correct M+H value
-                precursorMass = m_PeptideMassCalculator.ConvoluteMass(precursorMZ, psmChargeState, 1);
+                precursorMass = m_PeptideMassCalculator.ConvoluteMass(precursorMZ, psmChargeState);
                 precursorChargeState = psmChargeState;
             }
 

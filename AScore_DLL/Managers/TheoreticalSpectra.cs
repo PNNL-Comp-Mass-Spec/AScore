@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using AScore_DLL.Mod;
-using System.Collections;
 
 namespace AScore_DLL.Managers
 {
@@ -34,7 +34,7 @@ namespace AScore_DLL.Managers
         public TheoreticalSpectra(string sequenceClean, ParameterFileManager ascoreParams, int chargeS, MassType massType)
         {
             chargeState = chargeS;
-            this.peptideSequence = sequenceClean;
+            peptideSequence = sequenceClean;
             Calculate(chargeState, ascoreParams, massType);
         }
 

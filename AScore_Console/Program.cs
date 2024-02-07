@@ -4,9 +4,11 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using AScore_DLL;
 using PRISM;
+using PRISM.FileProcessor;
 using PRISM.Logging;
 
 namespace AScore_Console
@@ -31,7 +33,7 @@ namespace AScore_Console
             {
                 var parser = new CommandLineParser<AScoreOptions>();
 
-                var exeName = Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                var exeName = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
                 parser.UsageExamples.Add("Example command line #1:\n" + exeName +
                                   " -T:sequest\n" +
                                   " -F:\"C:\\Temp\\DatasetName_fht.txt\"\n" +
@@ -185,7 +187,7 @@ namespace AScore_Console
 
         private static string GetAppVersion()
         {
-            return PRISM.FileProcessor.ProcessFilesOrDirectoriesBase.GetAppVersion(AScoreOptions.PROGRAM_DATE);
+            return ProcessFilesOrDirectoriesBase.GetAppVersion(AScoreOptions.PROGRAM_DATE);
         }
 
         private static void ShowMessage(string message)

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Xml;
 using AScore_DLL.Mod;
-using System.Text.RegularExpressions;
 using PRISM;
 
 namespace AScore_DLL.Managers

@@ -23,16 +23,16 @@
         // ReSharper disable once UnusedMember.Global
         public DynamicModification(DynamicModification itemToCopy)
         {
-            this.CopyFrom(itemToCopy);
+            CopyFrom(itemToCopy);
         }
 
         protected void CopyFrom(DynamicModification itemToCopy)
         {
             base.CopyFrom(itemToCopy);
 
-            this.MaxPerSite = itemToCopy.MaxPerSite;
-            this.Position = itemToCopy.Position;
-            this.Count = itemToCopy.Count;
+            MaxPerSite = itemToCopy.MaxPerSite;
+            Position = itemToCopy.Position;
+            Count = itemToCopy.Count;
         }
     }
 }

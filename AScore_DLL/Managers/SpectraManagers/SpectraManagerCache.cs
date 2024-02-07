@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using PHRPReader;
 using PRISM;
 
 namespace AScore_DLL.Managers.SpectraManagers
@@ -16,7 +17,7 @@ namespace AScore_DLL.Managers.SpectraManagers
         /// <summary>
         /// Constructor
         /// </summary>
-        public SpectraManagerCache(PHRPReader.PeptideMassCalculator peptideMassCalculator)
+        public SpectraManagerCache(PeptideMassCalculator peptideMassCalculator)
         {
             _mzMLManager = new MzMLManager(peptideMassCalculator);
             _dtaManager = new DtaManager(peptideMassCalculator);

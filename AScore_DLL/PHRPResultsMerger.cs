@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using AScore_DLL.Managers.PSM_Managers;
 using PHRPReader;
 using PRISM;
@@ -289,7 +290,7 @@ namespace AScore_DLL
                 // Create the output file
                 using var phrpWriter = new StreamWriter(new FileStream(outputFile.FullName, FileMode.Create, FileAccess.Write, FileShare.Read));
 
-                var outLine = new System.Text.StringBuilder();
+                var outLine = new StringBuilder();
 
                 // Write the header line
                 outLine.Append(outputHeaderLine);

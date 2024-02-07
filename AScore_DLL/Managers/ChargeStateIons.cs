@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System.Collections.Generic;
+using AScore_DLL.Mod;
 
 namespace AScore_DLL.Managers
 {
@@ -70,7 +71,7 @@ namespace AScore_DLL.Managers
         /// <returns>A newly constructed FragmentIon upon success, null if any
         /// errors occurred during construction.</returns>
         public static ChargeStateIons GenerateFragmentIon(int chargeState,
-            MassType massType, List<Mod.DynamicModification> dynamicMods, int[] positions,
+            MassType massType, List<DynamicModification> dynamicMods, int[] positions,
             List<double> bIons, List<double> yIons, int peptideLength)
         {
             ChargeStateIons fragIon = null;

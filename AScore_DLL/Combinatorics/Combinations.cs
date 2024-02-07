@@ -1,6 +1,7 @@
 // Copyright 2008 Adrian Akison
 // Distributed under license terms of CPOL http://www.codeproject.com/info/cpol10.aspx
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace AScore_DLL.Combinatorics
@@ -87,7 +88,7 @@ namespace AScore_DLL.Combinatorics
         /// Gets an enumerator for collecting the list of combinations.
         /// </summary>
         /// <returns>The enumerator</returns>
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return new Enumerator(this);
         }
@@ -154,7 +155,7 @@ namespace AScore_DLL.Combinatorics
             /// <summary>
             /// The current combination
             /// </summary>
-            object System.Collections.IEnumerator.Current
+            object IEnumerator.Current
             {
                 get
                 {

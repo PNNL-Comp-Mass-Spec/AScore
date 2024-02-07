@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PHRPReader;
 
 namespace AScore_DLL.Managers
 {
@@ -15,7 +16,7 @@ namespace AScore_DLL.Managers
         public double m_minMZ = -1;
         private readonly List<List<ExperimentalSpectraEntry>> TopTenSpectra = new();
 
-        private readonly PHRPReader.PeptideMassCalculator mPeptideMassCalculator;
+        private readonly PeptideMassCalculator mPeptideMassCalculator;
 
         #endregion // Variables
 
@@ -60,7 +61,7 @@ namespace AScore_DLL.Managers
         /// <param name="peptideMassCalculator">Mass calculator class</param>
         public ExperimentalSpectra(int scanNum, int chargeState, double precursorMass,
             int precursorChargeState, List<ExperimentalSpectraEntry> spectra,
-            PHRPReader.PeptideMassCalculator peptideMassCalculator)
+            PeptideMassCalculator peptideMassCalculator)
         {
             ScanNumber = scanNum;
             ChargeState = chargeState;

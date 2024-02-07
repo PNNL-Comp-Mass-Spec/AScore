@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using AScore_DLL.Managers;
 using AScore_DLL.Managers.PSM_Managers;
 using AScore_DLL.Mod;
@@ -287,7 +288,7 @@ namespace AScore_DLL
         /// <returns></returns>
         private string GenerateFinalSequences(string seq, ParameterFileManager myParam, IReadOnlyList<int> peptideMods)
         {
-            var sbFinalSeq = new System.Text.StringBuilder(seq.Length);
+            var sbFinalSeq = new StringBuilder(seq.Length);
 
             for (var i = 0; i < seq.Length; i++)
             {
