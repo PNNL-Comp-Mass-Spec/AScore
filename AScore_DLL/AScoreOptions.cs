@@ -48,7 +48,7 @@ namespace AScore_DLL
         /// <remarks>
         /// This constant is used by the AScore executable (AScore_Console.exe)
         /// </remarks>
-        public const string PROGRAM_DATE = "November 22, 2022";
+        public const string PROGRAM_DATE = "February 6, 2024";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
