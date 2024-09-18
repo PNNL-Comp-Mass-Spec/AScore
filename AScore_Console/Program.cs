@@ -187,7 +187,7 @@ namespace AScore_Console
 
         private static string GetAppVersion()
         {
-            return ProcessFilesOrDirectoriesBase.GetAppVersion(AScoreOptions.PROGRAM_DATE);
+            return AppUtils.GetAppVersion(AScoreOptions.PROGRAM_DATE);
         }
 
         private static void ShowMessage(string message)
