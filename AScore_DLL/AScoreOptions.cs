@@ -14,18 +14,22 @@ namespace AScore_DLL
             /// SEQUEST
             /// </summary>
             Sequest,
+
             /// <summary>
             /// X!Tandem
             /// </summary>
             XTandem,
+
             /// <summary>
             /// Inspect
             /// </summary>
             Inspect,
+
             /// <summary>
             /// Old name for MS-GF+
             /// </summary>
             Msgfdb,
+
             /// <summary>
             /// MS-GF+
             /// </summary>
@@ -50,7 +54,7 @@ namespace AScore_DLL
         /// <remarks>
         /// This constant is used by the AScore executable (AScore_Console.exe)
         /// </remarks>
-        public const string PROGRAM_DATE = "February 6, 2024";
+        public const string PROGRAM_DATE = "September 17, 2024";
 
         [Option("T", "ResultType", Required = true, HelpText = "Search engine result type", HelpShowsDefault = false)]
         public SearchMode SearchType { get; set; }
@@ -111,6 +115,9 @@ namespace AScore_DLL
 
         public DirectoryInfo OutputDirectoryInfo { get; private set; }
 
+        /// <summary>
+        /// AScore Options
+        /// </summary>
         public AScoreOptions()
         {
             SearchType = SearchMode.Msgfplus;
@@ -142,6 +149,7 @@ namespace AScore_DLL
             AScoreResultsFilePath = resultsFilePath;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public bool Validate(out string errorMessage)
         {
             if (string.IsNullOrWhiteSpace(MassSpecFile) && string.IsNullOrWhiteSpace(JobToDatasetMapFile))
@@ -196,6 +204,8 @@ namespace AScore_DLL
             errorMessage = string.Empty;
             return true;
         }
+
+        // ReSharper disable once UnusedMember.Global
 
         /// <summary>
         /// Check the command line input for path errors
@@ -254,10 +264,12 @@ namespace AScore_DLL
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
+
         /// <summary>
         /// Final evaluation and management of settings
         /// </summary>
-        /// <param name="messageReporter"></param>
+        /// <param name="messageReporter">Method that handles the messages</param>
         /// <returns>true if processing should continue, false if it should be skipped</returns>
         public bool ProcessSettings(Action<string> messageReporter)
         {
