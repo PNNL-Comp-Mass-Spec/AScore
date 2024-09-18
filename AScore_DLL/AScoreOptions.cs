@@ -6,6 +6,8 @@ namespace AScore_DLL
 {
     public class AScoreOptions
     {
+        // Ignore Spelling: Fasta
+
         public enum SearchMode
         {
             /// <summary>
