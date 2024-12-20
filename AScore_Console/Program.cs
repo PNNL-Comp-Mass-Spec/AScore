@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Threading;
 using AScore_DLL;
 using PRISM;
-using PRISM.FileProcessor;
 using PRISM.Logging;
 
 namespace AScore_Console
