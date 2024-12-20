@@ -1,68 +1,219 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <doc>
-<assembly>
-<name>
-PeptideToProteinMapEngine
-</name>
-</assembly>
-<members>
-<member name="T:PeptideToProteinMapEngine.My.Resources.Resources">
-<summary>
-  A strongly-typed resource class, for looking up localized strings, etc.
-</summary>
-</member>
-<member name="P:PeptideToProteinMapEngine.My.Resources.Resources.ResourceManager">
-<summary>
-  Returns the cached ResourceManager instance used by this class.
-</summary>
-</member>
-<member name="P:PeptideToProteinMapEngine.My.Resources.Resources.Culture">
-<summary>
-  Overrides the current thread's CurrentUICulture property for all
-  resource lookups using this strongly typed resource class.
-</summary>
-</member>
-<member name="T:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine">
- <summary>
- This class uses ProteinCoverageSummarizer.dll to read in a protein fasta file or delimited protein info file along with
- an accompanying file with peptide sequences to find the proteins that contain each peptide
- It will also optionally compute the percent coverage of each of the proteins
- </summary>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.udtProteinIDMapInfoType.ToString">
- <summary>
- Show the peptide sequence
- </summary>
- <returns></returns>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.udtPepToProteinMappingType.ToString">
- <summary>
- Show the peptide sequence
- </summary>
- <returns></returns>
-</member>
-<member name="P:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.DeleteInspectTempFiles">
- <summary>
- Legacy property; superseded by DeleteTempFiles
- </summary>
- <value></value>
- <returns></returns>
- <remarks></remarks>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.IsHeaderLinePresent(System.String,PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.ePeptideInputFileFormatConstants)">
- <summary>
- Open the file and read the first line
- Examine it to determine if it looks like a header line
- </summary>
- <returns></returns>
-</member>
-<member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.UpdateUniquePeptideList(System.String,System.Int32)">
- <summary>
- Add peptideSequence to mUniquePeptideList if not defined, including tracking the scanNumber
- Otherwise, update the scan list for the peptide
- </summary>
- <param name="peptideSequence"></param>
- <param name="scanNumber"></param>
-</member>
-</members>
+    <assembly>
+        <name>PeptideToProteinMapEngine</name>
+    </assembly>
+    <members>
+        <member name="T:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine">
+            <summary>
+            This class uses ProteinCoverageSummarizer.dll to read in a protein FASTA file or delimited protein info file along with
+            an accompanying file with peptide sequences to find the proteins that contain each peptide
+            It will also optionally compute the percent coverage of each of the proteins
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.FILENAME_SUFFIX_INSPECT_RESULTS_FILE">
+            <summary>
+            InSpecT results filename suffix
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.FILENAME_SUFFIX_MSGFDB_RESULTS_FILE">
+            <summary>
+            MS-GF DB  results filename suffix
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.FILENAME_SUFFIX_MSGFPLUS_RESULTS_FILE">
+            <summary>
+            MS-GF+ results filename suffix
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.FILENAME_SUFFIX_PEP_TO_PROTEIN_MAPPING">
+            <summary>
+            PHRP peptide to protein map file suffix
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.FILENAME_SUFFIX_PSM_UNIQUE_PEPTIDES">
+            <summary>
+            Unique peptides filename suffix
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PEPTIDE_TO_PROTEIN_MAP_FILE_PROTEIN_COLUMN">
+            <summary>
+            Protein column name in the _PepToProtMap.txt file
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PEPTIDE_TO_PROTEIN_MAP_FILE_PEPTIDE_COLUMN">
+            <summary>
+            Peptide column name in the _PepToProtMap.txt file
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PERCENT_COMPLETE_PREPROCESSING">
+            <summary>
+            Initial % complete value displayed at the start of pre-processing
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PERCENT_COMPLETE_RUNNING_PROTEIN_COVERAGE_SUMMARIZER">
+            <summary>
+            Initial % complete value displayed when the coverage computation starts
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PERCENT_COMPLETE_POSTPROCESSING">
+            <summary>
+            Initial % complete value displayed at the start of post-processing
+            </summary>
+        </member>
+        <member name="T:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants">
+            <summary>
+            Peptide input file formats
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.Unknown">
+            <summary>
+            Unknown file type
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.AutoDetermine">
+            <summary>
+            Auto-determine the file type
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.PeptideListFile">
+            <summary>
+            First column is peptide sequence
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.ProteinAndPeptideFile">
+            <summary>
+            First column is protein name, second column is peptide sequence
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.InspectResultsFile">
+            <summary>
+            InSpecT results file; pre-process the file to determine the peptides present, then determine the proteins that contain the given peptides
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.MSGFPlusResultsFile">
+            <summary>
+            MS-GF+ results file; pre-process the file to determine the peptides present, then determine the proteins that contain the given peptides
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.PHRPFile">
+            <summary>
+            SEQUEST, InSpecT, X!Tandem, or MS-GF+ synopsis or first-hits file created by Peptide Hit Results Processor (PHRP); pre-processes the file to determine the peptides present, then determine the proteins that contain the given peptides
+            </summary>
+        </member>
+        <member name="F:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants.TabDelimitedText">
+            <summary>
+            Generic tab-delimited text file; will look for column names that start with Peptide, Protein, and Scan
+            </summary>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.ProteinIDMapInfo.ToString">
+            <summary>
+            Show the peptide sequence
+            </summary>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PepToProteinMapping.ToString">
+            <summary>
+            Show the peptide sequence
+            </summary>
+        </member>
+        <member name="P:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.DeleteTempFiles">
+            <summary>
+            When true, delete temp files
+            </summary>
+        </member>
+        <member name="P:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.InspectParameterFilePath">
+            <summary>
+            InSpecT parameter file path
+            </summary>
+        </member>
+        <member name="P:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.Options">
+            <summary>
+            Peptide to protein map engine options
+            </summary>
+        </member>
+        <member name="P:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormat">
+            <summary>
+            Peptide input file format
+            </summary>
+        </member>
+        <member name="P:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.StatusMessage">
+            <summary>
+            Status message
+            </summary>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.#ctor(ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options">Options</param>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.AbortProcessingNow">
+            <summary>
+            Abort processing now
+            </summary>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.DetermineResultsFileFormat(System.String)">
+            <summary>
+            Auto-determine the file format
+            </summary>
+            <param name="filePath">Input file path</param>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.ExtractModInfoFromInspectParamFile(System.String,System.Collections.Generic.List{System.String}@)">
+            <summary>
+            Parse an InSpecT parameter file to determine the modification names
+            </summary>
+            <param name="inspectParamFilePath">InSpecT parameter file path</param>
+            <param name="inspectModNames">List of InSpecT modification names</param>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.GetErrorMessage">
+            <summary>
+            Get the error message
+            </summary>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.IsHeaderLinePresent(System.String,PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PeptideInputFileFormatConstants,System.Boolean@)">
+            <summary>
+            Open the file and read the first line
+            Examine it to determine if it looks like a header line
+            </summary>
+            <param name="filePath">File path</param>
+            <param name="inputFileFormat">Input file format</param>
+            <param name="hasPeptideOrSequenceColumn">
+            Output: true if the file has a column named Peptide or Sequence
+            Will always be set to True if inputFileFormat is ProteinAndPeptideFile or PeptideListFile, even if there is no header line
+            </param>
+            <returns>True if the file has a header line</returns>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.LoadParameterFileSettings(System.String)">
+            <summary>
+            Load settings from an XML-based parameter file
+            </summary>
+            <param name="parameterFilePath">XML-based parameter file path</param>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.PostProcessPSMResultsFile(System.String,System.String,System.Boolean)">
+            <summary>
+            Post-process a PSM results file
+            </summary>
+            <param name="peptideListFilePath"> PSM results file path</param>
+            <param name="proteinToPepMapFilePath">Protein to peptide map file path</param>
+            <param name="deleteWorkingFiles">When true, delete working files when done processing</param>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.ProcessFile(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Process the input file to map peptides to proteins in the FASTA file
+            </summary>
+            <param name="inputFilePath">Input file path</param>
+            <param name="outputDirectoryPath">Output directory path</param>
+            <param name="parameterFilePath">Parameter file path</param>
+            <param name="resetErrorCode">When true, reset the error code</param>
+            <returns>True if success, false if an error</returns>
+        </member>
+        <member name="M:PeptideToProteinMapEngine.clsPeptideToProteinMapEngine.UpdateUniquePeptideList(System.String,System.Int32)">
+            <summary>
+            Add peptideSequence to mUniquePeptideList if not defined, including tracking the scanNumber
+            Otherwise, update the scan list for the peptide
+            </summary>
+            <param name="peptideSequence">Peptide sequence</param>
+            <param name="scanNumber">Scan number</param>
+        </member>
+    </members>
 </doc>

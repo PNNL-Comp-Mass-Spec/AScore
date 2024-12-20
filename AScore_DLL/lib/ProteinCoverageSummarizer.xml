@@ -1,273 +1,972 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <doc>
-<assembly>
-<name>
-ProteinCoverageSummarizer
-</name>
-</assembly>
-<members>
-<member name="T:ProteinCoverageSummarizer.My.Resources.Resources">
-<summary>
-  A strongly-typed resource class, for looking up localized strings, etc.
-</summary>
-</member>
-<member name="P:ProteinCoverageSummarizer.My.Resources.Resources.ResourceManager">
-<summary>
-  Returns the cached ResourceManager instance used by this class.
-</summary>
-</member>
-<member name="P:ProteinCoverageSummarizer.My.Resources.Resources.Culture">
-<summary>
-  Overrides the current thread's CurrentUICulture property for all
-  resource lookups using this strongly typed resource class.
-</summary>
-</member>
-<member name="T:ProteinCoverageSummarizer.clsLeaderSequenceCache">
- <summary>
- This class tracks the first n letters of each peptide sent to it, while also
- tracking the peptides and the location of those peptides in the leader sequence hash table
- </summary>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.ProteinName">
- <summary>
- Protein name (optional)
- </summary>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.PeptideSequence">
- <summary>
- Peptide amino acids (stored as uppercase letters)
- </summary>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.Prefix">
- <summary>
- Prefix residue
- </summary>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.Suffix">
- <summary>
- Suffix residue
- </summary>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.PeptideSequenceLtoI">
- <summary>
- Peptide sequence where leucines have been changed to isoleucine
- </summary>
- <remarks>Only used if mIgnoreILDifferences is True</remarks>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.PrefixLtoI">
- <summary>
- Prefix residue; if leucine, changed to isoleucine
- </summary>
- <remarks>Only used if mIgnoreILDifferences is True</remarks>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.SuffixLtoI">
- <summary>
- Suffix residue; if leucine, changed to isoleucine
- </summary>
- <remarks>Only used if mIgnoreILDifferences is True</remarks>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.udtPeptideSequenceInfoType.ToString">
- <summary>
- Show the peptide sequence, including prefix and suffix
- </summary>
- <returns></returns>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mCachedPeptideToHashIndexPointer">
- <summary>
- Parallel to mCachedPeptideSeqInfo
- </summary>
-</member>
-<member name="E:ProteinCoverageSummarizer.clsLeaderSequenceCache.ProgressChanged">
- <summary>
- Progress changed event
- </summary>
- <param name="taskDescription"></param>
- <param name="percentComplete">Value between 0 and 100, but can contain decimal percentage values</param>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mProgressPercentComplete">
- <summary>
- Percent complete
- </summary>
- <remarks>
- Value between 0 and 100, but can contain decimal percentage values
- </remarks>
-</member>
-<member name="P:ProteinCoverageSummarizer.clsLeaderSequenceCache.ProgressPercentComplete">
- <summary>
- Percent complete
- </summary>
- <remarks>
- Value between 0 and 100, but can contain decimal percentage values
- </remarks>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.CachePeptide(System.String,System.String,System.Char,System.Char)">
- <summary>
- Caches the peptide and updates mLeaderSequences
- </summary>
- <param name="peptideSequence">Peptide sequence</param>
- <param name="proteinName">Protein name</param>
- <param name="prefixResidue">Prefix residue</param>
- <param name="suffixResidue">Suffix residue</param>
- <returns></returns>
-</member>
-<member name="T:ProteinCoverageSummarizer.clsProteinCoverageSummarizer">
- <summary>
- This class will read in a protein FASTA file or delimited protein info file along with
- an accompanying file with peptide sequences and compute the percent coverage of each of the proteins
- </summary>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mResultsFilePath">
- <summary>
- This is populated by function ProcessFile()
- </summary>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mPercentCompleteStartLevels">
- <summary>
- Array that lists the percent complete value to report at the start
- of each of the various processing steps performed in this procedure
- </summary>
- <remarks>The percent complete values range from 0 to 100</remarks>
-</member>
-<member name="E:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProgressChanged">
- <summary>
- Progress changed event
- </summary>
- <param name="taskDescription"></param>
- <param name="percentComplete">Value between 0 and 100, but can contain decimal percentage values</param>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mProgressPercentComplete">
- <summary>
- Percent complete
- </summary>
- <remarks>
- Value between 0 and 100, but can contain decimal percentage values
- </remarks>
-</member>
-<member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.KeepDB">
- <summary>
- When this is True, the SQLite Database will not be deleted after processing finishes
- </summary>
-</member>
-<member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProgressPercentComplete">
- <summary>
- Percent complete
- </summary>
- <returns></returns>
- <remarks>Value between 0 and 100, but can contain decimal percentage values</remarks>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ConstructOutputFilePath(System.String,System.String,System.String,System.String)">
- <summary>
- Construct the output file path
- The output file is based on outputFileBaseName if defined, otherwise is based on inputFilePath with the suffix removed
- In either case, suffixToAppend is appended
- The Output directory is based on outputDirectoryPath if defined, otherwise it is the directory where inputFilePath resides
- </summary>
- <param name="inputFilePath"></param>
- <param name="suffixToAppend"></param>
- <param name="outputDirectoryPath"></param>
- <param name="outputFileBaseName"></param>
- <returns></returns>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptideList(System.Collections.Generic.IDictionary{System.String,System.Int32},System.String)">
- <summary>
- Searches for proteins that contain the peptides in peptideList
- If proteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True then searches all proteins
- Otherwise, only searches protein proteinNameForPeptide
- </summary>
- <param name="peptideList">Dictionary containing the peptides to search; peptides must be in the format Prefix.Peptide.Suffix where Prefix and Suffix are single characters; peptides are assumed to only contain letters (no symbols)</param>
- <param name="proteinNameForPeptides">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
- <remarks></remarks>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetOutputDirectoryPath(System.String,System.String)">
- <summary>
- Determine the output directory path
- Uses outputDirectoryPath if defined
- Otherwise uses the directory where outputFilePath resides
- </summary>
- <param name="outputDirectoryPath"></param>
- <param name="outputFilePath"></param>
- <returns></returns>
- <remarks>If an error, or unable to determine a directory, returns the directory with the application files</remarks>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.IncrementCountByKey(System.Collections.Generic.IDictionary{System.String,System.Int32},System.String)">
- <summary>
- Increment the observation count for the given key in the given dictionary
- If the key is not defined, add it
- </summary>
- <param name="dictionaryToUpdate"></param>
- <param name="keyName"></param>
- <returns>True if the protein is new and was added tomProteinPeptideStats </returns>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ReadProteinInfoChunk(System.Int32,System.Boolean[],System.Boolean)">
- <summary>
- Read the next chunk of proteins from the database (SequenceID, ProteinName, ProteinSequence)
- </summary>
- <returns>The number of records read</returns>
- <remarks></remarks>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ValidateColumnCountInInputFile(System.String,ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ePeptideFileColumnOrderingCode@,System.Boolean,System.Char)">
- <summary>
- Read the first two lines to check whether the data file actually has only one column when the user has
- specified mPeptideFileColumnOrdering = ePeptideFileColumnOrderingCode.ProteinName_PeptideSequence
- If mPeptideFileColumnOrdering = ePeptideFileColumnOrderingCode.SequenceOnly, the file isn't even opened
- </summary>
- <param name="peptideInputFilePath"></param>
- <param name="ePeptideFileColumnOrdering">Input / Output parameter</param>
- <param name="skipFirstLine"></param>
- <param name="columnDelimiter"></param>
- <returns>True if no problems; False if the user chooses to abort</returns>
-</member>
-<member name="T:ProteinCoverageSummarizer.clsProteinFileDataCache">
- <summary>
- This class will read a protein FASTA file or delimited protein info file and
- store the proteins in memory
- </summary>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.udtProteinInfoType.UniqueSequenceID">
- <summary>
- Unique sequence ID
- </summary>
- <remarks>
- Index number applied to the proteins stored in the SQLite DB; the first protein has UniqueSequenceID = 0
- </remarks>
-</member>
-<member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.udtProteinInfoType.PercentCoverage">
- <summary>
- Percent coverage
- </summary>
- <remarks>Value between 0 and 1</remarks>
-</member>
-<member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.AssumeDelimitedFile">
- <summary>
- When True, assume the input file is a tab-delimited text file
- </summary>
- <returns></returns>
- <remarks>Ignored if AssumeFastaFile is True</remarks>
-</member>
-<member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.AssumeFastaFile">
- <summary>
- When True, assume the input file is a FASTA text file
- </summary>
- <returns></returns>
-</member>
-<member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.KeepDB">
- <summary>
- When this is True, the SQLite Database will not be deleted after processing finishes
- </summary>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.DeleteSQLiteDBFile(System.String,System.Boolean)">
- <summary>
- Delete the SQLite database file
- </summary>
- <param name="callingMethod">Calling method name</param>
- <param name="forceDelete">Force deletion (ignore KeepDB)</param>
-</member>
-<member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.IsFastaFile(System.String)">
- <summary>
- Examines the file's extension and true if it ends in .fasta or .fsa or .faa
- </summary>
- <param name="filePath"></param>
- <returns></returns>
-</member>
-</members>
+    <assembly>
+        <name>ProteinCoverageSummarizer</name>
+    </assembly>
+    <members>
+        <member name="T:ProteinCoverageSummarizer.ProgressCompleteEventHandler">
+            <summary>
+            Progress complete event handler delegate
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.clsLeaderSequenceCache">
+            <summary>
+            This class tracks the first n letters of each peptide sent to it, while also
+            tracking the peptides and the location of those peptides in the leader sequence hash table
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.DEFAULT_LEADER_SEQUENCE_LENGTH">
+            <summary>
+            Default leader sequence length
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.MINIMUM_LEADER_SEQUENCE_LENGTH">
+            <summary>
+            Minimum allowed leader sequence length
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.MAX_LEADER_SEQUENCE_COUNT">
+            <summary>
+            Maximum leader sequence count
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo">
+            <summary>
+            Peptide sequence info structure
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo.ProteinName">
+            <summary>
+            Protein name (optional)
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo.PeptideSequence">
+            <summary>
+            Peptide amino acids (stored as uppercase letters)
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo.Prefix">
+            <summary>
+            Prefix residue
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo.Suffix">
+            <summary>
+            Suffix residue
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo.PeptideSequenceLtoI">
+            <summary>
+            Peptide sequence where leucines have been changed to isoleucine
+            </summary>
+            <remarks>Only used if mIgnoreILDifferences is True</remarks>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo.PrefixLtoI">
+            <summary>
+            Prefix residue; if leucine, changed to isoleucine
+            </summary>
+            <remarks>Only used if mIgnoreILDifferences is True</remarks>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo.SuffixLtoI">
+            <summary>
+            Suffix residue; if leucine, changed to isoleucine
+            </summary>
+            <remarks>Only used if mIgnoreILDifferences is True</remarks>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.PeptideSequenceInfo.ToString">
+            <summary>
+            Show the peptide sequence, including prefix and suffix
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mLeaderSequences">
+            <summary>
+            Keys in this dictionary are peptides, values are the corresponding index in mCachedPeptideToHashIndexPointer
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mCachedPeptideCount">
+            <summary>
+            Count of cached peptides
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mCachedPeptideSeqInfo">
+            <summary>
+            Cached peptide info
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mCachedPeptideToHashIndexPointer">
+            <summary>
+            Parallel to mCachedPeptideSeqInfo
+            </summary>
+        </member>
+        <member name="E:ProteinCoverageSummarizer.clsLeaderSequenceCache.ProgressChanged">
+            <summary>
+            Progress changed event
+            </summary>
+        </member>
+        <member name="E:ProteinCoverageSummarizer.clsLeaderSequenceCache.ProgressComplete">
+            <summary>
+            Progress complete event handler
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsLeaderSequenceCache.mProgressPercentComplete">
+            <summary>
+            Percent complete
+            </summary>
+            <remarks>
+            Value between 0 and 100, but can contain decimal percentage values
+            </remarks>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsLeaderSequenceCache.CachedPeptideCount">
+            <summary>
+            Number of cached peptides
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsLeaderSequenceCache.ErrorMessage">
+            <summary>
+            Error message
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsLeaderSequenceCache.IgnoreILDifferences">
+            <summary>
+            When true, treat I and L residues equally
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsLeaderSequenceCache.LeaderSequenceMinimumLength">
+            <summary>
+            Minimum leader sequence length
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsLeaderSequenceCache.ProgressStepDescription">
+            <summary>
+            Progress step description
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsLeaderSequenceCache.ProgressPercentComplete">
+            <summary>
+            Percent complete
+            </summary>
+            <remarks>
+            Value between 0 and 100, but can contain decimal percentage values
+            </remarks>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.AbortProcessingNow">
+            <summary>
+            Abort processing now
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.CachePeptide(System.String,System.String,System.Char,System.Char,System.Boolean)">
+            <summary>
+            Caches the peptide and updates mLeaderSequences
+            </summary>
+            <param name="peptideSequence">Peptide sequence</param>
+            <param name="proteinName">Protein name</param>
+            <param name="prefixResidue">Prefix residue</param>
+            <param name="suffixResidue">Suffix residue</param>
+            <param name="isNewPSM">Set this to false if this is a duplicate entry for a given scan number (e.g. different protein, or not the top scoring peptide)</param>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.DetermineShortestPeptideLengthInFile(System.String,System.Int32,System.Boolean,System.Char,System.Int32)">
+            <summary>
+            Parse the input file, examining column number columnNumWithPeptideSequence to determine the minimum peptide sequence length present
+            Updates mLeaderSequenceMinimumLength if successful, though the minimum length is not allowed to be less than MINIMUM_LEADER_SEQUENCE_LENGTH
+            </summary>
+            <param name="inputFilePath"></param>
+            <param name="terminatorSize"></param>
+            <param name="peptideFileSkipFirstLine"></param>
+            <param name="peptideInputFileDelimiter"></param>
+            <param name="columnNumWithPeptideSequence">Should be 1 if the peptide sequence is in the first column, 2 if in the second, etc.</param>
+            <returns>True if success, false if an error</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.GetFirstPeptideIndexForLeaderSequence(System.String)">
+            <summary>
+            Looks up the first index value in mCachedPeptideSeqInfo that matches leaderSequenceToFind
+            </summary>
+            <remarks>Calls SortIndices if mIndicesSorted = False</remarks>
+            <param name="leaderSequenceToFind"></param>
+            <returns>The index value if found, or -1 if not found</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.GetNextPeptideWithLeaderSequence(System.Int32)">
+            <summary>
+            Get the next peptide with the given leader sequence
+            </summary>
+            <param name="cachedPeptideMatchIndexCurrent"></param>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.InitializeCachedPeptides">
+            <summary>
+            Initialize the cached peptides
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsLeaderSequenceCache.InitializeVariables">
+             <summary>
+             Reset local variables to defaults
+             </summary>
+            
+             <remarks>Calls InitializeCachedPeptides</remarks>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProgressResetEventHandler">
+            <summary>
+            Progress reset event handler delegate
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProgressChangedEventHandler">
+            <summary>
+            Progress changed event
+            </summary>
+            <param name="taskDescription">Task description</param>
+            <param name="percentComplete">Value between 0 and 100, but can contain decimal percentage values</param>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.clsProteinCoverageSummarizer">
+            <summary>
+            This class will read in a protein FASTA file or delimited protein info file along with
+            an accompanying file with peptide sequences and compute the percent coverage of each of the proteins
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.XML_SECTION_PROCESSING_OPTIONS">
+            <summary>
+            ProcessingOptions section of the XML file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.OUTPUT_FILE_PROTEIN_DESCRIPTION_COLUMN_NUMBER">
+            <summary>
+            Protein description column number in the output file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.OUTPUT_FILE_PROTEIN_SEQUENCE_COLUMN_NUMBER">
+            <summary>
+            Protein sequence column number in the output file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FILENAME_SUFFIX_PROTEIN_TO_PEPTIDE_MAPPING">
+            <summary>
+            ProteinToPeptideMapping filename suffix
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FILENAME_SUFFIX_SOURCE_PLUS_ALL_PROTEINS">
+            <summary>
+            AllProteins filename suffix
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.PROTEIN_TO_PEPTIDE_MAP_FILE_PROTEIN_COLUMN">
+            <summary>
+            Protein column name in the _ProteinToPeptideMapping.txt file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.PROTEIN_TO_PEPTIDE_MAP_FILE_PEPTIDE_COLUMN">
+            <summary>
+            Peptide column name in the _ProteinToPeptideMapping.txt file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.PROTEIN_TO_PEPTIDE_MAP_FILE_PREFIX_RESIDUE_COLUMN">
+            <summary>
+            Prefix residue column name in the _ProteinToPeptideMapping.txt file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.PROTEIN_TO_PEPTIDE_MAP_FILE_SUFFIX_RESIDUE_COLUMN">
+            <summary>
+            Suffix residue column name in the _ProteinToPeptideMapping.txt file
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageErrorCodes">
+            <summary>
+            Protein coverage error codes
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageErrorCodes.NoError">
+            <summary>
+            No error
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageErrorCodes.InvalidInputFilePath">
+            <summary>
+            Invalid input file path
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageErrorCodes.ErrorReadingParameterFile">
+            <summary>
+            Error reading the parameter file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageErrorCodes.FilePathError">
+            <summary>
+            File path error
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageErrorCodes.UnspecifiedError">
+            <summary>
+            Unspecified error
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps">
+            <summary>
+            Protein coverage processing steps
+            </summary>
+            <remarks>
+            If you add/remove any steps, update PERCENT_COMPLETE_LEVEL_COUNT
+            and update the population of mPercentCompleteStartLevels()
+            </remarks>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.Starting">
+            <summary>
+            Starting
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.CacheProteins">
+            <summary>
+            Caching proteins
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.DetermineShortestPeptideLength">
+            <summary>
+            Determining the shortest peptide length
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.CachePeptides">
+            <summary>
+            Caching peptides
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.SearchProteinsUsingLeaderSequences">
+            <summary>
+            Searching proteins using leader sequences
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.SearchProteinsAgainstShortPeptides">
+            <summary>
+            Searching proteins against short peptides
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.ComputePercentCoverage">
+            <summary>
+            Computing percent coverage
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.WriteProteinCoverageFile">
+            <summary>
+            Writing the protein coverage file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinCoverageProcessingSteps.SaveAllProteinsVersionOfInputFile">
+            <summary>
+            Saving the all proteins version of the input file
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mPercentCompleteStartLevels">
+            <summary>
+            Array that lists the percent complete value to report at the start
+            of each of the various processing steps performed in this procedure
+            </summary>
+            <remarks>The percent complete values range from 0 to 100</remarks>
+        </member>
+        <member name="E:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProgressReset">
+            <summary>
+            Progress reset event
+            </summary>
+        </member>
+        <member name="E:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProgressChanged">
+            <summary>
+            Progress changed event
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mProgressPercentComplete">
+            <summary>
+            Percent complete
+            </summary>
+            <remarks>
+            Value between 0 and 100, but can contain decimal percentage values
+            </remarks>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ErrorCode">
+            <summary>
+            Error code
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ErrorMessage">
+            <summary>
+            Error message
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.Options">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinDataCache">
+            <summary>
+            Protein data cache
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProgressStepDescription">
+            <summary>
+            Progress description
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProgressPercentComplete">
+            <summary>
+            Percent complete
+            </summary>
+            <remarks>Value between 0 and 100, but can contain decimal percentage values</remarks>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProteinToPeptideMappingFilePath">
+            <summary>
+            Protein to peptide map file path
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ResultsFilePath">
+            <summary>
+            Results file path
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.StatusMessage">
+            <summary>
+            Status message
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.#ctor(ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options">Options</param>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.AbortProcessingNow">
+            <summary>
+            Abort processing now
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.CapitalizeMatchingProteinSequenceLetters(System.String,System.String,System.String,System.Char,System.Char,System.Boolean@,System.Boolean@,System.Int32@,System.Int32@)">
+            <summary>
+            Look for the peptide sequence in the given protein sequence
+            </summary>
+            <param name="proteinSequence">Protein sequence</param>
+            <param name="peptideSequence">Peptide sequence</param>
+            <param name="proteinPeptideKey">Key to use with dictionary mProteinPeptideStats when Options.TrackPeptideCounts is true</param>
+            <param name="prefixResidue">Peptide prefix residue; only used if Options.MatchPeptidePrefixAndSuffixToProtein is true</param>
+            <param name="suffixResidue">Peptide suffix residue; only used if Options.MatchPeptidePrefixAndSuffixToProtein is true</param>
+            <param name="matchFound">Output: true if the protein sequence contains the peptide</param>
+            <param name="matchIsNew">Output: true if this is a new match (but will always be true if Options.TrackPeptideCounts is false)</param>
+            <param name="startResidueNumber">Start residue number of the peptide in the protein (the first residue in the protein is 1); 0 if no match</param>
+            <param name="endResidueNumber">End residue number of the peptide in the protein; 0 if no match</param>
+            <returns>Protein sequence, with letters capitalized if Options.SearchAllProteinsSkipCoverageComputationSteps is false</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ConstructOutputFilePath(System.String,System.String,System.String,System.String)">
+            <summary>
+            Construct the output file path
+            The output file is based on outputFileBaseName if defined, otherwise is based on inputFilePath with the suffix removed
+            In either case, suffixToAppend is appended
+            The Output directory is based on outputDirectoryPath if defined, otherwise it is the directory where inputFilePath resides
+            </summary>
+            <param name="inputFilePath">Input file path</param>
+            <param name="suffixToAppend">Suffix to append</param>
+            <param name="outputDirectoryPath">Output directory path</param>
+            <param name="outputFileBaseName">Output file base name</param>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindColumnIndex(System.String,System.String,System.Boolean)">
+            <summary>
+            Look for the columnToFind in the first non-blank line of the input file
+            </summary>
+            <param name="peptideInputFilePath">Input file path</param>
+            <param name="columnToFind">Clumn name to find</param>
+            <param name="matchStartIfNotFound">When true, look for a column that starts with columnName if an exact match is not found</param>
+            <returns>Zero-base column index, or -1 if not found</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindColumnIndex(System.Collections.Generic.IReadOnlyList{System.String},System.String,System.Boolean)">
+            <summary>
+            Look for the first column whose name matches columnToFind
+            </summary>
+            <param name="columnNames">List of column names</param>
+            <param name="columnToFind">Column name to find</param>
+            <param name="matchStartIfNotFound">When true, look for a column that starts with columnName if an exact match is not found</param>
+            <returns>Column index if found, or -1 if not found</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.FindSequenceMatchForPeptideList(System.Collections.Generic.IDictionary{System.String,System.Int32},System.String)">
+            <summary>
+            Searches for proteins that contain the peptides in peptideList
+            If proteinNameForPeptide is blank or mSearchAllProteinsForPeptideSequence=True, searches all proteins
+            Otherwise, only searches the protein specified by proteinNameForPeptide
+            </summary>
+            <param name="peptideList">Dictionary containing the peptides to search; peptides must be in the format Prefix.Peptide.Suffix where Prefix and Suffix are single characters; peptides are assumed to only contain letters (no symbols)</param>
+            <param name="proteinNameForPeptides">The protein to search; only used if mSearchAllProteinsForPeptideSequence=False</param>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetAppDirectoryPath">
+            <summary>
+            Get the application directory path
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mSymbolMatcher">
+            <summary>
+            RegEx to match any character that is not a letter
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.mBracketModsMatcher">
+            <summary>
+            RegEx to match modifications of the form [15.9998] or [Acetyl]
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetCleanPeptideSequence(System.String,System.Char@,System.Char@,System.Boolean)">
+            <summary>
+            Get the peptide sequence without the prefix and suffix, and optionally without modification symbols
+            </summary>
+            <param name="peptideSequence">Peptide sequence, optionally with prefix and suffix residues</param>
+            <param name="prefixResidue">Prefix residue, if present before a period in the second character</param>
+            <param name="suffixResidue">Suffix residue, if present after a period in the second to the last character</param>
+            <param name="removeSymbolCharacters">
+            When true, look for and remove both bracket-based modifications (like [15.9998] or [Acetyl]) and symbols (like @, #, and $)
+            </param>
+            <returns>Clean peptide sequence</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetColumnValueIfNotEmpty(System.Collections.Generic.IReadOnlyList{System.String},System.Int32,System.String@)">
+            <summary>
+            Get the text in the column at the given index
+            </summary>
+            <param name="lineParts">Line parts after splitting a delimited data line</param>
+            <param name="columnIndex">Column index</param>
+            <param name="columnValue">Output: value at index columnIndex in lineParts</param>
+            <returns>
+            True if columnIndex is within range of the items in lineParts
+            and if the value is not an empty string
+            </returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetErrorMessage">
+            <summary>
+            Get the error message
+            </summary>
+            <returns>Error message, or an empty string</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.GetOutputDirectoryPath(System.String,System.String)">
+            <summary>
+            Determine the output directory path
+            Uses outputDirectoryPath if defined
+            Otherwise uses the directory where outputFilePath resides
+            </summary>
+            <remarks>If an error, or unable to determine a directory, returns the directory with the application files</remarks>
+            <param name="outputDirectoryPath">Output directory path</param>
+            <param name="outputFilePath">Output file path</param>
+            <returns>Output directory path</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.IncrementCountByKey(System.Collections.Generic.IDictionary{System.String,System.Int32},System.String,System.Boolean)">
+            <summary>
+            Increment the observation count for the given key in the given dictionary
+            If the key is not defined, add it
+            </summary>
+            <param name="dictionaryToUpdate">Dictionary where values are the item count for each key</param>
+            <param name="keyName">Key name to increment</param>
+            <param name="isNewPSM">Set this to false if this is a duplicate entry for a given scan number (e.g. different protein, or not the top scoring peptide)</param>
+            <returns>True if the protein is new and was added to mProteinPeptideStats </returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.LoadParameterFileSettings(System.String)">
+            <summary>
+            Load settings from an XML-based parameter file
+            </summary>
+            <param name="parameterFilePath">XML-based parameter file path</param>
+            <returns>True if success (including if parameterFilePath is an empty string), false if an error</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProcessFile(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Process the file to compute protein sequence coverage
+            </summary>
+            <param name="inputFilePath">Input file path</param>
+            <param name="outputDirectoryPath">Output directory path</param>
+            <param name="parameterFilePath">Parameter file path</param>
+            <param name="resetErrorCode">When true, reset the error code</param>
+            <returns>True if success, false if an error</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ProcessFile(System.String,System.String,System.String,System.Boolean,System.String@,System.String)">
+            <summary>
+            Process the file to compute protein sequence coverage
+            </summary>
+            <param name="inputFilePath">Input file path</param>
+            <param name="outputDirectoryPath">Output directory path</param>
+            <param name="parameterFilePath">Parameter file path</param>
+            <param name="resetErrorCode">When true, reset the error code</param>
+            <param name="proteinToPepMapFilePath">Protein to peptide map file path</param>
+            <param name="outputFileBaseName">Output file base name</param>
+            <returns>True if success, false if an error</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ReadProteinInfoChunk(System.Int32,System.Boolean[],System.Boolean)">
+            <summary>
+            Read the next chunk of proteins from the database (SequenceID, ProteinName, ProteinSequence)
+            </summary>
+            <returns>The number of records read</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.ValidateColumnCountInInputFile(System.String,ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideFileColumnOrderingCode@,System.Boolean,System.Char)">
+            <summary>
+            Read the first two lines to check whether the data file actually has only one column when the user has
+            specified Options.PeptideFileFormatCode = PeptideFileColumnOrderingCode.ProteinName_PeptideSequence
+            If Options.PeptideFileFormatCode is PeptideFileColumnOrderingCode.SequenceOnly, the file isn't even opened
+            </summary>
+            <param name="peptideInputFilePath">Iinput file path</param>
+            <param name="peptideFileFormatCode">Input/Output: file format code</param>
+            <param name="skipFirstLine">When true, skip the first line</param>
+            <param name="columnDelimiter">Column delimiter</param>
+            <returns>True if no problems; False if the user chooses to abort</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinCoverageSummarizer.WriteCachedLinesToAllProteinsFile(System.String,System.Collections.Generic.IReadOnlyCollection{System.Collections.Generic.KeyValuePair{System.String,System.String}},System.IO.TextWriter,System.Int32)">
+            <summary>
+            Write cached peptide lines to the source plus all proteins data file
+            </summary>
+            <param name="peptideSequence">Current peptide sequence (with modification symbols)</param>
+            <param name="peptideLines">Lines read from the PSM results file; Keys are the text of each line and values are the protein name for that line</param>
+            <param name="dataPlusProteinsWriter">Output file writer</param>
+            <param name="linesRead">Total number of lines read from the input file</param>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProteinCachingStartEventHandler">
+            <summary>
+            Protein caching start event handler delegate
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProteinCachedEventHandler">
+            <summary>
+            Protein caching event handler delegate
+            </summary>
+            <param name="proteinsCached"></param>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProteinCachedWithProgressEventHandler">
+            <summary>
+            Protein caching progress event handler delegate
+            </summary>
+            <param name="proteinsCached"></param>
+            <param name="percentFileProcessed"></param>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProteinCachingCompleteEventHandler">
+            <summary>
+            Protein caching completed event handler delegate
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.clsProteinFileDataCache">
+            <summary>
+            This class will read a protein FASTA file or delimited protein info file and
+            store the proteins in memory
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinInfo">
+            <summary>
+            Protein info structure
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinInfo.Name">
+            <summary>
+            Protein name
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinInfo.Description">
+            <summary>
+            Protein description
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinInfo.Sequence">
+            <summary>
+            Protein sequence
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinInfo.UniqueSequenceID">
+            <summary>
+            Unique sequence ID
+            </summary>
+            <remarks>
+            Index number applied to the proteins stored in the SQLite DB; the first protein has UniqueSequenceID = 0
+            </remarks>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinInfo.PercentCoverage">
+            <summary>
+            Percent coverage
+            </summary>
+            <remarks>Value between 0 and 1</remarks>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinInfo.ToString">
+            <summary>
+            Show the protein name
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.mSQLiteDBConnectionString">
+            <summary>
+            SQLite Connection String and file path
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.clsProteinFileDataCache.mSQLiteDBFilePath">
+            <summary>
+            SQLite file path
+            </summary>
+        </member>
+        <member name="E:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinCachingStart">
+            <summary>
+            Protein caching start event handler
+            </summary>
+        </member>
+        <member name="E:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinCached">
+            <summary>
+            Protein caching event handler
+            </summary>
+        </member>
+        <member name="E:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinCachedWithProgress">
+            <summary>
+            Protein caching progress event handler
+            </summary>
+        </member>
+        <member name="E:ProteinCoverageSummarizer.clsProteinFileDataCache.ProteinCachingComplete">
+            <summary>
+            Protein caching completed event handler
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.Options">
+            <summary>
+            Protein data cache options
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.clsProteinFileDataCache.StatusMessage">
+            <summary>
+            Status message
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.#ctor(ProteinCoverageSummarizer.ProteinDataCacheOptions)">
+            <summary>
+            Constructor that accepts an options class
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.ConnectToSQLiteDB(System.Boolean)">
+            <summary>
+            Connect to a SQLite database
+            </summary>
+            <param name="disableJournaling"></param>
+            <returns>the SQLite connection object</returns>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.DeleteSQLiteDBFile(System.String,System.Boolean)">
+            <summary>
+            Delete the SQLite database file
+            </summary>
+            <param name="callingMethod">Calling method name</param>
+            <param name="forceDelete">Force deletion (ignore KeepDB)</param>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.GetProteinCountCached">
+            <summary>
+            Get the total number of cached proteins
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.GetCachedProteins(System.Int32,System.Int32)">
+            <summary>
+            Get the list of cached proteins
+            </summary>
+            <param name="startIndex"></param>
+            <param name="endIndex"></param>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.IsFastaFile(System.String)">
+            <summary>
+            Examines the file's extension and true if it ends in .fasta or .fsa or .faa
+            </summary>
+            <param name="filePath"></param>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.clsProteinFileDataCache.ParseProteinFile(System.String)">
+            <summary>
+            Parse a protein file to cache proteins
+            </summary>
+            <param name="proteinInputFilePath"></param>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions">
+            <summary>
+            Protein coverage summarizer options
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideFileColumnOrderingCode">
+            <summary>
+            Peptide file column order
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideFileColumnOrderingCode.SequenceOnly">
+            <summary>
+            The first column is peptide sequence; ignore other columns
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideFileColumnOrderingCode.ProteinName_PeptideSequence">
+            <summary>
+            Protein name in the first column, peptide sequence in the second column
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideFileColumnOrderingCode.UseHeaderNames">
+            <summary>
+            Examine header names to find the peptide and protein columns
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.DebugMode">
+            <summary>
+            When true, show debug messages
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.IgnoreILDifferences">
+            <summary>
+            When true, treat I and L residues equally
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.KeepDB">
+            <summary>
+            When this is True, the SQLite Database will not be deleted after processing finishes
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.MapFileIncludesPrefixAndSuffixColumns">
+            <summary>
+            When true, add columns Prefix and Suffix to the protein to peptide map file
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.MatchPeptidePrefixAndSuffixToProtein">
+            <summary>
+            When true, require that each peptide's prefix and suffix letters match the protein sequence
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.OutputDirectoryPath">
+            <summary>
+            Output directory path
+            </summary>
+            <remarks>Leave empty to auto-define</remarks>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.OutputProteinSequence">
+            <summary>
+            When true, include the protein sequence in the protein coverage output file
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideFileFormatCode">
+            <summary>
+            Peptide file column order
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideFileSkipFirstLine">
+            <summary>
+            When true, skip the first line of the peptide file
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideInputFileDelimiter">
+            <summary>
+            Peptide file column delimiter (default is tab)
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.PeptideInputFilePath">
+            <summary>
+            Peptide input file path
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.ProteinInputFilePath">
+            <summary>
+            Protein input file path
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.ProteinDataOptions">
+            <summary>
+            Protein data cache options
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.RemoveSymbolCharacters">
+            <summary>
+            When true, remove symbol characters from peptide sequences (default is true)
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.SaveProteinToPeptideMappingFile">
+            <summary>
+            Save the protein to peptide map file
+            </summary>
+            <remarks>The filename is auto-defined as the input file name, but with suffix _ProteinToPeptideMapping.txt</remarks>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.SaveSourceDataPlusProteinsFile">
+            <summary>
+            Create a new file that matches the input file, but has protein name appended
+            </summary>
+            <remarks>The filename is auto-defined as the input file name, but with suffix _AllProteins.txt</remarks>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.SearchAllProteinsForPeptideSequence">
+            <summary>
+            When true, search all proteins for each peptide, ignoring any protein names listed in the input file
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.SearchAllProteinsSkipCoverageComputationSteps">
+            <summary>
+            When true, skip coverage computation steps (saves memory)
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.TrackPeptideCounts">
+            <summary>
+            Track peptide counts
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.UseLeaderSequenceHashTable">
+            <summary>
+            Use the leader sequence hash table (dramatically speeds up the search)
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.ProteinCoverageSummarizerOptions.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:ProteinCoverageSummarizer.ProteinDataCacheOptions">
+            <summary>
+            Protein data cache options
+            </summary>
+        </member>
+        <member name="F:ProteinCoverageSummarizer.ProteinDataCacheOptions.mDelimitedInputFileDelimiter">
+            <summary>
+            Delimiter character for delimited protein files
+            </summary>
+            <remarks>Only used for delimited protein input files, not for FASTA files</remarks>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.AssumeDelimitedFile">
+            <summary>
+            When True, assume the input file is a tab-delimited text file
+            </summary>
+            <remarks>Ignored if AssumeFastaFile is True</remarks>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.AssumeFastaFile">
+            <summary>
+            When True, assume the input file is a FASTA text file
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.ChangeProteinSequencesToLowercase">
+            <summary>
+            When true, change protein sequences to lowercase
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.ChangeProteinSequencesToUppercase">
+            <summary>
+            When true, change protein sequences to uppercase
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.DelimitedInputFileDelimiter">
+            <summary>
+            Delimiter character for delimited protein files
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.DelimitedFileFormatCode">
+            <summary>
+            Delimited file format
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.DelimitedFileSkipFirstLine">
+            <summary>
+            When true, skip the first line of a delimited protein file
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.KeepDB">
+            <summary>
+            When this is True, the SQLite Database will not be deleted after processing finishes
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.RemoveSymbolCharacters">
+            <summary>
+            When true, remove symbol characters from proteins
+            </summary>
+        </member>
+        <member name="P:ProteinCoverageSummarizer.ProteinDataCacheOptions.IgnoreILDifferences">
+            <summary>
+            When true, treat I and L residues equally
+            </summary>
+        </member>
+        <member name="M:ProteinCoverageSummarizer.ProteinDataCacheOptions.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+    </members>
 </doc>
